@@ -5,7 +5,10 @@ import java.io.PrintWriter;
 
 public class CS580GL
 {
-	// Allocates memory for the frame buffer, an array of 32-bit RGBA pixels (8-bits per channel) and a 32-bit depth value
+
+	// Allocates memory for the frame buffer, an array of 32-bit RGBA pixels
+	// (8-bits per channel) and a 32-bit depth value
+	// TODO CS580GL.NewFrameBuffer(): remaining test
 	public boolean NewFrameBuffer(FrameBuffer framebuffer, int width, int height)
 	{
 		try
@@ -27,7 +30,8 @@ public class CS580GL
 		try
 		{
 			// if xRes or yRes is smaller than 0, than xres or yres = 0
-			// if xRes or y Res is larger than MAXXRES or MAXYRES, than xres = MAXXRES or yres = MAXYRES
+			// if xRes or y Res is larger than MAXXRES or MAXYRES, than xres =
+			// MAXXRES or yres = MAXYRES
 			display.dispClass = dispClass;
 			xRes = xRes < 0 ? 0 : (xRes > Display.MAXXRES ? Display.MAXXRES : xRes);
 			yRes = yRes < 0 ? 0 : (yRes > Display.MAXYRES ? Display.MAXYRES : yRes);
@@ -45,6 +49,7 @@ public class CS580GL
 	}
 
 	// Frees up the memory allocated to a frame buffer
+	// TODO CS580GL.FreeFrameBuffer(): remaining test
 	public boolean FreeFrameBuffer(FrameBuffer frameBuffer)
 	{
 		try
@@ -94,7 +99,8 @@ public class CS580GL
 		return false;
 	}
 
-	// Sets the corresponding pixel in a Display object's frame buffer to the desired values
+	// Sets the corresponding pixel in a Display object's frame buffer to the
+	// desired values
 	public boolean SetDisplayPixel(Display display, int i, int j, short r, short g, short b, short a, int z)
 	{
 		try
@@ -128,7 +134,8 @@ public class CS580GL
 		return false;
 	}
 
-	// Writes the pixel values from a Display object's frame buffer to a PPM image file
+	// Writes the pixel values from a Display object's frame buffer to a PPM
+	// image file
 	// TODO CS580GL.FlushDisplayToPPMFile(): optimize this function
 	public boolean FlushDisplayToPPMFile(FileOutputStream outfile, Display display)
 	{
@@ -166,6 +173,36 @@ public class CS580GL
 			System.out.println("Error in CS580GL.FlushDisplayToPPMFile()");
 			e.printStackTrace();
 		}
+		return false;
+	}
+
+	// TODO CS580GL.NewRender(): finish this function
+	boolean NewRender(Render render, int renderClass, Display display)
+	{
+		return false;
+	}
+
+	// TODO CS580GL.FreeRender(): finish this function
+	boolean FreeRender(Render render)
+	{
+		return false;
+	}
+
+	// TODO CS580GL.BeginRender(): finish this function
+	boolean BeginRender(Render render)
+	{
+		return false;
+	}
+
+	// TODO CS580GL.PutAttribute(): finish this function
+	boolean PutAttribute(Render render, int numAttributes, int[] nameList, float[][][] valueList)
+	{
+		return false;
+	}
+
+	// TODO CS580GL.GzPutTriangle(): finish this function
+	boolean GzPutTriangle(Render render, int numParts, int[] nameList, float[][][] valueList)
+	{
 		return false;
 	}
 }
