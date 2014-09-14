@@ -4,54 +4,26 @@ public class Render
 {
 	public static int MATLEVELS = 10; // how many matrix pushes allowed
 	public static int MAX_LIGHTS = 10; // how many lights allowed
+	public static int GZ_Z_BUFFER_RENDER = 1; // one type of renderClass
+	public static int GZ_POSITION = 1; // one type of nameList for putAttr and putTri
 
 	public int renderClass;
 	public Display display;
 	public boolean open;
 	public Camera camera;
 	public short matlevel; // top of stack - current xform
-	public Matrix[] Ximage; // stack of xforms (Xsm)
-	public Matrix[] Xnorm; // xforms for norms (Xim)
-	public Matrix Xsp; // NDC to screen (pers-to-screen)
-	public Color flatcolor; // color state for flat shaded triangles
+	public float[][][] Ximage = new float[MATLEVELS][4][4]; // stack of xforms (Xsm)
+	public float[][][] Xnorm = new float[MATLEVELS][4][4]; // xforms for norms (Xim)
+	public float[][] Xsp = new float[4][4]; // NDC to screen (pers-to-screen)
+	public float[] flatcolor = new float[3]; // color state for flat shaded triangles
 	public int interp_mode;
 	public int numlights;
-	public Light[] lights;
+	public Light[] lights = new Light[MAX_LIGHTS];
 	public Light ambientlight;
-	public Color Ka, Kd, Ks;
+	public float[] Ka = new float[3], Kd = new float[3], Ks = new float[3];
 	public float spec; // specular power
 
-	public void tex_fun(float u, float v, Color color)
+	public void tex_fun(float u, float v, float[] color)
 	{
-	}
-
-	public static class Matrix
-	{
-		public float[][] value = new float[4][4];
-	}
-
-	public static class Color
-	{
-		public float[] value = new float[3];
-	}
-
-	public Render()
-	{
-		Ximage = new Matrix[MATLEVELS];
-		Xnorm = new Matrix[MATLEVELS];
-		for (int i = 0; i < MATLEVELS; i++)
-		{
-			Ximage[i] = new Matrix();
-			Xnorm[i] = new Matrix();
-		}
-		lights = new Light[MAX_LIGHTS];
-		for (int i = 0; i < lights.length; i++)
-			lights[i] = new Light();
-		Xsp = new Matrix();
-		flatcolor = new Color();
-		Ka = new Color();
-		Kd = new Color();
-		Ks = new Color();
-
 	}
 }

@@ -31,10 +31,7 @@ public class Run
 				System.exit(-1);
 
 			// I/O File open
-			BufferedReader br;
-
-			br = new BufferedReader(new FileReader(inFileName));
-
+			BufferedReader br = new BufferedReader(new FileReader(inFileName));
 			FileOutputStream fos = new FileOutputStream(outFileName);
 
 			int ulx, uly, lrx, lry;
@@ -76,7 +73,7 @@ public class Run
 			System.out.println("please check input file \"rects\"");
 			e.printStackTrace();
 		}
-		catch (IOException e)
+		catch (Exception e)
 		{
 			e.printStackTrace();
 		}

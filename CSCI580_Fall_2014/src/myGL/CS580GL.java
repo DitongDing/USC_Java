@@ -6,8 +6,7 @@ import java.io.PrintWriter;
 public class CS580GL
 {
 
-	// Allocates memory for the frame buffer, an array of 32-bit RGBA pixels
-	// (8-bits per channel) and a 32-bit depth value
+	// Allocates memory for the frame buffer, an array of 32-bit RGBA pixels (8-bits per channel) and a 32-bit depth value
 	// TODO CS580GL.NewFrameBuffer(): remaining test
 	public boolean NewFrameBuffer(FrameBuffer framebuffer, int width, int height)
 	{
@@ -30,8 +29,7 @@ public class CS580GL
 		try
 		{
 			// if xRes or yRes is smaller than 0, than xres or yres = 0
-			// if xRes or y Res is larger than MAXXRES or MAXYRES, than xres =
-			// MAXXRES or yres = MAXYRES
+			// if xRes or y Res is larger than MAXXRES or MAXYRES, than xres = MAXXRES or yres = MAXYRES
 			display.dispClass = dispClass;
 			xRes = xRes < 0 ? 0 : (xRes > Display.MAXXRES ? Display.MAXXRES : xRes);
 			yRes = yRes < 0 ? 0 : (yRes > Display.MAXYRES ? Display.MAXYRES : yRes);
@@ -99,8 +97,7 @@ public class CS580GL
 		return false;
 	}
 
-	// Sets the corresponding pixel in a Display object's frame buffer to the
-	// desired values
+	// Sets the corresponding pixel in a Display object's frame buffer to the desired values
 	public boolean SetDisplayPixel(Display display, int i, int j, short r, short g, short b, short a, int z)
 	{
 		try
@@ -134,8 +131,7 @@ public class CS580GL
 		return false;
 	}
 
-	// Writes the pixel values from a Display object's frame buffer to a PPM
-	// image file
+	// Writes the pixel values from a Display object's frame buffer to a PPM image file
 	// TODO CS580GL.FlushDisplayToPPMFile(): optimize this function
 	public boolean FlushDisplayToPPMFile(FileOutputStream outfile, Display display)
 	{
@@ -176,32 +172,37 @@ public class CS580GL
 		return false;
 	}
 
+	// Malloc a renderer struct
 	// TODO CS580GL.NewRender(): finish this function
-	boolean NewRender(Render render, int renderClass, Display display)
+	public boolean NewRender(Render render, int renderClass, Display display)
 	{
 		return false;
 	}
 
+	// Free all renderer resources
 	// TODO CS580GL.FreeRender(): finish this function
-	boolean FreeRender(Render render)
+	public boolean FreeRender(Render render)
 	{
 		return false;
 	}
 
+	// Set up for start of each frame - init frame buffer
 	// TODO CS580GL.BeginRender(): finish this function
-	boolean BeginRender(Render render)
+	public boolean BeginRender(Render render)
 	{
 		return false;
 	}
 
+	// Set renderer attribute states (e.g.: GZ_RGB_COLOR default color)
 	// TODO CS580GL.PutAttribute(): finish this function
-	boolean PutAttribute(Render render, int numAttributes, int[] nameList, float[][][] valueList)
+	public boolean PutAttribute(Render render, int numAttributes, int[] nameList, Object[] valueList)
 	{
 		return false;
 	}
 
-	// TODO CS580GL.GzPutTriangle(): finish this function
-	boolean GzPutTriangle(Render render, int numParts, int[] nameList, float[][][] valueList)
+	// Invoke the scan converter and return an error code
+	// TODO CS580GL.PutTriangle(): finish this function
+	public boolean PutTriangle(Render render, int numParts, int[] nameList, Object[] valueList)
 	{
 		return false;
 	}
