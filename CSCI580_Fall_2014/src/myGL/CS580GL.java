@@ -5,7 +5,6 @@ import java.io.PrintWriter;
 
 public class CS580GL
 {
-
 	// Allocates memory for the frame buffer, an array of 32-bit RGBA pixels (8-bits per channel) and a 32-bit depth value
 	// TODO CS580GL.NewFrameBuffer(): remaining test
 	public boolean NewFrameBuffer(FrameBuffer framebuffer, int width, int height)
@@ -98,12 +97,12 @@ public class CS580GL
 	}
 
 	// Sets the corresponding pixel in a Display object's frame buffer to the desired values
-	public boolean SetDisplayPixel(Display display, int i, int j, short r, short g, short b, short a, int z)
+	public boolean SetDisplayPixel(Display display, int x, int y, short r, short g, short b, short a, int z)
 	{
 		try
 		{
 			Pixel pixel = new Pixel(r, g, b, a, z);
-			display.setPixel(i, j, pixel);
+			display.setPixel(x, y, pixel);
 			return true;
 		}
 		catch (Exception e)
@@ -172,31 +171,90 @@ public class CS580GL
 		return false;
 	}
 
-	// Malloc a renderer struct
-	// TODO CS580GL.NewRender(): finish this function
+	// Malloc a renderer struct, keep closed until BeginRender inits are done
+	// check for legal class GZ_Z_BUFFER_RENDER
+	// TODO CS580GL.NewRender(): check this function
 	public boolean NewRender(Render render, int renderClass, Display display)
 	{
+		try
+		{
+			// check for legal. for more class, just add conditions
+			if (renderClass != Render.GZ_Z_BUFFER_RENDER)
+				throw new Exception("render class error in new render");
+
+			render.renderClass = renderClass;
+			render.display = display;
+			render.open = false;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.NewRender()");
+			e.printStackTrace();
+		}
 		return false;
 	}
 
 	// Free all renderer resources
-	// TODO CS580GL.FreeRender(): finish this function
+	// TODO CS580GL.FreeRender(): check this function
 	public boolean FreeRender(Render render)
 	{
+		try
+		{
+			render.display = null;
+			render.open = false;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.FreeRender()");
+			e.printStackTrace();
+		}
 		return false;
 	}
 
 	// Set up for start of each frame - init frame buffer
-	// TODO CS580GL.BeginRender(): finish this function
+	// TODO CS580GL.BeginRender(): do not understand this function
 	public boolean BeginRender(Render render)
 	{
+		try
+		{
+			render.z_buf = new float[render.display.xres][render.display.yres];
+			for (int i = 0; i < render.display.xres; i++)
+				for (int j = 0; j < render.display.yres; j++)
+					render.z_buf[i][j] = Float.MAX_VALUE;
+			render.open = true;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.BeginRender()");
+			e.printStackTrace();
+		}
 		return false;
 	}
 
 	// Set renderer attribute states (e.g.: GZ_RGB_COLOR default color)
-	// TODO CS580GL.PutAttribute(): finish this function
+	// TODO CS580GL.PutAttribute(): check this function
 	public boolean PutAttribute(Render render, int numAttributes, int[] nameList, Object[] valueList)
 	{
+		try
+		{
+			if (render.open)
+				for (int i = 0; i < numAttributes; i++)
+				{
+					if (nameList[i] == Render.GZ_RGB_COLOR)
+						render.flatcolor = (float[]) valueList[i];
+					else
+						throw new Exception("attr name error in put attr for render");
+				}
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.PutAttribute()");
+			e.printStackTrace();
+		}
 		return false;
 	}
 
@@ -204,6 +262,101 @@ public class CS580GL
 	// TODO CS580GL.PutTriangle(): finish this function
 	public boolean PutTriangle(Render render, int numParts, int[] nameList, Object[] valueList)
 	{
+		try
+		{
+			if (render.open)
+				for (int i = 0; i < numParts; i++)
+				{
+					// TODO CS580GL.PutTriangle(): may be changed later. consider to interpolate Z to xOy plane now, no camera position, fov, etc.
+					// Apply LEE, not SLR. Try SLR later
+					if (nameList[i] == Render.GZ_POSITION)
+					{
+						float[][] vertexList = (float[][]) valueList;
+						// if there are two vertexes with same y value, then mark the one with larger x value as up
+						// Assume CCW in x forward right and y forward down is up->left->right->up.
+						int right = 0, left, up = 0;
+						float ulx = vertexList[0][Render.X], uly = vertexList[0][Render.Y], lrx = vertexList[0][Render.X], lry = vertexList[0][Render.Y];
+						for (int j = 1; j < 3; j++)
+						{
+							if (vertexList[j][Render.Y] < vertexList[up][Render.Y])
+								up = j;
+							else if (vertexList[j][Render.Y] == vertexList[up][Render.Y])
+							{
+								if (vertexList[j][Render.X] > vertexList[up][Render.X])
+									up = j;
+								else if (vertexList[j][Render.X] == vertexList[up][Render.X])
+									throw new Exception("two same nodes in one triangle");
+							}
+							if (vertexList[j][Render.X] < ulx)
+								ulx = vertexList[j][Render.X];
+							if (vertexList[j][Render.X] > lrx)
+								lrx = vertexList[j][Render.X];
+							if (vertexList[j][Render.Y] < uly)
+								uly = vertexList[j][Render.Y];
+							if (vertexList[j][Render.Y] < lry)
+								lry = vertexList[j][Render.Y];
+						}
+						// initialize right and left with different value;
+						if (up == 0)
+							right = 1;
+						left = 3 - up - right;
+						if (vertexList[right][Render.X] < vertexList[left][Render.X]
+								|| (vertexList[right][Render.X] == vertexList[left][Render.X] && vertexList[right][Render.Y] > vertexList[left][Render.Y]))
+						{
+							int j = right;
+							right = left;
+							left = j;
+						}
+
+						float[] A = new float[3];
+						float[] B = new float[3];
+						float[] C = new float[3];
+						A[0] = vertexList[left][Render.Y] - vertexList[up][Render.Y];
+						A[1] = vertexList[right][Render.Y] - vertexList[left][Render.Y];
+						A[2] = vertexList[up][Render.Y] - vertexList[right][Render.Y];
+						B[0] = vertexList[up][Render.X] - vertexList[left][Render.X];
+						B[1] = vertexList[left][Render.X] - vertexList[right][Render.X];
+						B[2] = vertexList[right][Render.X] - vertexList[up][Render.X];
+						C[0] = -(A[0] * vertexList[up][Render.X] + B[0] * vertexList[up][Render.Y]);
+						C[1] = -(A[1] * vertexList[left][Render.X] + B[1] * vertexList[left][Render.Y]);
+						C[2] = -(A[2] * vertexList[right][Render.X] + B[2] * vertexList[right][Render.Y]);
+
+						int x1 = (int) Math.ceil(ulx), x2 = (int) Math.floor(lrx), y1 = (int) Math.ceil(uly), y2 = (int) Math.floor(lry);
+						for(int Y = y1; Y < y2; Y++)
+						{
+							for(int X = x1; X < x2; X++)
+								if(PixelJudge_LEE(A[0],B[0],C[0],X,Y)&&PixelJudge_LEE(A[1],B[1],C[1],X,Y)&&PixelJudge_LEE(A[2],B[2],C[2],X,Y))
+								{
+									float Z = ;
+									if(render.z_buf[X][Y] > Z)
+									{
+										SetDisplayPixel(render.display, X, Y, ctoi(render.flatcolor[Render.R]), ctoi(render.flatcolor[Render.G]), ctoi(render.flatcolor[Render.B]), (short) 1, 0);
+										render.z_buf[X][Y] = Z;
+									}
+								}
+						}
+					}
+					else
+						throw new Exception("attr name error in put tri for render");
+				}
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.PutTriangle()");
+			e.printStackTrace();
+		}
 		return false;
+	}
+
+	private boolean PixelJudge_LEE(float A, float B, float C, int X, int Y)
+	{
+		return A * X + B * Y + C > 0;
+	}
+
+	// convert float color to GzIntensity short
+	private short ctoi(float color)
+	{
+		return (short) ((int) (color * ((1 << 12) - 1)));
 	}
 }

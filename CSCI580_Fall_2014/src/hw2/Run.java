@@ -86,7 +86,7 @@ public class Run
 				// Set up shading attributes for each triangle
 				shade2(normalList[0], color);// shade based on the norm of vert0
 				valueListColor[0] = color;
-				nameListColor[0] = Constant.GZ_RGB_COLOR;
+				nameListColor[0] = Render.GZ_RGB_COLOR;
 				method.PutAttribute(m_pRender, 1, nameListColor, valueListColor);
 
 				// Set the value pointers to the first vertex of the triangle, then feed it to the renderer
