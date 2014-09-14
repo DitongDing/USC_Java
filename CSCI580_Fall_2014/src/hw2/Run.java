@@ -10,8 +10,7 @@ import myGL.*;
 
 public class Run
 {
-	// public static String inFileName = "pot4.screen.asc";
-	public static String inFileName = "test.txt";
+	public static String inFileName = "pot4.screen.asc";
 	public static String outFileName = "output.ppm";
 
 	public static void main(String[] args)
@@ -21,7 +20,7 @@ public class Run
 			CS580GL method = new CS580GL();
 			Display m_pDisplay = new Display();
 			Render m_pRender = new Render();
-			Pixel defaultPixel = new Pixel((short) 0, (short) 0, (short) 0, (short) 1, 0);
+			Pixel defaultPixel = new Pixel((short) 1000, (short) 1000, (short) 1000, (short) 1, 0);
 
 			int[] nameListTriangle = new int[3]; // vertex attribute names
 			Object[] valueListTriangle = new Object[3]; // vertex attribute pointers

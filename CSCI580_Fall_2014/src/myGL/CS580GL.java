@@ -173,7 +173,6 @@ public class CS580GL
 
 	// Malloc a renderer struct, keep closed until BeginRender inits are done
 	// check for legal class GZ_Z_BUFFER_RENDER
-	// TODO CS580GL.NewRender(): check this function
 	public boolean NewRender(Render render, int renderClass, Display display)
 	{
 		try
@@ -196,7 +195,6 @@ public class CS580GL
 	}
 
 	// Free all renderer resources
-	// TODO CS580GL.FreeRender(): check this function
 	public boolean FreeRender(Render render)
 	{
 		try
@@ -235,7 +233,6 @@ public class CS580GL
 	}
 
 	// Set renderer attribute states (e.g.: GZ_RGB_COLOR default color)
-	// TODO CS580GL.PutAttribute(): check this function
 	public boolean PutAttribute(Render render, int numAttributes, int[] nameList, Object[] valueList)
 	{
 		try
@@ -259,7 +256,7 @@ public class CS580GL
 	}
 
 	// Invoke the scan converter and return an error code
-	// TODO CS580GL.PutTriangle(): finish this function
+	// TODO CS580GL.PutTriangle(): There is still a little difference between the original pic. Why?
 	public boolean PutTriangle(Render render, int numParts, int[] nameList, Object[] valueList)
 	{
 		try
@@ -279,7 +276,7 @@ public class CS580GL
 						for (int j = 0; j < vertexList.length - 1; j++)
 							for (int k = j + 1; k < vertexList.length; k++)
 							{
-								if(vertexList[i][Render.X] == vertexList[j][Render.X] && vertexList[i][Render.Y] == vertexList[j][Render.Y])
+								if(vertexList[j][Render.X] == vertexList[k][Render.X] && vertexList[j][Render.Y] == vertexList[k][Render.Y])
 								{
 									flag = true;
 									break;
@@ -287,21 +284,16 @@ public class CS580GL
 							}
 						if(flag)
 							break;
-						// if there are two vertexes with same y value, then mark the one with larger x value as up
-						// Assume CCW in x forward right and y forward down is up->left->right->up.
-						int right = 0, left, up = 0;
+						// Assume CCW in x forward right and y forward down is first->second->third->first.
+						// the first vertex is the vertex with minimum y value
+						// if there are two vertexes with same y value, then mark the one with larger x value as firsts
+						int first = 0, second = 0, third = 0;
 						float ulx = vertexList[0][Render.X], uly = vertexList[0][Render.Y], lrx = vertexList[0][Render.X], lry = vertexList[0][Render.Y];
-						for (int j = 1; j < 3; j++)
+						// choose the vertex for first in CCW.
+						for (int j = 1; j < vertexList.length; j++)
 						{
-							if (vertexList[j][Render.Y] < vertexList[up][Render.Y])
-								up = j;
-							else if (vertexList[j][Render.Y] == vertexList[up][Render.Y])
-							{
-								if (vertexList[j][Render.X] > vertexList[up][Render.X])
-									up = j;
-								else if (vertexList[j][Render.X] == vertexList[up][Render.X])
-									throw new Exception("two same nodes in one triangle");
-							}
+							if (vertexList[j][Render.Y] < vertexList[first][Render.Y] || (vertexList[j][Render.Y] == vertexList[first][Render.Y] && vertexList[j][Render.X] > vertexList[first][Render.X]))
+								first = j;
 							if (vertexList[j][Render.X] < ulx)
 								ulx = vertexList[j][Render.X];
 							if (vertexList[j][Render.X] > lrx)
@@ -311,63 +303,67 @@ public class CS580GL
 							if (vertexList[j][Render.Y] > lry)
 								lry = vertexList[j][Render.Y];
 						}
-						// initialize right and left with different value;
-						if (up == 0)
-							right = 1;
-						left = 3 - up - right;
-						if (vertexList[right][Render.X] < vertexList[left][Render.X]
-								|| (vertexList[right][Render.X] == vertexList[left][Render.X] && vertexList[right][Render.Y] > vertexList[left][Render.Y]))
+						// initialize second and third with different value;
+						if (first == 0)
+							second = 1;
+						third = 3 - first - second;
+						// judge the right sequence by vector.
+						float dx1 = vertexList[second][Render.X]-vertexList[first][Render.X];
+						float dy1 = vertexList[second][Render.Y]-vertexList[first][Render.Y];
+						float dx2 = vertexList[third][Render.X]-vertexList[first][Render.X];
+						float dy2 = vertexList[third][Render.Y]-vertexList[first][Render.Y];
+						if(dx1/Math.sqrt(dx1*dx1+dy1*dy1) > dx2 / Math.sqrt(dx2*dx2+dy2*dy2))
 						{
-							int j = right;
-							right = left;
-							left = j;
+							int j = second;
+							second = third;
+							third = j;
 						}
 
 						float[] A = new float[3];
 						float[] B = new float[3];
 						float[] C = new float[3];
-						A[0] = vertexList[left][Render.Y] - vertexList[up][Render.Y];
-						A[1] = vertexList[right][Render.Y] - vertexList[left][Render.Y];
-						A[2] = vertexList[up][Render.Y] - vertexList[right][Render.Y];
-						B[0] = vertexList[up][Render.X] - vertexList[left][Render.X];
-						B[1] = vertexList[left][Render.X] - vertexList[right][Render.X];
-						B[2] = vertexList[right][Render.X] - vertexList[up][Render.X];
-						C[0] = -(A[0] * vertexList[up][Render.X] + B[0] * vertexList[up][Render.Y]);
-						C[1] = -(A[1] * vertexList[left][Render.X] + B[1] * vertexList[left][Render.Y]);
-						C[2] = -(A[2] * vertexList[right][Render.X] + B[2] * vertexList[right][Render.Y]);
+						A[0] = vertexList[second][Render.Y] - vertexList[first][Render.Y];
+						A[1] = vertexList[third][Render.Y] - vertexList[second][Render.Y];
+						A[2] = vertexList[first][Render.Y] - vertexList[third][Render.Y];
+						B[0] = vertexList[first][Render.X] - vertexList[second][Render.X];
+						B[1] = vertexList[second][Render.X] - vertexList[third][Render.X];
+						B[2] = vertexList[third][Render.X] - vertexList[first][Render.X];
+						C[0] = -(A[0] * vertexList[first][Render.X] + B[0] * vertexList[first][Render.Y]);
+						C[1] = -(A[1] * vertexList[second][Render.X] + B[1] * vertexList[second][Render.Y]);
+						C[2] = -(A[2] * vertexList[third][Render.X] + B[2] * vertexList[third][Render.Y]);
 
 						int x1 = (int) Math.floor(ulx), x2 = (int) Math.ceil(lrx), y1 = (int) Math.floor(uly), y2 = (int) Math.ceil(lry);
-						x1 = x1 < 0 ? 0 : (x1 >= render.display.xres ? render.display.xres - 1 : x1);
-						x2 = x2 < 0 ? 0 : (x2 >= render.display.xres ? render.display.xres - 1 : x2);
-						y1 = y1 < 0 ? 0 : (y1 >= render.display.yres ? render.display.yres - 1 : y1);
-						y2 = y2 < 0 ? 0 : (y2 >= render.display.yres ? render.display.yres - 1 : y2);
+						x1 = x1 < 0 ? 0 : (x1 >= render.display.xres ? render.display.xres : x1);
+						x2 = x2 < 0 ? 0 : (x2 >= render.display.xres ? render.display.xres : x2);
+						y1 = y1 < 0 ? 0 : (y1 >= render.display.yres ? render.display.yres : y1);
+						y2 = y2 < 0 ? 0 : (y2 >= render.display.yres ? render.display.yres : y2);
 						for (int Y = y1; Y < y2; Y++)
 						{
 							float XL, XR, ZL, ZR;
 							float alpha;
-							if (vertexList[left][Render.Y] >= Y)
+							if (vertexList[second][Render.Y] >= Y)
 							{
-								alpha = (Y - vertexList[up][Render.Y]) / A[0];
-								XL = alpha * vertexList[left][Render.X] + (1 - alpha) * vertexList[up][Render.X];
-								ZL = alpha * vertexList[left][Render.Z] + (1 - alpha) * vertexList[up][Render.Z];
+								alpha = (Y - vertexList[first][Render.Y]) / A[0];
+								XL = alpha * vertexList[second][Render.X] + (1 - alpha) * vertexList[first][Render.X];
+								ZL = alpha * vertexList[second][Render.Z] + (1 - alpha) * vertexList[first][Render.Z];
 							}
 							else
 							{
-								alpha = (Y - vertexList[left][Render.Y]) / A[1];
-								XL = alpha * vertexList[right][Render.X] + (1 - alpha) * vertexList[left][Render.X];
-								ZL = alpha * vertexList[right][Render.Z] + (1 - alpha) * vertexList[left][Render.Z];
+								alpha = (Y - vertexList[second][Render.Y]) / A[1];
+								XL = alpha * vertexList[third][Render.X] + (1 - alpha) * vertexList[second][Render.X];
+								ZL = alpha * vertexList[third][Render.Z] + (1 - alpha) * vertexList[second][Render.Z];
 							}
-							if (vertexList[right][Render.Y] >= Y)
+							if (vertexList[third][Render.Y] >= Y)
 							{
-								alpha = (Y - vertexList[right][Render.Y]) / A[2];
-								XR = alpha * vertexList[up][Render.X] + (1 - alpha) * vertexList[right][Render.X];
-								ZR = alpha * vertexList[up][Render.Z] + (1 - alpha) * vertexList[right][Render.Z];
+								alpha = (Y - vertexList[third][Render.Y]) / A[2];
+								XR = alpha * vertexList[first][Render.X] + (1 - alpha) * vertexList[third][Render.X];
+								ZR = alpha * vertexList[first][Render.Z] + (1 - alpha) * vertexList[third][Render.Z];
 							}
 							else
 							{
-								alpha = (Y - vertexList[left][Render.Y]) / A[1];
-								XR = alpha * vertexList[right][Render.X] + (1 - alpha) * vertexList[left][Render.X];
-								ZR = alpha * vertexList[right][Render.Z] + (1 - alpha) * vertexList[left][Render.Z];
+								alpha = (Y - vertexList[second][Render.Y]) / A[1];
+								XR = alpha * vertexList[third][Render.X] + (1 - alpha) * vertexList[second][Render.X];
+								ZR = alpha * vertexList[third][Render.Z] + (1 - alpha) * vertexList[second][Render.Z];
 							}
 							for (int X = x1; X < x2; X++)
 								if (PixelJudge_LEE(A[0], B[0], C[0], X, Y) && PixelJudge_LEE(A[1], B[1], C[1], X, Y) && PixelJudge_LEE(A[2], B[2], C[2], X, Y))
@@ -402,7 +398,7 @@ public class CS580GL
 
 	private boolean PixelJudge_LEE(float A, float B, float C, int X, int Y)
 	{
-		return A * X + B * Y + C >= 0;
+		return A * X + B * Y + C > 0;
 	}
 
 	// convert float color to GzIntensity short
