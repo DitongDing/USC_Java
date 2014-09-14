@@ -111,7 +111,7 @@ public class Run
 		}
 		catch (FileNotFoundException e)
 		{
-			System.out.println("please check input file \"rects\"");
+			System.out.println("please check input file \"pot4.screen.asc\"");
 			e.printStackTrace();
 		}
 		catch (Exception e)
