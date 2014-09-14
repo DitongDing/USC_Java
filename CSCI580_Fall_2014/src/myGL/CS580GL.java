@@ -268,10 +268,25 @@ public class CS580GL
 				for (int i = 0; i < numParts; i++)
 				{
 					// TODO CS580GL.PutTriangle(): may be changed later. consider to interpolate Z to xOy plane now, no camera position, fov, etc.
+					// Interpolate to X:[0, 255], Y:[0,255];
 					// Apply LEE, not SLR. Try SLR later
 					if (nameList[i] == Render.GZ_POSITION)
 					{
-						float[][] vertexList = (float[][]) valueList;
+						float[][] vertexList = (float[][]) valueList[i];
+						// check if there are two vertexes has same (X,Y), which means this tri is a line in xOy plane
+						// right now I just ignore this kind of tri.
+						boolean flag = false;
+						for (int j = 0; j < vertexList.length - 1; j++)
+							for (int k = j + 1; k < vertexList.length; k++)
+							{
+								if(vertexList[i][Render.X] == vertexList[j][Render.X] && vertexList[i][Render.Y] == vertexList[j][Render.Y])
+								{
+									flag = true;
+									break;
+								}
+							}
+						if(flag)
+							break;
 						// if there are two vertexes with same y value, then mark the one with larger x value as up
 						// Assume CCW in x forward right and y forward down is up->left->right->up.
 						int right = 0, left, up = 0;
@@ -293,7 +308,7 @@ public class CS580GL
 								lrx = vertexList[j][Render.X];
 							if (vertexList[j][Render.Y] < uly)
 								uly = vertexList[j][Render.Y];
-							if (vertexList[j][Render.Y] < lry)
+							if (vertexList[j][Render.Y] > lry)
 								lry = vertexList[j][Render.Y];
 						}
 						// initialize right and left with different value;
@@ -321,20 +336,56 @@ public class CS580GL
 						C[1] = -(A[1] * vertexList[left][Render.X] + B[1] * vertexList[left][Render.Y]);
 						C[2] = -(A[2] * vertexList[right][Render.X] + B[2] * vertexList[right][Render.Y]);
 
-						int x1 = (int) Math.ceil(ulx), x2 = (int) Math.floor(lrx), y1 = (int) Math.ceil(uly), y2 = (int) Math.floor(lry);
-						for(int Y = y1; Y < y2; Y++)
+						int x1 = (int) Math.floor(ulx), x2 = (int) Math.ceil(lrx), y1 = (int) Math.floor(uly), y2 = (int) Math.ceil(lry);
+						x1 = x1 < 0 ? 0 : (x1 >= render.display.xres ? render.display.xres - 1 : x1);
+						x2 = x2 < 0 ? 0 : (x2 >= render.display.xres ? render.display.xres - 1 : x2);
+						y1 = y1 < 0 ? 0 : (y1 >= render.display.yres ? render.display.yres - 1 : y1);
+						y2 = y2 < 0 ? 0 : (y2 >= render.display.yres ? render.display.yres - 1 : y2);
+						for (int Y = y1; Y < y2; Y++)
 						{
-							for(int X = x1; X < x2; X++)
-								if(PixelJudge_LEE(A[0],B[0],C[0],X,Y)&&PixelJudge_LEE(A[1],B[1],C[1],X,Y)&&PixelJudge_LEE(A[2],B[2],C[2],X,Y))
+							float XL, XR, ZL, ZR;
+							float alpha;
+							if (vertexList[left][Render.Y] >= Y)
+							{
+								alpha = (Y - vertexList[up][Render.Y]) / A[0];
+								XL = alpha * vertexList[left][Render.X] + (1 - alpha) * vertexList[up][Render.X];
+								ZL = alpha * vertexList[left][Render.Z] + (1 - alpha) * vertexList[up][Render.Z];
+							}
+							else
+							{
+								alpha = (Y - vertexList[left][Render.Y]) / A[1];
+								XL = alpha * vertexList[right][Render.X] + (1 - alpha) * vertexList[left][Render.X];
+								ZL = alpha * vertexList[right][Render.Z] + (1 - alpha) * vertexList[left][Render.Z];
+							}
+							if (vertexList[right][Render.Y] >= Y)
+							{
+								alpha = (Y - vertexList[right][Render.Y]) / A[2];
+								XR = alpha * vertexList[up][Render.X] + (1 - alpha) * vertexList[right][Render.X];
+								ZR = alpha * vertexList[up][Render.Z] + (1 - alpha) * vertexList[right][Render.Z];
+							}
+							else
+							{
+								alpha = (Y - vertexList[left][Render.Y]) / A[1];
+								XR = alpha * vertexList[right][Render.X] + (1 - alpha) * vertexList[left][Render.X];
+								ZR = alpha * vertexList[right][Render.Z] + (1 - alpha) * vertexList[left][Render.Z];
+							}
+							for (int X = x1; X < x2; X++)
+								if (PixelJudge_LEE(A[0], B[0], C[0], X, Y) && PixelJudge_LEE(A[1], B[1], C[1], X, Y) && PixelJudge_LEE(A[2], B[2], C[2], X, Y))
 								{
-									float Z = ;
-									if(render.z_buf[X][Y] > Z)
+									alpha = (X - XL) / (XR - XL);
+									float Z = alpha * ZR + (1 - alpha) * ZL;
+									if (render.z_buf[X][Y] > Z)
 									{
-										SetDisplayPixel(render.display, X, Y, ctoi(render.flatcolor[Render.R]), ctoi(render.flatcolor[Render.G]), ctoi(render.flatcolor[Render.B]), (short) 1, 0);
+										SetDisplayPixel(render.display, X, Y, ctoi(render.flatcolor[Render.R]), ctoi(render.flatcolor[Render.G]),
+												ctoi(render.flatcolor[Render.B]), (short) 1, 0);
 										render.z_buf[X][Y] = Z;
 									}
 								}
 						}
+					}
+					else if (nameList[i] == Render.GZ_NULL_TOKEN)
+					{
+						// Do nothing
 					}
 					else
 						throw new Exception("attr name error in put tri for render");
@@ -351,7 +402,7 @@ public class CS580GL
 
 	private boolean PixelJudge_LEE(float A, float B, float C, int X, int Y)
 	{
-		return A * X + B * Y + C > 0;
+		return A * X + B * Y + C >= 0;
 	}
 
 	// convert float color to GzIntensity short

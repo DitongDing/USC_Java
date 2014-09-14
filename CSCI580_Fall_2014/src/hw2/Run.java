@@ -10,7 +10,8 @@ import myGL.*;
 
 public class Run
 {
-	public static String inFileName = "pot4.screen.asc";
+	// public static String inFileName = "pot4.screen.asc";
+	public static String inFileName = "test.txt";
 	public static String outFileName = "output.ppm";
 
 	public static void main(String[] args)
@@ -45,8 +46,8 @@ public class Run
 			status &= method.NewRender(m_pRender, Render.GZ_Z_BUFFER_RENDER, m_pDisplay);
 			status &= method.BeginRender(m_pRender);
 
-			if (status)
-				System.exit(-1);
+			if (!status)
+				throw new Exception("Initialize error");
 
 			// Tokens associated with triangle vertex values
 			nameListTriangle[0] = Render.GZ_POSITION; // define vert coordinates only
@@ -66,7 +67,7 @@ public class Run
 					if (string == null)
 						break;
 					st[count] = new StringTokenizer(string, " ");
-					if (st[count].countTokens() != 7)
+					if (st[count].countTokens() != 8)
 						break;
 				}
 				// meets end of file
@@ -105,7 +106,7 @@ public class Run
 			status &= method.FreeDisplay(m_pDisplay);
 
 			if (!status)
-				System.exit(-1);
+				throw new Exception("Finalize error");
 
 			System.out.println("finish!");
 		}
