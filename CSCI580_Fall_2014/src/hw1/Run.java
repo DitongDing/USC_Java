@@ -16,7 +16,7 @@ public class Run
 			CS580GL method = new CS580GL();
 			Display m_pDisplay = new Display();
 			boolean status;
-			Pixel defaultPixel = new Pixel((short) 0, (short) 0, (short) 0, (short) 1, 0);
+			Pixel defaultPixel = new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Float.MAX_VALUE);
 
 			status = true;
 

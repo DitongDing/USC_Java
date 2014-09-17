@@ -20,7 +20,7 @@ public class Run
 			CS580GL method = new CS580GL();
 			Display m_pDisplay = new Display();
 			Render m_pRender = new Render();
-			Pixel defaultPixel = new Pixel((short) 1000, (short) 1000, (short) 1000, (short) 1, 0);
+			Pixel defaultPixel = new Pixel((short) 1000, (short) 1000, (short) 1000, (short) 1, Float.MAX_VALUE);
 
 			int[] nameListTriangle = new int[3]; // vertex attribute names
 			Object[] valueListTriangle = new Object[3]; // vertex attribute pointers

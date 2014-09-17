@@ -44,8 +44,6 @@ public class Render
 	public Light ambientlight;
 	public float[] Ka = new float[3], Kd = new float[3], Ks = new float[3];
 	public float spec; // specular power
-	// z_buf added by Ditong Ding, ***** not part of original API *****
-	public float[][] z_buf;
 
 	public void tex_fun(float u, float v, float[] color)
 	{

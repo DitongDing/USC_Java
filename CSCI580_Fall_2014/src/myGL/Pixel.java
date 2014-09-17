@@ -6,13 +6,13 @@ public class Pixel
 	public short green;
 	public short blue;
 	public short alpha;
-	public int z; // signed z for clipping
+	public float z; // signed z for clipping. *****Ditong Ding***** Previously it is int, I change it to float.
 	
 	public Pixel()
 	{
 	}
 	
-	public Pixel(short red, short green, short blue, short alpha, int z)
+	public Pixel(short red, short green, short blue, short alpha, float z)
 	{
 		this.red = red;
 		this.green = green;

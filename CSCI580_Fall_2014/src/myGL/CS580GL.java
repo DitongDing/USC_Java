@@ -97,7 +97,7 @@ public class CS580GL
 	}
 
 	// Sets the corresponding pixel in a Display object's frame buffer to the desired values
-	public boolean SetDisplayPixel(Display display, int x, int y, short r, short g, short b, short a, int z)
+	public boolean SetDisplayPixel(Display display, int x, int y, short r, short g, short b, short a, float z)
 	{
 		try
 		{
@@ -211,16 +211,12 @@ public class CS580GL
 		return false;
 	}
 
-	// Set up for start of each frame - init frame buffer
+	// Set up for start of each frame
 	// TODO CS580GL.BeginRender(): do not understand this function
 	public boolean BeginRender(Render render)
 	{
 		try
 		{
-			render.z_buf = new float[render.display.xres][render.display.yres];
-			for (int i = 0; i < render.display.xres; i++)
-				for (int j = 0; j < render.display.yres; j++)
-					render.z_buf[i][j] = Float.MAX_VALUE;
 			render.open = true;
 			return true;
 		}
@@ -276,13 +272,13 @@ public class CS580GL
 						for (int j = 0; j < vertexList.length - 1; j++)
 							for (int k = j + 1; k < vertexList.length; k++)
 							{
-								if(vertexList[j][Render.X] == vertexList[k][Render.X] && vertexList[j][Render.Y] == vertexList[k][Render.Y])
+								if (vertexList[j][Render.X] == vertexList[k][Render.X] && vertexList[j][Render.Y] == vertexList[k][Render.Y])
 								{
 									flag = true;
 									break;
 								}
 							}
-						if(flag)
+						if (flag)
 							break;
 						// Assume CCW in x forward right and y forward down is first->second->third->first.
 						// the first vertex is the vertex with minimum y value
@@ -292,7 +288,8 @@ public class CS580GL
 						// choose the vertex for first in CCW.
 						for (int j = 1; j < vertexList.length; j++)
 						{
-							if (vertexList[j][Render.Y] < vertexList[first][Render.Y] || (vertexList[j][Render.Y] == vertexList[first][Render.Y] && vertexList[j][Render.X] > vertexList[first][Render.X]))
+							if (vertexList[j][Render.Y] < vertexList[first][Render.Y]
+									|| (vertexList[j][Render.Y] == vertexList[first][Render.Y] && vertexList[j][Render.X] > vertexList[first][Render.X]))
 								first = j;
 							if (vertexList[j][Render.X] < ulx)
 								ulx = vertexList[j][Render.X];
@@ -308,11 +305,11 @@ public class CS580GL
 							second = 1;
 						third = 3 - first - second;
 						// judge the right sequence by vector.
-						float dx1 = vertexList[second][Render.X]-vertexList[first][Render.X];
-						float dy1 = vertexList[second][Render.Y]-vertexList[first][Render.Y];
-						float dx2 = vertexList[third][Render.X]-vertexList[first][Render.X];
-						float dy2 = vertexList[third][Render.Y]-vertexList[first][Render.Y];
-						if(dx1/Math.sqrt(dx1*dx1+dy1*dy1) > dx2 / Math.sqrt(dx2*dx2+dy2*dy2))
+						float dx1 = vertexList[second][Render.X] - vertexList[first][Render.X];
+						float dy1 = vertexList[second][Render.Y] - vertexList[first][Render.Y];
+						float dx2 = vertexList[third][Render.X] - vertexList[first][Render.X];
+						float dy2 = vertexList[third][Render.Y] - vertexList[first][Render.Y];
+						if (dx1 / Math.sqrt(dx1 * dx1 + dy1 * dy1) > dx2 / Math.sqrt(dx2 * dx2 + dy2 * dy2))
 						{
 							int j = second;
 							second = third;
@@ -370,12 +367,9 @@ public class CS580GL
 								{
 									alpha = (X - XL) / (XR - XL);
 									float Z = alpha * ZR + (1 - alpha) * ZL;
-									if (render.z_buf[X][Y] > Z)
-									{
+									if (render.display.getPixel(X, Y).z > Z)
 										SetDisplayPixel(render.display, X, Y, ctoi(render.flatcolor[Render.R]), ctoi(render.flatcolor[Render.G]),
-												ctoi(render.flatcolor[Render.B]), (short) 1, 0);
-										render.z_buf[X][Y] = Z;
-									}
+												ctoi(render.flatcolor[Render.B]), (short) 1, Z);
 								}
 						}
 					}
