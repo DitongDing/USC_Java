@@ -265,27 +265,32 @@ public class CS580GL
 					// Apply LEE, not SLR. Try SLR later
 					if (nameList[i] == Render.GZ_POSITION)
 					{
+						// The way to implement:
+						// Do not need to arrange vertex. To consider the sign of three judgment.
+						// Calculate normal of plane, then calculate Z value with normal, X and Y. These two vector is vertical with each other.
+						// It is faster, and comparison shows, the difference is plus-minus 0.00003%, which can be considered as the lose of float calculation.
+						
 						float[][] vertexList = (float[][]) valueList[i];
+						
 						// check if three points in xOy plane are in the same line
-						float[][] vectors = new float[2][2];
+						float[][] vectors = new float[2][3];
 						for (int j = 0; j < 2; j++)
-							for (int k = 0; k < 2; k++)
+							for (int k = 0; k < 3; k++)
 								vectors[j][k] = vertexList[j][k] - vertexList[j + 1][k];
 						// They are in the same line
 						if (vectors[0][0] * vectors[1][1] == vectors[0][1] * vectors[1][0])
 							break;
-						
-						// Assume CCW in x forward right and y forward down is first->second->third->first.
-						// the first vertex is the vertex with minimum y value
-						// if there are two vertexes with same y value, then mark the one with larger x value as firsts
-						int first = 0, second = 0, third = 0;
+
+						// Calculate normal vector of plane v1,v2,v3
+						float[] normal = new float[3];
+						normal[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
+						normal[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
+						normal[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
+
+						// calculate ulx, uly, lrx, lry
 						float ulx = vertexList[0][Render.X], uly = vertexList[0][Render.Y], lrx = vertexList[0][Render.X], lry = vertexList[0][Render.Y];
-						// choose the vertex for first in CCW.
 						for (int j = 1; j < vertexList.length; j++)
 						{
-							if (vertexList[j][Render.Y] < vertexList[first][Render.Y]
-									|| (vertexList[j][Render.Y] == vertexList[first][Render.Y] && vertexList[j][Render.X] > vertexList[first][Render.X]))
-								first = j;
 							if (vertexList[j][Render.X] < ulx)
 								ulx = vertexList[j][Render.X];
 							if (vertexList[j][Render.X] > lrx)
@@ -295,34 +300,19 @@ public class CS580GL
 							if (vertexList[j][Render.Y] > lry)
 								lry = vertexList[j][Render.Y];
 						}
-						// initialize second and third with different value;
-						if (first == 0)
-							second = 1;
-						third = 3 - first - second;
-						// judge the right sequence by vector.
-						float dx1 = vertexList[second][Render.X] - vertexList[first][Render.X];
-						float dy1 = vertexList[second][Render.Y] - vertexList[first][Render.Y];
-						float dx2 = vertexList[third][Render.X] - vertexList[first][Render.X];
-						float dy2 = vertexList[third][Render.Y] - vertexList[first][Render.Y];
-						if (dx1 / Math.sqrt(dx1 * dx1 + dy1 * dy1) > dx2 / Math.sqrt(dx2 * dx2 + dy2 * dy2))
-						{
-							int j = second;
-							second = third;
-							third = j;
-						}
 
 						float[] A = new float[3];
 						float[] B = new float[3];
 						float[] C = new float[3];
-						A[0] = vertexList[second][Render.Y] - vertexList[first][Render.Y];
-						A[1] = vertexList[third][Render.Y] - vertexList[second][Render.Y];
-						A[2] = vertexList[first][Render.Y] - vertexList[third][Render.Y];
-						B[0] = vertexList[first][Render.X] - vertexList[second][Render.X];
-						B[1] = vertexList[second][Render.X] - vertexList[third][Render.X];
-						B[2] = vertexList[third][Render.X] - vertexList[first][Render.X];
-						C[0] = -(A[0] * vertexList[first][Render.X] + B[0] * vertexList[first][Render.Y]);
-						C[1] = -(A[1] * vertexList[second][Render.X] + B[1] * vertexList[second][Render.Y]);
-						C[2] = -(A[2] * vertexList[third][Render.X] + B[2] * vertexList[third][Render.Y]);
+						A[0] = vertexList[1][Render.Y] - vertexList[0][Render.Y];
+						A[1] = vertexList[2][Render.Y] - vertexList[1][Render.Y];
+						A[2] = vertexList[0][Render.Y] - vertexList[2][Render.Y];
+						B[0] = vertexList[0][Render.X] - vertexList[1][Render.X];
+						B[1] = vertexList[1][Render.X] - vertexList[2][Render.X];
+						B[2] = vertexList[2][Render.X] - vertexList[0][Render.X];
+						C[0] = -(A[0] * vertexList[0][Render.X] + B[0] * vertexList[0][Render.Y]);
+						C[1] = -(A[1] * vertexList[1][Render.X] + B[1] * vertexList[1][Render.Y]);
+						C[2] = -(A[2] * vertexList[2][Render.X] + B[2] * vertexList[2][Render.Y]);
 
 						int x1 = (int) Math.floor(ulx), x2 = (int) Math.ceil(lrx), y1 = (int) Math.floor(uly), y2 = (int) Math.ceil(lry);
 						x1 = x1 < 0 ? 0 : (x1 >= render.display.xres ? render.display.xres : x1);
@@ -330,43 +320,15 @@ public class CS580GL
 						y1 = y1 < 0 ? 0 : (y1 >= render.display.yres ? render.display.yres : y1);
 						y2 = y2 < 0 ? 0 : (y2 >= render.display.yres ? render.display.yres : y2);
 						for (int Y = y1; Y < y2; Y++)
-						{
-							float XL, XR, ZL, ZR;
-							float alpha;
-							if (vertexList[second][Render.Y] >= Y)
-							{
-								alpha = (Y - vertexList[first][Render.Y]) / A[0];
-								XL = alpha * vertexList[second][Render.X] + (1 - alpha) * vertexList[first][Render.X];
-								ZL = alpha * vertexList[second][Render.Z] + (1 - alpha) * vertexList[first][Render.Z];
-							}
-							else
-							{
-								alpha = (Y - vertexList[second][Render.Y]) / A[1];
-								XL = alpha * vertexList[third][Render.X] + (1 - alpha) * vertexList[second][Render.X];
-								ZL = alpha * vertexList[third][Render.Z] + (1 - alpha) * vertexList[second][Render.Z];
-							}
-							if (vertexList[third][Render.Y] >= Y)
-							{
-								alpha = (Y - vertexList[third][Render.Y]) / A[2];
-								XR = alpha * vertexList[first][Render.X] + (1 - alpha) * vertexList[third][Render.X];
-								ZR = alpha * vertexList[first][Render.Z] + (1 - alpha) * vertexList[third][Render.Z];
-							}
-							else
-							{
-								alpha = (Y - vertexList[second][Render.Y]) / A[1];
-								XR = alpha * vertexList[third][Render.X] + (1 - alpha) * vertexList[second][Render.X];
-								ZR = alpha * vertexList[third][Render.Z] + (1 - alpha) * vertexList[second][Render.Z];
-							}
 							for (int X = x1; X < x2; X++)
-								if (PixelJudge_LEE(A[0], B[0], C[0], X, Y) && PixelJudge_LEE(A[1], B[1], C[1], X, Y) && PixelJudge_LEE(A[2], B[2], C[2], X, Y))
+								if (Math.abs(PixelJudge_LEE(A[0], B[0], C[0], X, Y) + PixelJudge_LEE(A[1], B[1], C[1], X, Y)
+										+ PixelJudge_LEE(A[2], B[2], C[2], X, Y)) == 3)
 								{
-									alpha = (X - XL) / (XR - XL);
-									float Z = alpha * ZR + (1 - alpha) * ZL;
+									float Z = vertexList[0][2] - ((X - vertexList[0][0]) * normal[0] + (Y - vertexList[0][1]) * normal[1]) / normal[2];
 									if (render.display.getPixel(X, Y).z > Z)
 										SetDisplayPixel(render.display, X, Y, ctoi(render.flatcolor[Render.R]), ctoi(render.flatcolor[Render.G]),
 												ctoi(render.flatcolor[Render.B]), (short) 1, Z);
 								}
-						}
 					}
 					else if (nameList[i] == Render.GZ_NULL_TOKEN)
 					{
@@ -385,9 +347,14 @@ public class CS580GL
 		return false;
 	}
 
-	private boolean PixelJudge_LEE(float A, float B, float C, int X, int Y)
+	private int PixelJudge_LEE(float A, float B, float C, int X, int Y)
 	{
-		return A * X + B * Y + C > 0;
+		float value = A * X + B * Y + C;
+		if (value > 0)
+			return 1;
+		else if (value == 0)
+			return 0;
+		return -1;
 	}
 
 	// convert float color to GzIntensity short
