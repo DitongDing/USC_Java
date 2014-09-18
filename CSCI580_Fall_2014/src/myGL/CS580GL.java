@@ -266,20 +266,15 @@ public class CS580GL
 					if (nameList[i] == Render.GZ_POSITION)
 					{
 						float[][] vertexList = (float[][]) valueList[i];
-						// check if there are two vertexes has same (X,Y), which means this tri is a line in xOy plane
-						// right now I just ignore this kind of tri.
-						boolean flag = false;
-						for (int j = 0; j < vertexList.length - 1; j++)
-							for (int k = j + 1; k < vertexList.length; k++)
-							{
-								if (vertexList[j][Render.X] == vertexList[k][Render.X] && vertexList[j][Render.Y] == vertexList[k][Render.Y])
-								{
-									flag = true;
-									break;
-								}
-							}
-						if (flag)
+						// check if three points in xOy plane are in the same line
+						float[][] vectors = new float[2][2];
+						for (int j = 0; j < 2; j++)
+							for (int k = 0; k < 2; k++)
+								vectors[j][k] = vertexList[j][k] - vertexList[j + 1][k];
+						// They are in the same line
+						if (vectors[0][0] * vectors[1][1] == vectors[0][1] * vectors[1][0])
 							break;
+						
 						// Assume CCW in x forward right and y forward down is first->second->third->first.
 						// the first vertex is the vertex with minimum y value
 						// if there are two vertexes with same y value, then mark the one with larger x value as firsts
