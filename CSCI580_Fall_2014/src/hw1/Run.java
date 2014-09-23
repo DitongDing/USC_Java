@@ -24,7 +24,7 @@ public class Run
 			short m_nWidth = 512; // frame buffer and display width
 			short m_nHeight = 512; // frame buffer and display height
 
-			status &= method.NewDisplay(m_pDisplay, Display.GZ_RGBAZ_DISPLAY, m_nWidth, m_nHeight);
+			status &= method.NewDisplay(m_pDisplay, Display.RGBAZ_DISPLAY, m_nWidth, m_nHeight);
 			status &= method.ClearDisplay(m_pDisplay, defaultPixel); // init for new frame
 
 			if (!status)

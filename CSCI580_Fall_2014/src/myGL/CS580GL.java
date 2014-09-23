@@ -172,13 +172,13 @@ public class CS580GL
 	}
 
 	// Malloc a renderer struct, keep closed until BeginRender inits are done
-	// check for legal class GZ_Z_BUFFER_RENDER
+	// check for legal class Z_BUFFER_RENDER
 	public boolean NewRender(Render render, int renderClass, Display display)
 	{
 		try
 		{
 			// check for legal. for more class, just add conditions
-			if (renderClass != Render.GZ_Z_BUFFER_RENDER)
+			if (renderClass != Render.Z_BUFFER_RENDER)
 				throw new Exception("render class error in new render");
 
 			render.renderClass = renderClass;
@@ -228,7 +228,7 @@ public class CS580GL
 		return false;
 	}
 
-	// Set renderer attribute states (e.g.: GZ_RGB_COLOR default color)
+	// Set renderer attribute states (e.g.: RGB_COLOR default color)
 	public boolean PutAttribute(Render render, int numAttributes, int[] nameList, Object[] valueList)
 	{
 		try
@@ -236,7 +236,7 @@ public class CS580GL
 			if (render.open)
 				for (int i = 0; i < numAttributes; i++)
 				{
-					if (nameList[i] == Render.GZ_RGB_COLOR)
+					if (nameList[i] == Render.RGB_COLOR)
 						render.flatcolor = (float[]) valueList[i];
 					else
 						throw new Exception("attr name error in put attr for render");
@@ -253,7 +253,7 @@ public class CS580GL
 
 	// Invoke the scan converter and return an error code
 	// TODO CS580GL.PutTriangle(): There is still a little difference between the original pic. Why?
-	public boolean PutTriangle(Render render, int numParts, int[] nameList, Object[] valueList)
+	public boolean DrawTriangle(Render render, int numParts, int[] nameList, Object[] valueList)
 	{
 		try
 		{
@@ -263,7 +263,7 @@ public class CS580GL
 					// TODO CS580GL.PutTriangle(): may be changed later. consider to interpolate Z to xOy plane now, no camera position, fov, etc.
 					// Interpolate to X:[0, 255], Y:[0,255];
 					// Apply LEE, not SLR. Try SLR later
-					if (nameList[i] == Render.GZ_POSITION)
+					if (nameList[i] == Render.POSITION)
 					{
 						// The way to implement:
 						// Do not need to arrange vertex. To consider the sign of three judgment.
@@ -330,7 +330,7 @@ public class CS580GL
 												ctoi(render.flatcolor[Render.B]), (short) 1, Z);
 								}
 					}
-					else if (nameList[i] == Render.GZ_NULL_TOKEN)
+					else if (nameList[i] == Render.NULL_TOKEN)
 					{
 						// Do nothing
 					}

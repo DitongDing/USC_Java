@@ -40,16 +40,16 @@ public class Run
 			int m_nWidth = 256; // frame buffer and display width
 			int m_nHeight = 256; // frame buffer and display height
 
-			status &= method.NewDisplay(m_pDisplay, Display.GZ_RGBAZ_DISPLAY, m_nWidth, m_nHeight);
+			status &= method.NewDisplay(m_pDisplay, Display.RGBAZ_DISPLAY, m_nWidth, m_nHeight);
 			status &= method.ClearDisplay(m_pDisplay, defaultPixel);
-			status &= method.NewRender(m_pRender, Render.GZ_Z_BUFFER_RENDER, m_pDisplay);
+			status &= method.NewRender(m_pRender, Render.Z_BUFFER_RENDER, m_pDisplay);
 			status &= method.BeginRender(m_pRender);
 
 			if (!status)
 				throw new Exception("Initialize error");
 
 			// Tokens associated with triangle vertex values
-			nameListTriangle[0] = Render.GZ_POSITION; // define vert coordinates only
+			nameListTriangle[0] = Render.POSITION; // define vert coordinates only
 
 			// I/O File open
 			BufferedReader br = new BufferedReader(new FileReader(inFileName));
@@ -86,13 +86,13 @@ public class Run
 				// Set up shading attributes for each triangle
 				shade2(normalList[0], color);// shade based on the norm of vert0
 				valueListColor[0] = color;
-				nameListColor[0] = Render.GZ_RGB_COLOR;
+				nameListColor[0] = Render.RGB_COLOR;
 				method.PutAttribute(m_pRender, 1, nameListColor, valueListColor);
 
 				// Set the value pointers to the first vertex of the triangle, then feed it to the renderer
 				valueListTriangle[0] = vertexList;
 
-				method.PutTriangle(m_pRender, 1, nameListTriangle, valueListTriangle);
+				method.DrawTriangle(m_pRender, 1, nameListTriangle, valueListTriangle);
 			}
 
 			method.FlushDisplayToPPMFile(fos, m_pDisplay); /* write out or update display to file */

@@ -4,20 +4,20 @@ public class Render
 {
 	public static int MATLEVELS = 10; // how many matrix pushes allowed
 	public static int MAX_LIGHTS = 10; // how many lights allowed
-	public static int GZ_NULL_TOKEN = 0;// one type of nameList for putAttr and putTri. triangle vert attributes */
-	public static int GZ_POSITION = 1;// one type of nameList for putAttr and putTri
-	public static int GZ_NORMAL = 2;// one type of nameList for putAttr and putTri
-	public static int GZ_TEXTURE_INDEX = 3;// one type of nameList for putAttr and putTri
-	public static int GZ_Z_BUFFER_RENDER = 1; // one type of renderClass
-	public static int GZ_RGB_COLOR = 99; // one type of nameList for putAttr and putTri
-	public static int GZ_SHADER = 96; // one type of nameList for putAttr and putTri
+	public static int NULL_TOKEN = 0;// one type of nameList for putAttr and putTri. triangle vert attributes */
+	public static int POSITION = 1;// one type of nameList for putAttr and putTri
+	public static int NORMAL = 2;// one type of nameList for putAttr and putTri
+	public static int TEXTURE_INDEX = 3;// one type of nameList for putAttr and putTri
+	public static int Z_BUFFER_RENDER = 1; // one type of renderClass
+	public static int RGB_COLOR = 99; // one type of nameList for putAttr and putTri
+	public static int SHADER = 96; // one type of nameList for putAttr and putTri
 
 	// flags fields for value list attributes
 	// shade mode flags combine the bit fields below
-	public static int GZ_NONE = 0; // flat shading only
-	public static int GZ_AMBIENT = 1; // can be selected or not
-	public static int GZ_DIFFUSE = 2; // can be selected or not
-	public static int GZ_SPECULAR = 4; // can be selected or not
+	public static int NONE = 0; // flat shading only
+	public static int AMBIENT = 1; // can be selected or not
+	public static int DIFFUSE = 2; // can be selected or not
+	public static int SPECULAR = 4; // can be selected or not
 
 	// coors constant
 	public static int X = 0;
