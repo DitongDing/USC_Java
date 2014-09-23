@@ -237,7 +237,10 @@ public class CS580GL
 				for (int i = 0; i < numAttributes; i++)
 				{
 					if (nameList[i] == Render.RGB_COLOR)
-						render.flatcolor = (float[]) valueList[i];
+					{
+						float[] value = (float[]) valueList[i];
+						render.flatcolor = new Color(value[Render.R], value[Render.G], value[Render.B]);
+					}
 					else
 						throw new Exception("attr name error in put attr for render");
 				}
@@ -269,9 +272,9 @@ public class CS580GL
 						// Do not need to arrange vertex. To consider the sign of three judgment.
 						// Calculate normal of plane, then calculate Z value with normal, X and Y. These two vector is vertical with each other.
 						// It is faster, and comparison shows, the difference is plus-minus 0.00003%, which can be considered as the lose of float calculation.
-						
+
 						float[][] vertexList = (float[][]) valueList[i];
-						
+
 						// check if three points in xOy plane are in the same line
 						float[][] vectors = new float[2][3];
 						for (int j = 0; j < 2; j++)
@@ -326,8 +329,8 @@ public class CS580GL
 								{
 									float Z = vertexList[0][2] - ((X - vertexList[0][0]) * normal[0] + (Y - vertexList[0][1]) * normal[1]) / normal[2];
 									if (render.display.getPixel(X, Y).z > Z)
-										SetDisplayPixel(render.display, X, Y, ctoi(render.flatcolor[Render.R]), ctoi(render.flatcolor[Render.G]),
-												ctoi(render.flatcolor[Render.B]), (short) 1, Z);
+										SetDisplayPixel(render.display, X, Y, ctoi(render.flatcolor.red), ctoi(render.flatcolor.green),
+												ctoi(render.flatcolor.blue), (short) 1, Z);
 								}
 					}
 					else if (nameList[i] == Render.NULL_TOKEN)

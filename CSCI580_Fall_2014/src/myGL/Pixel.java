@@ -7,11 +7,11 @@ public class Pixel
 	public short blue;
 	public short alpha;
 	public float z; // signed z for clipping. *****Ditong Ding***** Previously it is int, I change it to float.
-	
+
 	public Pixel()
 	{
 	}
-	
+
 	public Pixel(short red, short green, short blue, short alpha, float z)
 	{
 		this.red = red;
@@ -20,7 +20,7 @@ public class Pixel
 		this.alpha = alpha;
 		this.z = z;
 	}
-	
+
 	public void copy(Pixel pixel)
 	{
 		red = pixel.red;

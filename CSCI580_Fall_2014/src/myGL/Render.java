@@ -4,11 +4,14 @@ public class Render
 {
 	public static int MATLEVELS = 10; // how many matrix pushes allowed
 	public static int MAX_LIGHTS = 10; // how many lights allowed
+
 	public static int NULL_TOKEN = 0;// one type of nameList for putAttr and putTri. triangle vert attributes */
 	public static int POSITION = 1;// one type of nameList for putAttr and putTri
 	public static int NORMAL = 2;// one type of nameList for putAttr and putTri
 	public static int TEXTURE_INDEX = 3;// one type of nameList for putAttr and putTri
+
 	public static int Z_BUFFER_RENDER = 1; // one type of renderClass
+
 	public static int RGB_COLOR = 99; // one type of nameList for putAttr and putTri
 	public static int SHADER = 96; // one type of nameList for putAttr and putTri
 
@@ -19,11 +22,25 @@ public class Render
 	public static int DIFFUSE = 2; // can be selected or not
 	public static int SPECULAR = 4; // can be selected or not
 
+	public static int DIRECTIONAL_LIGHT = 79; // directional light
+	public static int AMBIENT_LIGHT = 78; // ambient light type
+
+	public static int AMBIENT_COEFFICIENT = 1001; // Ka material property
+	public static int DIFFUSE_COEFFICIENT = 1002; // Kd material property
+	public static int SPECULAR_COEFFICIENT = 1003; // Ks material property
+	public static int DISTRIBUTION_COEFFICIENT = 1004; // specular power of material
+
+	public static int TEXTURE_MAP = 1010; // pointer to texture routine */
+
+	// select interpolation mode of the shader (either one - not both)
+	public static int GZ_COLOR = 1; // interpolate vertex color
+	public static int NORMALS = 2; // interpolate normals
+
 	// coors constant
 	public static int X = 0;
 	public static int Y = 1;
 	public static int Z = 2;
-	
+
 	// color constant
 	public static int R = 0;
 	public static int G = 1;
@@ -32,18 +49,26 @@ public class Render
 	public int renderClass;
 	public Display display;
 	public boolean open;
-	public Camera camera;
+	public Camera camera = new Camera();
 	public short matlevel; // top of stack - current xform
-	public float[][][] Ximage = new float[MATLEVELS][4][4]; // stack of xforms (Xsm)
-	public float[][][] Xnorm = new float[MATLEVELS][4][4]; // xforms for norms (Xim)
-	public float[][] Xsp = new float[4][4]; // NDC to screen (pers-to-screen)
-	public float[] flatcolor = new float[3]; // color state for flat shaded triangles
+	public Matrix[] Ximage = new Matrix[MATLEVELS]; // stack of xforms (Xsm)
+	public Matrix[] Xnorm = new Matrix[MATLEVELS]; // xforms for norms (Xim)
+	public Matrix Xsp = new Matrix(); // NDC to screen (pers-to-screen)
+	public Color flatcolor; // color state for flat shaded triangles. Do not need to malloc, as every time we change value by "new"
 	public int interp_mode;
 	public int numlights;
 	public Light[] lights = new Light[MAX_LIGHTS];
 	public Light ambientlight;
-	public float[] Ka = new float[3], Kd = new float[3], Ks = new float[3];
+	public Color Ka = new Color(), Kd = new Color(), Ks = new Color();
 	public float spec; // specular power
+
+	public Render()
+	{
+		for (int i = 0; i < Ximage.length; i++)
+			Ximage[i] = new Matrix();
+		for (int i = 0; i < Xnorm.length; i++)
+			Xnorm[i] = new Matrix();
+	}
 
 	public void tex_fun(float u, float v, float[] color)
 	{
