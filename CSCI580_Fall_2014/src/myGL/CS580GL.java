@@ -139,26 +139,25 @@ public class CS580GL
 			PrintWriter pw = new PrintWriter(outfile);
 			pw.println("P3");
 			pw.println("" + display.xres + " " + display.yres);
-			short global_max = Short.MIN_VALUE;
 			StringBuffer output = new StringBuffer("");
 			for (int j = 0; j < display.yres; j++)
 			{
 				for (int i = 0; i < display.xres; i++)
 				{
 					Pixel pixel = display.getPixel(i, j);
-					if (pixel.red > global_max)
-						global_max = pixel.red;
-					if (pixel.green > global_max)
-						global_max = pixel.green;
-					if (pixel.blue > global_max)
-						global_max = pixel.blue;
+					if (pixel.red > display.global_max)
+						display.global_max = pixel.red;
+					if (pixel.green > display.global_max)
+						display.global_max = pixel.green;
+					if (pixel.blue > display.global_max)
+						display.global_max = pixel.blue;
 					output.append("" + pixel.red + " " + pixel.green + " " + pixel.blue + " ");
 				}
 				output.deleteCharAt(output.length() - 1);
 				output.append("\n");
 			}
 			output.deleteCharAt(output.length() - 1);
-			pw.println(global_max);
+			pw.println(display.global_max);
 			pw.println(output);
 			pw.close();
 			return true;

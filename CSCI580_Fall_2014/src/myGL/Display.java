@@ -11,6 +11,8 @@ public class Display
 	public int dispClass;
 	public short open;
 	public Pixel[] fbuf; // frame buffer array
+	
+	public short global_max = Short.MIN_VALUE; // ******Added by Ditong Ding******can only be used after FlushToFile
 
 	public void setPixel(int x, int y, Pixel pixel)
 	{
