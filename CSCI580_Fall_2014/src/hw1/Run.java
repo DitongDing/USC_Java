@@ -18,10 +18,11 @@ public class Run
 	public static ResultWindow rw;
 	public static String defaultInput = "rects";
 	public static String defaultOutput = "output1.ppm";
+	public static int hwNumber = 1;
 
 	public static void main(String[] args)
 	{
-		gui = new MainGUI("homework1", 1);
+		gui = new MainGUI("homework" + hwNumber, hwNumber);
 		gui.inputPath.setText(defaultInput);
 		gui.outputPath.setText(defaultOutput);
 		gui.runRender.addActionListener(new ActionListener() {
@@ -31,8 +32,8 @@ public class Run
 				{
 					String inFileName = gui.inputPath.getText();
 					String outFileName = gui.outputPath.getText();
-					CS580GL method = new CS580GL();
-					Display m_pDisplay = new Display();
+					CS580GL method = new CS580GL(hwNumber);
+					Display m_pDisplay = gui.display;
 					boolean status;
 					Pixel defaultPixel = new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Float.MAX_VALUE);
 

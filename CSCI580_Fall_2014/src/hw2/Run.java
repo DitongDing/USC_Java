@@ -10,6 +10,7 @@ import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
 
+import utils.ComUtils;
 import utils.MainGUI;
 import utils.ResultWindow;
 
@@ -21,10 +22,11 @@ public class Run
 	public static ResultWindow rw;
 	public static String defaultInput = "pot4.screen.asc";
 	public static String defaultOutput = "output.ppm";
+	public static int hwNumber = 2;
 
 	public static void main(String[] args)
 	{
-		gui = new MainGUI("homework2", 2);
+		gui = new MainGUI("homework" + hwNumber, hwNumber);
 		gui.inputPath.setText(defaultInput);
 		gui.outputPath.setText(defaultOutput);
 		gui.runRender.addActionListener(new ActionListener() {
@@ -34,9 +36,9 @@ public class Run
 				{
 					String inFileName = gui.inputPath.getText();
 					String outFileName = gui.outputPath.getText();
-					CS580GL method = new CS580GL();
-					Display m_pDisplay = new Display();
-					Render m_pRender = new Render();
+					CS580GL method = new CS580GL(hwNumber);
+					Display m_pDisplay = gui.display;
+					Render m_pRender = gui.render;
 					Pixel defaultPixel = new Pixel((short) 1000, (short) 1000, (short) 1000, (short) 1, Float.MAX_VALUE);
 
 					int[] nameListTriangle = new int[3]; // vertex attribute names
@@ -101,7 +103,7 @@ public class Run
 						}
 
 						// Set up shading attributes for each triangle
-						shade2(normalList[0], color);// shade based on the norm of vert0
+						ComUtils.shade2(normalList[0], color);// shade based on the norm of vert0
 						valueListColor[0] = color;
 						nameListColor[0] = Render.RGB_COLOR;
 						method.PutAttribute(m_pRender, 1, nameListColor, valueListColor);
@@ -139,26 +141,5 @@ public class Run
 				}
 			}
 		});
-	}
-
-	public static void shade2(float[] norm, float[] color)
-	{
-
-		float[] light = new float[3];
-		float coef;
-
-		light[0] = 0.707f;
-		light[1] = 0.5f;
-		light[2] = 0.5f;
-
-		coef = light[0] * norm[0] + light[1] * norm[1] + light[2] * norm[2];
-		if (coef < 0)
-			coef *= -1;
-
-		if (coef > 1.0)
-			coef = 1.0f;
-		color[0] = coef * 0.95f;
-		color[1] = coef * 0.65f;
-		color[2] = coef * 0.88f;
 	}
 }

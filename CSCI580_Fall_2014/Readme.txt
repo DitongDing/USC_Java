@@ -1,0 +1,1 @@
+1. add adaption for different homework in: MainGUI's construction function, CS580GL.DrawTriangle()

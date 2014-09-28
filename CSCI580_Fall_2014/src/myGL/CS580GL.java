@@ -3,10 +3,19 @@ package myGL;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 
+import utils.ComUtils;
+
 public class CS580GL
 {
+	public int hwNumber;
+
+	public CS580GL(int hwNumber)
+	{
+		this.hwNumber = hwNumber;
+	}
+
+	// HW1 Start
 	// Allocates memory for the frame buffer, an array of 32-bit RGBA pixels (8-bits per channel) and a 32-bit depth value
-	// TODO CS580GL.NewFrameBuffer(): remaining test
 	public boolean NewFrameBuffer(FrameBuffer framebuffer, int width, int height)
 	{
 		try
@@ -46,7 +55,6 @@ public class CS580GL
 	}
 
 	// Frees up the memory allocated to a frame buffer
-	// TODO CS580GL.FreeFrameBuffer(): remaining test
 	public boolean FreeFrameBuffer(FrameBuffer frameBuffer)
 	{
 		try
@@ -114,11 +122,11 @@ public class CS580GL
 	}
 
 	// Gets the corresponding pixel in a Display object's frame buffer
-	public boolean GetDisplayPixel(Display display, int i, int j, Pixel value)
+	public boolean GetDisplayPixel(Display display, int x, int y, Pixel value)
 	{
 		try
 		{
-			Pixel pixel = display.getPixel(i, i);
+			Pixel pixel = display.getPixel(x, y);
 			value.copy(pixel);
 			return true;
 		}
@@ -170,7 +178,8 @@ public class CS580GL
 		return false;
 	}
 
-	// Malloc a renderer struct, keep closed until BeginRender inits are done
+	// HW2 Start
+	// Malloc a renderer struct, init camera, init Xsp
 	// check for legal class Z_BUFFER_RENDER
 	public boolean NewRender(Render render, int renderClass, Display display)
 	{
@@ -182,7 +191,14 @@ public class CS580GL
 
 			render.renderClass = renderClass;
 			render.display = display;
-			render.open = false;
+			render.camera = new Camera();
+
+			float xs2 = render.display.xres / 2.0f;
+			float ys2 = render.display.yres / 2.0f;
+			float[][] value = { { xs2, 0, 0, xs2 }, { 0, -ys2, 0, ys2 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
+			render.Xsp.value = value;
+
+			render.open = true;
 			return true;
 		}
 		catch (Exception e)
@@ -210,13 +226,14 @@ public class CS580GL
 		return false;
 	}
 
-	// Set up for start of each frame
-	// TODO CS580GL.BeginRender(): do not understand this function
+	// Set up for start of each frame, push Xsp, Xpi, Xiw to stack
 	public boolean BeginRender(Render render)
 	{
 		try
 		{
-			render.open = true;
+			PushMatrix(render, render.Xsp);
+			PushMatrix(render, render.camera.Xpi);
+			PushMatrix(render, render.camera.Xiw);
 			return true;
 		}
 		catch (Exception e)
@@ -254,6 +271,7 @@ public class CS580GL
 	}
 
 	// Invoke the scan converter and return an error code
+	// Adapted for different homework
 	// TODO CS580GL.PutTriangle(): There is still a little difference between the original pic. Why?
 	public boolean DrawTriangle(Render render, int numParts, int[] nameList, Object[] valueList)
 	{
@@ -262,8 +280,7 @@ public class CS580GL
 			if (render.open)
 				for (int i = 0; i < numParts; i++)
 				{
-					// TODO CS580GL.PutTriangle(): may be changed later. consider to interpolate Z to xOy plane now, no camera position, fov, etc.
-					// Interpolate to X:[0, 255], Y:[0,255];
+					// Interpolate to X:[0, xRes], Y:[0, yRes];
 					// Apply LEE, not SLR. Try SLR later
 					if (nameList[i] == Render.POSITION)
 					{
@@ -271,7 +288,6 @@ public class CS580GL
 						// Do not need to arrange vertex. To consider the sign of three judgment.
 						// Calculate normal of plane, then calculate Z value with normal, X and Y. These two vector is vertical with each other.
 						// It is faster, and comparison shows, the difference is plus-minus 0.00003%, which can be considered as the lose of float calculation.
-
 						float[][] vertexList = (float[][]) valueList[i];
 
 						// check if three points in xOy plane are in the same line
@@ -363,5 +379,147 @@ public class CS580GL
 	private short ctoi(float color)
 	{
 		return (short) ((int) (color * ((1 << 12) - 1)));
+	}
+
+	// HW3 Start
+	// Overwrite renderer camera structure with new camera definition
+	public boolean PutCamera(Render render, Camera camera)
+	{
+		try
+		{
+			render.camera = camera;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.PutCamera()");
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	// Push a matrix onto the Ximage stack
+	// ***** Added by Ditong Ding ***** Push a multipled matrix onto the MXimage stack
+	public boolean PushMatrix(Render render, Matrix matrix)
+	{
+		try
+		{
+			if (render.matlevel == Render.MATLEVELS)
+				throw new Exception("Render matrix (Xsm) stack overflow");
+			render.Ximage[render.matlevel] = matrix;
+			render.matlevel++;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.PushMatrix()");
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	// Pop a matrix off the Ximage stack
+	// ***** Edited by Ditong Ding ***** add one paramater in function, get the top element in stack
+	public boolean PopMatrix(Render render, Matrix matrix)
+	{
+		try
+		{
+			if (render.matlevel == 0)
+				throw new Exception("Render matrix (Xsm) stack underflow");
+			matrix.value = render.Ximage[--render.matlevel].value;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.PopMatrix()");
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public boolean CreateRotationByXMatrix(float degree, Matrix matrix)
+	{
+		try
+		{
+			float sin = (float) Math.sin(degree * ComUtils.DEGREE_2_RAD);
+			float cos = (float) Math.cos(degree * ComUtils.DEGREE_2_RAD);
+			float[][] value = { { 1, 0, 0, 0 }, { 0, cos, -sin, 0 }, { 0, sin, cos, 0 }, { 0, 0, 0, 1 } };
+			matrix.value = value;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.CreateRotationByXMatrix()");
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public boolean CreateRotationByYMatrix(float degree, Matrix matrix)
+	{
+		try
+		{
+			float sin = (float) Math.sin(degree * ComUtils.DEGREE_2_RAD);
+			float cos = (float) Math.cos(degree * ComUtils.DEGREE_2_RAD);
+			float[][] value = { { cos, 0, sin, 0 }, { 0, 1, 0, 0 }, { -sin, 0, cos, 0 }, { 0, 0, 0, 1 } };
+			matrix.value = value;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.CreateRotationByYMatrix()");
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public boolean CreateRotationByZMatrix(float degree, Matrix matrix)
+	{
+		try
+		{
+			float sin = (float) Math.sin(degree * ComUtils.DEGREE_2_RAD);
+			float cos = (float) Math.cos(degree * ComUtils.DEGREE_2_RAD);
+			float[][] value = { { cos, -sin, 0, 0 }, { sin, cos, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
+			matrix.value = value;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.CreateRotationByZMatrix()");
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public boolean CreateTranslationMatrix(Coord translate, Matrix matrix)
+	{
+		try
+		{
+			float[][] value = { { 1, 0, 0, translate.x }, { 0, 1, 0, translate.y }, { 0, 0, 1, translate.z }, { 0, 0, 0, 1 } };
+			matrix.value = value;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.CreateTranslationMatrix()");
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public boolean CreateScaleMatrix(Coord scale, Matrix matrix)
+	{
+		try
+		{
+			float[][] value = { { scale.x, 0, 0, 0 }, { 0, scale.y, 0, 0 }, { 0, 0, scale.z, 0 }, { 0, 0, 0, 1 } };
+			matrix.value = value;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.CreateScaleMatrix()");
+			e.printStackTrace();
+		}
+		return false;
 	}
 }

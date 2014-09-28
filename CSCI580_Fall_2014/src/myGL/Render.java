@@ -1,5 +1,6 @@
 package myGL;
 
+// TODO Render: add Xwm, add MXimage
 public class Render
 {
 	public static int MATLEVELS = 10; // how many matrix pushes allowed
@@ -46,12 +47,17 @@ public class Render
 	public static int G = 1;
 	public static int B = 2;
 
+	// texture coords
+	public static int U = 0;
+	public static int V = 1;
+
 	public int renderClass;
 	public Display display;
-	public boolean open;
-	public Camera camera = new Camera();
-	public short matlevel; // top of stack - current xform
-	public Matrix[] Ximage = new Matrix[MATLEVELS]; // stack of xforms (Xsm)
+	public boolean open = false;
+	public Camera camera;
+	public short matlevel = 0; // top of stack - current xform
+	// stack of xforms (Xsm) ***** Edited by Ditong Ding ***** Assume this stack is for transformation
+	public Matrix[] Ximage = new Matrix[MATLEVELS];
 	public Matrix[] Xnorm = new Matrix[MATLEVELS]; // xforms for norms (Xim)
 	public Matrix Xsp = new Matrix(); // NDC to screen (pers-to-screen)
 	public Color flatcolor; // color state for flat shaded triangles. Do not need to malloc, as every time we change value by "new"
@@ -64,8 +70,6 @@ public class Render
 
 	public Render()
 	{
-		for (int i = 0; i < Ximage.length; i++)
-			Ximage[i] = new Matrix();
 		for (int i = 0; i < Xnorm.length; i++)
 			Xnorm[i] = new Matrix();
 	}
