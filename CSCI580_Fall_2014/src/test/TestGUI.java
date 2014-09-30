@@ -3,9 +3,14 @@ package test;
 import javax.swing.*;
 import java.awt.*;
 
-public class Test extends JComponent
+public class TestGUI extends JComponent
 {
-	public Test()
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public TestGUI()
 	{
 
 	}
@@ -47,7 +52,7 @@ public class Test extends JComponent
 		// 要增加元件或是設定LayoutManager等動作，
 		// 要間接透過getContentPane()方法取得RootPane，
 		// 才能在上面進行動作。
-		frame.getContentPane().add(new Test());
+		frame.getContentPane().add(new TestGUI());
 		frame.getContentPane().setBackground(Color.WHITE);
 
 		// 設定視窗顯示在螢幕在的位置

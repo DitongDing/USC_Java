@@ -56,8 +56,7 @@ public class Render
 	public boolean open = false;
 	public Camera camera;
 	public short matlevel = 0; // top of stack - current xform
-	// stack of xforms (Xsm) ***** Edited by Ditong Ding ***** Assume this stack is for transformation
-	public Matrix[] Ximage = new Matrix[MATLEVELS];
+	public Matrix[] Ximage = new Matrix[MATLEVELS]; // stack of xforms (Xsm)
 	public Matrix[] Xnorm = new Matrix[MATLEVELS]; // xforms for norms (Xim)
 	public Matrix Xsp = new Matrix(); // NDC to screen (pers-to-screen)
 	public Color flatcolor; // color state for flat shaded triangles. Do not need to malloc, as every time we change value by "new"
@@ -67,11 +66,15 @@ public class Render
 	public Light ambientlight;
 	public Color Ka = new Color(), Kd = new Color(), Ks = new Color();
 	public float spec; // specular power
+	
+	public Matrix[] MXimage = new Matrix[MATLEVELS]; // ***** Added by Ditong Ding, storing the multiplied matrix *****
 
 	public Render()
 	{
 		for (int i = 0; i < Xnorm.length; i++)
 			Xnorm[i] = new Matrix();
+		for (int i = 0; i < MXimage.length; i++)
+			MXimage[i] = new Matrix();
 	}
 
 	public void tex_fun(float u, float v, float[] color)

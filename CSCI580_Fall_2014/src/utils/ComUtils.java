@@ -50,6 +50,16 @@ public class ComUtils
 		return re;
 	}
 
+	// Do constant matrix multiply, without check
+	public static float[][] Multiply(float constant, float[][] matrix) throws Exception
+	{
+		float[][] re = new float[matrix.length][matrix[0].length];
+		for (int i = 0; i < re.length; i++)
+			for (int j = 0; j < re[i].length; j++)
+				re[i][j] = matrix[i][j] * constant;
+		return re;
+	}
+
 	// Do matrix Transpose, without check
 	public static float[][] Transpose(float[][] matrix) throws Exception
 	{

@@ -284,11 +284,33 @@ public class CS580GL
 					// Apply LEE, not SLR. Try SLR later
 					if (nameList[i] == Render.POSITION)
 					{
+						float[][] value = (float[][]) valueList[i];
+						if (hwNumber >= 3)
+						{
+							int countOfTooNearVeters = 0;
+							float[][] verticalVector = new float[4][1];
+							for (int iTri = 0; iTri < value.length; iTri++)
+							{
+								int iValue;
+								for (iValue = 0; iValue < verticalVector.length - 1; iValue++)
+									verticalVector[iValue][0] = value[iTri][iValue];
+								verticalVector[iValue][0] = 1;
+								// ***** perform Xwm, Xiw, Xpi, Xsp and Homogeneous Coordinate *****
+								Matrix matrix = render.MXimage[render.matlevel - 1];
+								verticalVector = ComUtils.Multiply(matrix.value, verticalVector);
+								verticalVector = ComUtils.Multiply(1 / verticalVector[verticalVector.length - 1][0], verticalVector);
+								// ***** remove off screen triangles *****
+								// if(verticalVector[Render.Z][0])
+								for (iValue = 0; iValue < verticalVector.length - 1; iValue++)
+									value[iTri][iValue] = verticalVector[iValue][0];
+							}
+						}
+
 						// The way to implement:
 						// Do not need to arrange vertex. To consider the sign of three judgment.
 						// Calculate normal of plane, then calculate Z value with normal, X and Y. These two vector is vertical with each other.
 						// It is faster, and comparison shows, the difference is plus-minus 0.00003%, which can be considered as the lose of float calculation.
-						float[][] vertexList = (float[][]) valueList[i];
+						float[][] vertexList = value;
 
 						// check if three points in xOy plane are in the same line
 						float[][] vectors = new float[2][3];
@@ -407,6 +429,10 @@ public class CS580GL
 			if (render.matlevel == Render.MATLEVELS)
 				throw new Exception("Render matrix (Xsm) stack overflow");
 			render.Ximage[render.matlevel] = matrix;
+			if (render.matlevel == 0)
+				render.MXimage[0] = matrix;
+			else
+				render.MXimage[render.matlevel].value = ComUtils.Multiply(render.MXimage[render.matlevel - 1].value, matrix.value);
 			render.matlevel++;
 			return true;
 		}

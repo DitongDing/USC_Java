@@ -22,11 +22,12 @@ import utils.ComUtils;
 import utils.MainGUI;
 import utils.ResultWindow;
 
+// TODO Edited
 public class Run
 {
 	public static MainGUI gui;
 	public static ResultWindow rw;
-	public static String defaultInput = "pot4.asc";
+	public static String defaultInput = "Mytri.asc";
 	public static String defaultOutput = "output.ppm";
 	public static boolean status = true;
 	public static int hwNumber = 3;
@@ -36,8 +37,14 @@ public class Run
 	{
 		try
 		{
+			// Do not put it in run render, as it will force render to add default action every time it runs.
 			gui = new MainGUI("homework" + hwNumber, hwNumber);
-			
+
+			int m_nWidth = 256; // frame buffer and display width
+			int m_nHeight = 256; // frame buffer and display height
+
+			status &= method.NewDisplay(gui.display, Display.RGBAZ_DISPLAY, m_nWidth, m_nHeight);
+
 			status &= method.NewRender(gui.render, Render.Z_BUFFER_RENDER, gui.display);
 			status &= method.BeginRender(gui.render);
 
@@ -47,13 +54,13 @@ public class Run
 			Coord rotateX = new Coord(315f, 0f, 0f, 0f);
 			Camera camera = new Camera(new Coord(13.2f, -8.7f, -14.8f, 0f), new Coord(0.8f, 0.7f, 4.5f, 0f), new Coord(-0.2f, 1.0f, 0.0f, 0), 53.7f);
 
-			UIInput input = new UIInput(UIInput.TRANSLATION, UIInput.WORLD, translation);
-			status &= gui.addAction(method, input);
-			input = new UIInput(UIInput.SCALE, UIInput.WORLD, scale);
+			UIInput input = new UIInput(UIInput.ROTATION_X, UIInput.WORLD, rotateX);
 			status &= gui.addAction(method, input);
 			input = new UIInput(UIInput.ROTATION_Y, UIInput.WORLD, rotateY);
 			status &= gui.addAction(method, input);
-			input = new UIInput(UIInput.ROTATION_X, UIInput.WORLD, rotateX);
+			input = new UIInput(UIInput.SCALE, UIInput.WORLD, scale);
+			status &= gui.addAction(method, input);
+			input = new UIInput(UIInput.TRANSLATION, UIInput.WORLD, translation);
 			status &= gui.addAction(method, input);
 
 			if (!status)
@@ -71,11 +78,7 @@ public class Run
 						Display m_pDisplay = gui.display;
 						Render m_pRender = gui.render;
 						Pixel defaultPixel = new Pixel((short) 1000, (short) 1000, (short) 1000, (short) 1, Float.MAX_VALUE);
-						
-						int m_nWidth = 256; // frame buffer and display width
-						int m_nHeight = 256; // frame buffer and display height
 
-						status &= method.NewDisplay(gui.display, Display.RGBAZ_DISPLAY, m_nWidth, m_nHeight);
 						status &= method.ClearDisplay(gui.display, defaultPixel);
 
 						int[] nameListTriangle = new int[3]; // vertex attribute names
@@ -148,12 +151,6 @@ public class Run
 						br.close();
 						fos.close();
 
-						status &= method.FreeRender(m_pRender);
-						status &= method.FreeDisplay(m_pDisplay);
-
-						if (!status)
-							throw new Exception("Finalize error");
-
 						System.out.println("finish!");
 					}
 					catch (FileNotFoundException e)
@@ -174,5 +171,22 @@ public class Run
 			JOptionPane.showMessageDialog(gui, "error", "error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
+		// TODO HW3: consider where to put finalization.
+//		finally
+//		{
+//			try
+//			{
+//				status &= method.FreeRender(gui.render);
+//				status &= method.FreeDisplay(gui.display);
+//
+//				if (!status)
+//					throw new Exception("Finalize error");
+//			}
+//			catch (Exception e)
+//			{
+//				System.out.println("Finalize error");
+//				e.printStackTrace();
+//			}
+//		}
 	}
 }
