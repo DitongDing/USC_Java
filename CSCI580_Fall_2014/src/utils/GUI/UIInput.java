@@ -1,4 +1,7 @@
-package myGL;
+package utils.GUI;
+
+import myGL.Camera;
+import myGL.Coord;
 
 public class UIInput
 {
@@ -12,15 +15,13 @@ public class UIInput
 	public static short OBJECT = 0; // For transform object
 	public static short WORLD = 1; // For construct Xwm
 
-	public static int defaultFPS = 20; // Param for animation
-
 	public short space = -1;
 	public short type = -1;
 	public Coord rotation = null;
 	public Coord translation = null;
 	public Coord scale = null;
 	public Camera camera = null;
-	public double period = 0; // the length of interval to perform this input. Zero means no animation.
+	public double period = 1; // the length of interval to perform this input. Zero means no animation.
 
 	public UIInput(short type, short space, Object action)
 	{

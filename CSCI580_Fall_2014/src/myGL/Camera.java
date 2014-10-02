@@ -47,4 +47,24 @@ public class Camera
 	{
 		return d;
 	}
+	
+	public float getFOV()
+	{
+		return FOV;
+	}
+
+	public Coord getPosition()
+	{
+		return position;
+	}
+
+	public Coord getLookat()
+	{
+		return lookat;
+	}
+
+	public Coord getWorldup()
+	{
+		return worldup;
+	}
 }

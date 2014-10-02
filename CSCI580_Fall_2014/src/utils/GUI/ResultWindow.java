@@ -1,4 +1,4 @@
-package utils;
+package utils.GUI;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -11,6 +11,7 @@ import myGL.Pixel;
 public class ResultWindow extends JFrame
 {
 	private static final long serialVersionUID = 1L;
+	public static int defaultFPS = 20; // Param for animation
 
 	Display display;
 	BufferedImage bi;

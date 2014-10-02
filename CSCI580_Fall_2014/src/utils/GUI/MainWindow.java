@@ -1,4 +1,4 @@
-package utils;
+package utils.GUI;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -11,9 +11,8 @@ import myGL.CS580GL;
 import myGL.Display;
 import myGL.Matrix;
 import myGL.Render;
-import myGL.UIInput;
 
-public class MainGUI extends JFrame
+public class MainWindow extends JFrame
 {
 	private static final long serialVersionUID = 1L;
 
@@ -26,6 +25,7 @@ public class MainGUI extends JFrame
 	public JTextField inputPath;
 	public JTextField outputPath;
 	public JMenuItem runRender;
+	public JMenuItem runAnimation;
 
 	// For construction of Xwm
 	public short XwmSize;
@@ -36,9 +36,10 @@ public class MainGUI extends JFrame
 	public ArrayList<UIInput> actionList;
 	public ArrayList<Integer> cameraActionIndex;
 
-	public MainGUI(String title, int hwNumber)
+	public MainWindow(String title, int hwNumber)
 	{
 		super(title);
+		XwmList = new ArrayList<UIInput>();
 		actionList = new ArrayList<UIInput>();
 		cameraActionIndex = new ArrayList<Integer>();
 		render = new Render();
@@ -61,15 +62,27 @@ public class MainGUI extends JFrame
 		menuBar.setSize(width, 20);
 		add(menuBar);
 
+		JMenu run = new JMenu("run");
+		runRender = new JMenuItem("run render");
+		run.add(runRender);
+
 		if (hwNumber >= 3)
 		{
+			JMenu edit = new JMenu("edit");
+			JMenuItem editXwm = new JMenuItem("edit Xwm"), editAction = new JMenuItem("edit action");
+			editXwm.addActionListener(new XwmWindow.XWActionListener(this));
+			editAction.addActionListener(new ActionWindow.AWActionListener(this));
+			edit.add(editXwm);
+			edit.add(editAction);
+			menuBar.add(edit);
 			// TODO object space TSR (given origin, give a message to show that the default orign is (0,0,0)), world space TSR, Camera, Animation(From, To, interval)
-			// TODO action log: delete, add
+			// TODO action log: delete, add, edit
 			// TODO action definition: except camera, all of them have a default value. For camera, should find previous camera in Log
+			runAnimation = new JMenuItem("run animation");
+			run.add(runAnimation);
 		}
 
-		runRender = new JMenuItem("run");
-		menuBar.add(runRender);
+		menuBar.add(run);
 
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLocation(5, menuBar.getSize().height);
@@ -128,7 +141,7 @@ public class MainGUI extends JFrame
 					method.PopMatrix(render, matrixTemp);
 					temp.push(matrixTemp);
 				}
-				if(input.space == UIInput.WORLD)
+				if (input.space == UIInput.WORLD)
 				{
 					for (; render.matlevel > 3;)
 					{
@@ -159,7 +172,46 @@ public class MainGUI extends JFrame
 		}
 		catch (Exception e)
 		{
-			System.out.println("Error in MainGUI.addAction()");
+			System.out.println("Error in MainGUI.addAction():"+e.getMessage());
+			throw e;
+		}
+	}
+
+	// Only permit to edit time period
+	public boolean editAction(CS580GL method, int index, double newTimePeriod) throws Exception
+	{
+		try
+		{
+			actionList.get(index).period = newTimePeriod;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in MainGUI.editAction()");
+			e.printStackTrace();
+			throw e;
+		}
+	}
+
+	// TODO MainWindow.deleteAction()
+	public boolean deleteAction(CS580GL method, int index) throws Exception
+	{
+		try
+		{
+			UIInput action = actionList.get(index);
+			if(action.type == UIInput.CAMERA)
+			{
+				
+			}
+			else
+			{
+				
+			}
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in MainGUI.deleteAction()");
 			e.printStackTrace();
 			throw e;
 		}

@@ -2,66 +2,34 @@ package test;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
 
-public class TestGUI extends JComponent
+public class TestGUI
 {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 	public TestGUI()
 	{
-
-	}
-
-	public void paintComponent(Graphics g)
-	{
-		super.paintComponent(g);
-
-		// 畫一條直線,從座標(100,100)到(150,150)
-		g.drawLine(100, 100, 150, 150);
-	}
-
-	// 實做自訂元件時，
-	// 最好覆寫這getPreferredSize、getMaximumSize、getMinimumSize三個方法
-	// 因為許多LayoutManager都可能由這三個方法來決定此物件的大小
-	public Dimension getPreferredSize()
-	{
-		return new Dimension(640, 480);
-	}
-
-	public Dimension getMaximumSize()
-	{
-		return getPreferredSize();
-	}
-
-	public Dimension getMinimumSize()
-	{
-		return getPreferredSize();
+		JFrame f = new JFrame();
+		Object[][] playerInfo = { { "阿呆", new Integer(66), new Integer(32), new Integer(98), new Boolean(false) },
+				{ "阿呆", new Integer(82), new Integer(69), new Integer(128), new Boolean(true) }, };
+		String[] Names = { "姓名", "语文", "数学", "总分", "及格" };
+		JTable table = new JTable(playerInfo, Names);
+		table.setPreferredScrollableViewportSize(new Dimension(550, 30));
+		JScrollPane scrollPane = new JScrollPane(table);
+		f.getContentPane().add(scrollPane, BorderLayout.CENTER);
+		f.setTitle("Simple Table");
+		f.pack();
+		f.show();
+		f.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e)
+			{
+				System.exit(0);
+			}
+		});
 	}
 
 	public static void main(String[] args)
 	{
-		// 設定視窗的外觀
-		JFrame.setDefaultLookAndFeelDecorated(true);
-
-		JFrame frame = new JFrame("MyCanvasDemo_2");
-
-		// 在Swing的JFrame元件中，
-		// 要增加元件或是設定LayoutManager等動作，
-		// 要間接透過getContentPane()方法取得RootPane，
-		// 才能在上面進行動作。
-		frame.getContentPane().add(new TestGUI());
-		frame.getContentPane().setBackground(Color.WHITE);
-
-		// 設定視窗顯示在螢幕在的位置
-		frame.setLocation(100, 100);
-
-		// 讓視窗右上角的X圖示被按下之後，視窗會關閉
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		frame.pack();
-		frame.setVisible(true);
+		TestGUI b = new TestGUI();
 	}
 }

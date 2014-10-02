@@ -7,14 +7,14 @@ import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
 
-import utils.MainGUI;
-import utils.ResultWindow;
+import utils.GUI.MainWindow;
+import utils.GUI.ResultWindow;
 
 import myGL.*;
 
 public class Run
 {
-	public static MainGUI gui;
+	public static MainWindow gui;
 	public static ResultWindow rw;
 	public static String defaultInput = "rects";
 	public static String defaultOutput = "output1.ppm";
@@ -22,7 +22,7 @@ public class Run
 
 	public static void main(String[] args)
 	{
-		gui = new MainGUI("homework" + hwNumber, hwNumber);
+		gui = new MainWindow("homework" + hwNumber, hwNumber);
 		gui.inputPath.setText(defaultInput);
 		gui.outputPath.setText(defaultOutput);
 		gui.runRender.addActionListener(new ActionListener() {
