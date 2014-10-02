@@ -9,8 +9,8 @@ public class UIInput
 	public static short SCALE = 4; // incremental;
 	public static short CAMERA = 5; // not incremental;
 
-	public static short OBJECT = 0;
-	public static short WORLD = 1;
+	public static short OBJECT = 0; // For transform object
+	public static short WORLD = 1; // For construct Xwm
 
 	public static int defaultFPS = 20; // Param for animation
 

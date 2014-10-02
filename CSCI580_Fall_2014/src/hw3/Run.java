@@ -22,12 +22,11 @@ import utils.ComUtils;
 import utils.MainGUI;
 import utils.ResultWindow;
 
-// TODO Edited
 public class Run
 {
 	public static MainGUI gui;
 	public static ResultWindow rw;
-	public static String defaultInput = "Mytri.asc";
+	public static String defaultInput = "pot4.asc";
 	public static String defaultOutput = "output.ppm";
 	public static boolean status = true;
 	public static int hwNumber = 3;
@@ -52,9 +51,11 @@ public class Run
 			Coord scale = new Coord(3.25f, 3.25f, 3.25f, 1.0f);
 			Coord rotateY = new Coord(0f, 330f, 0f, 0f);
 			Coord rotateX = new Coord(315f, 0f, 0f, 0f);
-			Camera camera = new Camera(new Coord(13.2f, -8.7f, -14.8f, 0f), new Coord(0.8f, 0.7f, 4.5f, 0f), new Coord(-0.2f, 1.0f, 0.0f, 0), 53.7f);
+			Camera camera = new Camera(new Coord(13.2f, -8.7f, -14.8f, 1f), new Coord(0.8f, 0.7f, 4.5f, 1f), new Coord(-0.2f, 1.0f, 0.0f, 0), 53.7f);
 
-			UIInput input = new UIInput(UIInput.ROTATION_X, UIInput.WORLD, rotateX);
+			UIInput input = new UIInput(UIInput.CAMERA, UIInput.WORLD, camera);
+			status &= gui.addAction(method, input);
+			input = new UIInput(UIInput.ROTATION_X, UIInput.WORLD, rotateX);
 			status &= gui.addAction(method, input);
 			input = new UIInput(UIInput.ROTATION_Y, UIInput.WORLD, rotateY);
 			status &= gui.addAction(method, input);
@@ -171,22 +172,5 @@ public class Run
 			JOptionPane.showMessageDialog(gui, "error", "error", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
-		// TODO HW3: consider where to put finalization.
-//		finally
-//		{
-//			try
-//			{
-//				status &= method.FreeRender(gui.render);
-//				status &= method.FreeDisplay(gui.display);
-//
-//				if (!status)
-//					throw new Exception("Finalize error");
-//			}
-//			catch (Exception e)
-//			{
-//				System.out.println("Finalize error");
-//				e.printStackTrace();
-//			}
-//		}
 	}
 }

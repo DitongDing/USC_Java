@@ -1,6 +1,5 @@
 package myGL;
 
-// TODO Render: add Xwm, add MXimage
 public class Render
 {
 	public static int MATLEVELS = 10; // how many matrix pushes allowed
@@ -68,6 +67,7 @@ public class Render
 	public float spec; // specular power
 	
 	public Matrix[] MXimage = new Matrix[MATLEVELS]; // ***** Added by Ditong Ding, storing the multiplied matrix *****
+	public boolean begun = false; // ***** Added by Ditong Ding, to show if the begin function has been run *****
 
 	public Render()
 	{

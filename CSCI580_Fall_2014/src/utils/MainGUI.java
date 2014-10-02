@@ -26,17 +26,24 @@ public class MainGUI extends JFrame
 	public JTextField inputPath;
 	public JTextField outputPath;
 	public JMenuItem runRender;
-	public ArrayList<UIInput> inputLog;
-	public ArrayList<Integer> cameraActionIndex;
+
+	// For construction of Xwm
+	public short XwmSize;
+	public ArrayList<UIInput> XwmList;
+
+	// For all actions, including transformation in object space, camera change
 	public short transformSize;
+	public ArrayList<UIInput> actionList;
+	public ArrayList<Integer> cameraActionIndex;
 
 	public MainGUI(String title, int hwNumber)
 	{
 		super(title);
-		inputLog = new ArrayList<UIInput>();
+		actionList = new ArrayList<UIInput>();
 		cameraActionIndex = new ArrayList<Integer>();
 		render = new Render();
 		display = new Display();
+		XwmSize = 0;
 		transformSize = 0;
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -57,7 +64,7 @@ public class MainGUI extends JFrame
 		if (hwNumber >= 3)
 		{
 			// TODO object space TSR (given origin, give a message to show that the default orign is (0,0,0)), world space TSR, Camera, Animation(From, To, interval)
-			// TODO action log: delete, add, move
+			// TODO action log: delete, add
 			// TODO action definition: except camera, all of them have a default value. For camera, should find previous camera in Log
 		}
 
@@ -88,27 +95,19 @@ public class MainGUI extends JFrame
 	}
 
 	// Add later action to actionlist
-	// TODO consider to add Object space transform. Right now assume all of them is world space transformation
 	public boolean addAction(CS580GL method, UIInput input) throws Exception
 	{
 		try
 		{
-			if (input.type != UIInput.CAMERA && transformSize == Render.MATLEVELS - 3) // 3 means Xsp, Xpi, Xiw already in Ximage
+			if (input.type != UIInput.CAMERA && XwmSize + transformSize == Render.MATLEVELS - 3) // 3 means Xsp, Xpi, Xiw already in Ximage
 				throw new Exception("Render Xforms stack overflow");
-			inputLog.add(input);
-			Matrix matrix = null;
-			
-			// Pup until remains Xsp, Xpi and Xiw
-			Stack<Matrix> temp = new Stack<Matrix>();
-			for (; render.matlevel > 3;)
-			{
-				matrix = new Matrix();
-				method.PopMatrix(render, matrix);
-				temp.push(matrix);
-			}
 
 			if (input.type != UIInput.CAMERA)
 			{
+				// Pop until remains Xsp, Xpi and Xiw
+				Stack<Matrix> temp = new Stack<Matrix>();
+				Matrix matrix = null;
+
 				matrix = new Matrix();
 				if (input.type == UIInput.ROTATION_X)
 					method.CreateRotationByXMatrix(input.rotation.x, matrix);
@@ -121,27 +120,41 @@ public class MainGUI extends JFrame
 				else if (input.type == UIInput.SCALE)
 					method.CreateScaleMatrix(input.scale, matrix);
 				else
+					throw new Exception("input type error");
+
+				for (; render.matlevel > 3 + XwmSize;)
 				{
-					while (!temp.isEmpty())
-						method.PushMatrix(render, temp.pop());
-					throw new Exception("Add Action type error");
+					Matrix matrixTemp = new Matrix();
+					method.PopMatrix(render, matrixTemp);
+					temp.push(matrixTemp);
+				}
+				if(input.space == UIInput.WORLD)
+				{
+					for (; render.matlevel > 3;)
+					{
+						Matrix matrixTemp = new Matrix();
+						method.PopMatrix(render, matrixTemp);
+						temp.push(matrixTemp);
+					}
+					XwmSize++;
+					XwmList.add(input);
+				}
+				else
+				{
+					transformSize++;
+					actionList.add(input);
 				}
 				method.PushMatrix(render, matrix);
-				transformSize++;
+				while (!temp.isEmpty())
+					method.PushMatrix(render, temp.pop());
 			}
 			else
 			{
 				method.PutCamera(render, input.camera);
-				method.PopMatrix(render, new Matrix()); // pop Xiw
-				method.PopMatrix(render, new Matrix()); // pop Xpi
-				method.PushMatrix(render, input.camera.Xpi); // push Xpi
-				method.PushMatrix(render, input.camera.Xiw); // push Xiw
-				cameraActionIndex.add(inputLog.size());
+				cameraActionIndex.add(actionList.size());
+				actionList.add(input);
 			}
-			
-			while (!temp.isEmpty())
-				method.PushMatrix(render, temp.pop());
-			inputLog.add(input);
+
 			return true;
 		}
 		catch (Exception e)

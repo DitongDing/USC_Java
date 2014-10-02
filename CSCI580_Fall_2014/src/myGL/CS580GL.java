@@ -2,6 +2,7 @@ package myGL;
 
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.Stack;
 
 import utils.ComUtils;
 
@@ -234,6 +235,7 @@ public class CS580GL
 			PushMatrix(render, render.Xsp);
 			PushMatrix(render, render.camera.Xpi);
 			PushMatrix(render, render.camera.Xiw);
+			render.begun = true;
 			return true;
 		}
 		catch (Exception e)
@@ -249,7 +251,7 @@ public class CS580GL
 	{
 		try
 		{
-			if (render.open)
+			if (render.open && render.begun)
 				for (int i = 0; i < numAttributes; i++)
 				{
 					if (nameList[i] == Render.RGB_COLOR)
@@ -272,12 +274,11 @@ public class CS580GL
 
 	// Invoke the scan converter and return an error code
 	// Adapted for different homework
-	// TODO CS580GL.PutTriangle(): There is still a little difference between the original pic. Why?
 	public boolean DrawTriangle(Render render, int numParts, int[] nameList, Object[] valueList)
 	{
 		try
 		{
-			if (render.open)
+			if (render.open && render.begun)
 				for (int i = 0; i < numParts; i++)
 				{
 					// Interpolate to X:[0, xRes], Y:[0, yRes];
@@ -287,7 +288,7 @@ public class CS580GL
 						float[][] value = (float[][]) valueList[i];
 						if (hwNumber >= 3)
 						{
-							int countOfTooNearVeters = 0;
+							int countOfTooNearVertices = 0;
 							float[][] verticalVector = new float[4][1];
 							for (int iTri = 0; iTri < value.length; iTri++)
 							{
@@ -298,12 +299,17 @@ public class CS580GL
 								// ***** perform Xwm, Xiw, Xpi, Xsp and Homogeneous Coordinate *****
 								Matrix matrix = render.MXimage[render.matlevel - 1];
 								verticalVector = ComUtils.Multiply(matrix.value, verticalVector);
+								// ***** detect off screen vertices *****
+								if(verticalVector[verticalVector.length-1][0] < 1)
+									countOfTooNearVertices++;
+								// TODO CS580GL.DrawTriangle(): I think we need to consider verticalVector[verticalVector.length - 1][0] may be zero
 								verticalVector = ComUtils.Multiply(1 / verticalVector[verticalVector.length - 1][0], verticalVector);
-								// ***** remove off screen triangles *****
-								// if(verticalVector[Render.Z][0])
 								for (iValue = 0; iValue < verticalVector.length - 1; iValue++)
 									value[iTri][iValue] = verticalVector[iValue][0];
 							}
+							// TODO CS580GL.DrawTriangle(): continue or break. depend on the meaning of rest value of valueList
+							if(countOfTooNearVertices == value.length)
+								continue;
 						}
 
 						// The way to implement:
@@ -409,7 +415,26 @@ public class CS580GL
 	{
 		try
 		{
-			render.camera = camera;
+			// To ensure that there is at least 3 matrix in stack
+			if (render.open && render.begun)
+			{
+				render.camera = camera;
+				Stack<Matrix> temp = new Stack<Matrix>();
+				for (; render.matlevel > 3;)
+				{
+					Matrix matrix = new Matrix();
+					PopMatrix(render, matrix);
+					temp.push(matrix);
+				}
+				
+				PopMatrix(render, new Matrix()); // pop Xiw
+				PopMatrix(render, new Matrix()); // pop Xpi
+				PushMatrix(render, camera.Xpi); // push Xpi
+				PushMatrix(render, camera.Xiw); // push Xiw
+
+				while (!temp.isEmpty())
+					PushMatrix(render, temp.pop());
+			}
 			return true;
 		}
 		catch (Exception e)
