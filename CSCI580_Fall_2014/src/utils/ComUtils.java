@@ -1,5 +1,7 @@
 package utils;
 
+import myGL.Coord;
+
 public class ComUtils
 {
 	public static double DEGREE_2_RAD = Math.PI / 180;
@@ -108,5 +110,17 @@ public class ComUtils
 		for (int i = 0; i < re.length; i++)
 			re[i] = (float) (vector[i] / length);
 		return re;
+	}
+
+	public static Coord interpolateCoord(Coord start, Coord end, float progress)
+	{
+		float left = 1 - progress;
+		return new Coord(start.x * left + end.x * progress, start.y * left + end.y * progress, start.z * left + end.z * progress, start.w * left + end.w
+				* progress);
+	}
+	public static float interpolateFloat(float start, float end, float progress)
+	{
+		float left = 1 - progress;
+		return start * left + end * progress;
 	}
 }

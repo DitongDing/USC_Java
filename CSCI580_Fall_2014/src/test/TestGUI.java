@@ -3,7 +3,6 @@ package test;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 
 public class TestGUI
 {
@@ -19,7 +18,6 @@ public class TestGUI
 		f.getContentPane().add(scrollPane, BorderLayout.CENTER);
 		f.setTitle("Simple Table");
 		f.pack();
-		f.show();
 		f.addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e)
 			{
@@ -30,6 +28,6 @@ public class TestGUI
 
 	public static void main(String[] args)
 	{
-		TestGUI b = new TestGUI();
+		new TestGUI();
 	}
 }

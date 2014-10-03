@@ -2,6 +2,7 @@ package hw1;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.StringTokenizer;
 
@@ -75,7 +76,9 @@ public class Run
 					}
 
 					method.FlushDisplayToPPMFile(fos, m_pDisplay); // write out or update display to file
-					rw = new ResultWindow(m_pDisplay);
+					BufferedImage[] biList = new BufferedImage[1];
+					biList[0] = ResultWindow.Display2BufferedImage(gui.display);
+					new ResultWindow(biList);
 
 					// Clean up and exit
 					br.close();

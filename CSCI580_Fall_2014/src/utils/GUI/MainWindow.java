@@ -2,12 +2,14 @@ package utils.GUI;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.ListIterator;
 import java.util.Stack;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import myGL.CS580GL;
+import myGL.Camera;
 import myGL.Display;
 import myGL.Matrix;
 import myGL.Render;
@@ -34,14 +36,12 @@ public class MainWindow extends JFrame
 	// For all actions, including transformation in object space, camera change
 	public short transformSize;
 	public ArrayList<UIInput> actionList;
-	public ArrayList<Integer> cameraActionIndex;
 
 	public MainWindow(String title, int hwNumber)
 	{
 		super(title);
 		XwmList = new ArrayList<UIInput>();
 		actionList = new ArrayList<UIInput>();
-		cameraActionIndex = new ArrayList<Integer>();
 		render = new Render();
 		display = new Display();
 		XwmSize = 0;
@@ -164,7 +164,6 @@ public class MainWindow extends JFrame
 			else
 			{
 				method.PutCamera(render, input.camera);
-				cameraActionIndex.add(actionList.size());
 				actionList.add(input);
 			}
 
@@ -172,7 +171,7 @@ public class MainWindow extends JFrame
 		}
 		catch (Exception e)
 		{
-			System.out.println("Error in MainGUI.addAction():"+e.getMessage());
+			System.out.println("Error in MainGUI.addAction():" + e.getMessage());
 			throw e;
 		}
 	}
@@ -194,18 +193,61 @@ public class MainWindow extends JFrame
 	}
 
 	// TODO MainWindow.deleteAction()
+	// 0-based index in actionList or XwmList
 	public boolean deleteAction(CS580GL method, int index) throws Exception
 	{
 		try
 		{
 			UIInput action = actionList.get(index);
-			if(action.type == UIInput.CAMERA)
+			// Delete camere change action
+			if (action.type == UIInput.CAMERA)
 			{
-				
+				Camera prevCamera = null;
+				ListIterator<UIInput> li = actionList.listIterator(index);
+				while (li.hasPrevious())
+				{
+					UIInput input = li.previous();
+					if (input.type != UIInput.CAMERA)
+					{
+						prevCamera = input.camera;
+						break;
+					}
+				}
+				if (prevCamera == null)
+					prevCamera = new Camera();
+				method.PutCamera(render, prevCamera);
+				actionList.remove(index);
 			}
 			else
 			{
-				
+				// Delete Xwm construction action
+				// TODO MainWindow.deleteAction(): finish the part of delete Xwm construction action
+				if (action.space == UIInput.WORLD)
+				{
+
+				}
+				// Delete object space transformation
+				else
+				{
+					ListIterator<UIInput> li = actionList.listIterator(index);
+					int level = 3 + XwmSize+transformSize - index;
+					while (li.hasPrevious())
+						if (li.previous().type == UIInput.CAMERA)
+							level++;
+
+					Stack<Matrix> temp = new Stack<Matrix>();
+					for (; render.matlevel > level;)
+					{
+						Matrix matrixTemp = new Matrix();
+						method.PopMatrix(render, matrixTemp);
+						temp.push(matrixTemp);
+					}
+					method.PopMatrix(render, new Matrix());
+					while (!temp.isEmpty())
+						method.PushMatrix(render, temp.pop());
+					actionList.remove(index);
+					transformSize--;
+				}
 			}
 			return true;
 		}

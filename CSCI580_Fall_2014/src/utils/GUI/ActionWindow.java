@@ -488,9 +488,17 @@ public class ActionWindow extends JFrame
 				try
 				{
 					int index = table.getSelectedRow();
-					double time = Double.parseDouble(JOptionPane.showInputDialog("please enter time length (s)"));
-					parent.editAction(Run.method, index, time);
-					refreshTable();
+					if (index != -1)
+					{
+						String temp = JOptionPane.showInputDialog("please enter time length (s)");
+						double time = 0;
+						if (temp != null && temp != "")
+						{
+							time = Double.parseDouble(temp);
+							parent.editAction(Run.method, index, time);
+							refreshTable();
+						}
+					}
 				}
 				catch (Exception e)
 				{
@@ -505,9 +513,12 @@ public class ActionWindow extends JFrame
 				try
 				{
 					int index = table.getSelectedRow();
-					if (JOptionPane.showConfirmDialog(null, "Really want to delete action?", "Delete action", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
-						parent.deleteAction(Run.method, index);
-					refreshTable();
+					if (index != -1)
+						if (JOptionPane.showConfirmDialog(null, "Really want to delete action?", "Delete action", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+						{
+							parent.deleteAction(Run.method, index);
+							refreshTable();
+						}
 				}
 				catch (Exception e)
 				{

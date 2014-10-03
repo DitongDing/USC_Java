@@ -95,6 +95,7 @@ public class CS580GL
 			for (int i = 0; i < display.xres; i++)
 				for (int j = 0; j < display.yres; j++)
 					display.setPixel(i, j, defaultPixel);
+			display.changable = false;
 			return true;
 		}
 		catch (Exception e)
@@ -169,6 +170,7 @@ public class CS580GL
 			pw.println(display.global_max);
 			pw.println(output);
 			pw.close();
+			display.changable = true;
 			return true;
 		}
 		catch (Exception e)
