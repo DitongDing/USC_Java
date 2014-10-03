@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.ListIterator;
-import java.util.Stack;
 import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
@@ -18,7 +17,6 @@ import myGL.CS580GL;
 import myGL.Camera;
 import myGL.Coord;
 import myGL.Display;
-import myGL.Matrix;
 import myGL.Pixel;
 import myGL.Render;
 import myGL.Vertex;
@@ -79,6 +77,8 @@ public class Run
 
 			triList.add(tri);
 		}
+		
+		br.close();
 
 		return triList;
 	}
