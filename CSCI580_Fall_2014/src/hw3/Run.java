@@ -239,7 +239,7 @@ public class Run
 									while (li.hasPrevious())
 									{
 										UIInput input = li.previous();
-										if (input.type != UIInput.CAMERA)
+										if (input.type == UIInput.CAMERA)
 										{
 											prevCamera = input.camera;
 											break;

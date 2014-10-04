@@ -11,7 +11,7 @@ import myGL.Pixel;
 public class ResultWindow extends JFrame
 {
 	private static final long serialVersionUID = 1L;
-	public static int defaultFPS = 30; // Param for animation
+	public static int defaultFPS = 50; // Param for animation
 
 	private BufferedImage[] bi = null;
 	private int imageIndex = -1;
