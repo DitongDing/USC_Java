@@ -457,7 +457,7 @@ public class CS580GL
 							if (render.display.getPixel(X, Y).z > Z)
 							{
 								Color color = null;
-								if (hwNumber <= 4)
+								if (hwNumber <= 3)
 									color = render.flatcolor;
 								else
 								{
@@ -572,7 +572,7 @@ public class CS580GL
 				// TODO remain untested
 				// Actually, do not need to consider unitary matrix for Xnorm, as we can do normalize after Xn.
 				// But still need to consider non-uniform scaling.
-				Matrix matrix4Xnorm = matrix;
+				Matrix matrix4Xnorm = new Matrix(matrix);
 				// For scaling matrix or rotation matrix with θ=90k. in case of non-uniform scaling
 				if (matrix4Xnorm.value[0][1] == 0 && matrix4Xnorm.value[0][2] == 0 && matrix4Xnorm.value[1][2] == 0)
 				{
@@ -750,7 +750,7 @@ public class CS580GL
 			Sle = ComUtils.Plus(Sle, ComUtils.Multiply(RE, le[i]));
 		}
 		for (int i = 0; i < tempColor.length; i++)
-			tempColor[i] = Ks[i] * Sle[i];
+			tempColor[i] += Ks[i] * Sle[i];
 
 		if (tempColor[0] < 1 || tempColor[1] < 1 || tempColor[2] < 1)
 		{
@@ -763,16 +763,16 @@ public class CS580GL
 				Dle = ComUtils.Plus(Dle, ComUtils.Multiply(NL, le[i]));
 			}
 			for (int i = 0; i < tempColor.length; i++)
-				tempColor[i] = Kd[i] * Dle[i];
+				tempColor[i] += Kd[i] * Dle[i];
 		}
 
 		if (tempColor[0] < 1 || tempColor[1] < 1 || tempColor[2] < 1)
 			for (int i = 0; i < tempColor.length; i++)
 				tempColor[i] = Ka[i] * la[i];
 
-		color.red = color.red > 1 ? 1 : color.red;
-		color.green = color.green > 1 ? 1 : color.green;
-		color.blue = color.blue > 1 ? 1 : color.blue;
+		color.red = tempColor[0] > 1 ? 1 : tempColor[0];
+		color.green = tempColor[1] > 1 ? 1 : tempColor[1];
+		color.blue = tempColor[2] > 1 ? 1 : tempColor[2];
 
 		return color;
 	}

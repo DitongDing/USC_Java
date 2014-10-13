@@ -31,9 +31,9 @@ import utils.GUI.UIInput;
 public class Run
 {
 	public static MainWindow gui;
-	public static String defaultInput = "pot4.asc";
+	public static String defaultInput = "tri.asc";
 	public static String defaultOutput = "output.ppm";
-	public static Pixel defaultPixel = new Pixel((short) 1000, (short) 1000, (short) 1000, (short) 1, Float.MAX_VALUE);
+	public static Pixel defaultPixel = new Pixel((short) 100, (short) 100, (short) 100, (short) 1, Float.MAX_VALUE);
 	public static boolean status = true;
 	public static int hwNumber = 4;
 	public static CS580GL method;
@@ -120,17 +120,6 @@ public class Run
 				uvList[i][0] = tri[i].U;
 				uvList[i][1] = tri[i].V;
 			}
-
-			// ///// Test
-			// Set up shading attributes for each triangle
-			int[] nameListColor = new int[3]; // color type names
-			Object[] valueListColor = new Object[3]; // color type rgb pointers
-			float[] color = new float[3];
-			ComUtils.shade2(normalList[0], color);// shade based on the norm of vert0
-			valueListColor[0] = color;
-			nameListColor[0] = Render.RGB_COLOR;
-			method.PutAttribute(gui.render, 1, nameListColor, valueListColor);
-			// ///// Test
 
 			// Set the value pointers to the first vertex of the triangle, then feed it to the renderer
 			valueListTriangle[0] = vertexList;
