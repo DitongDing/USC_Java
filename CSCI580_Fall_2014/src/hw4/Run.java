@@ -31,9 +31,9 @@ import utils.GUI.UIInput;
 public class Run
 {
 	public static MainWindow gui;
-	public static String defaultInput = "tri.asc";
+	public static String defaultInput = "pot4.asc";
 	public static String defaultOutput = "output.ppm";
-	public static Pixel defaultPixel = new Pixel((short) 100, (short) 100, (short) 100, (short) 1, Float.MAX_VALUE);
+	public static Pixel defaultPixel = new Pixel((short) 1000, (short) 1000, (short) 1000, (short) 1, Float.MAX_VALUE);
 	public static boolean status = true;
 	public static int hwNumber = 4;
 	public static CS580GL method;

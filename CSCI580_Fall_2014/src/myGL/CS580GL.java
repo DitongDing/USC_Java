@@ -561,18 +561,13 @@ public class CS580GL
 				render.MXimage[0] = matrix;
 			else
 				render.MXimage[render.matlevel].value = ComUtils.Multiply(render.MXimage[render.matlevel - 1].value, matrix.value);
-			render.matlevel++;
 
-			// TODO remain untested
-			// Ignore Xsp and Xpi, skip translation matrix for Xnorm
-			if (render.matlevel > 2 && matrix.value[0][3] == 0 && matrix.value[1][3] == 0 && matrix.value[2][3] == 0)
+			// Actually, do not need to consider unitary matrix for Xnorm, as we can do normalize after Xn.
+			// But still need to consider non-uniform scaling.
+			// Do not need to consider translation effect. As it only affects the last column of matrix, which will not be used in Xnorm cal.
+			Matrix matrix4Xnorm = new Matrix(matrix);
+			if (render.matlevel > 2)
 			{
-				if (render.normmatlevel == Render.MATLEVELS)
-					throw new Exception("Render matrix (Xnorm) stack overflow");
-				// TODO remain untested
-				// Actually, do not need to consider unitary matrix for Xnorm, as we can do normalize after Xn.
-				// But still need to consider non-uniform scaling.
-				Matrix matrix4Xnorm = new Matrix(matrix);
 				// For scaling matrix or rotation matrix with θ=90k. in case of non-uniform scaling
 				if (matrix4Xnorm.value[0][1] == 0 && matrix4Xnorm.value[0][2] == 0 && matrix4Xnorm.value[1][2] == 0)
 				{
@@ -580,13 +575,15 @@ public class CS580GL
 					matrix4Xnorm.value[1][1] = 1 / matrix4Xnorm.value[1][1];
 					matrix4Xnorm.value[2][2] = 1 / matrix4Xnorm.value[2][2];
 				}
-				render.Xnorm[render.normmatlevel] = matrix4Xnorm;
-				if (render.normmatlevel == 0)
-					render.MXnorm[0] = matrix4Xnorm;
-				else
-					render.MXnorm[render.normmatlevel].value = ComUtils.Multiply(render.MXnorm[render.normmatlevel - 1].value, matrix4Xnorm.value);
-				render.normmatlevel++;
 			}
+			render.Xnorm[render.matlevel] = matrix4Xnorm;
+			// Ignore Xsp and Xpi
+			if (render.matlevel <= 2)
+				render.MXnorm[render.matlevel] = matrix4Xnorm;
+			else
+				render.MXnorm[render.matlevel].value = ComUtils.Multiply(render.MXnorm[render.matlevel - 1].value, matrix4Xnorm.value);
+
+			render.matlevel++;
 			return true;
 		}
 		catch (Exception e)
@@ -606,15 +603,6 @@ public class CS580GL
 			if (render.matlevel == 0)
 				throw new Exception("Render matrix (Xsm) stack underflow");
 			matrix.value = render.Ximage[--render.matlevel].value;
-
-			// TODO remain untested
-			// Ignore Xsp and Xpi, skip translation matrix for Xnorm
-			if (render.matlevel >= 2 && matrix.value[0][3] == 0 && matrix.value[1][3] == 0 && matrix.value[2][3] == 0)
-			{
-				if (render.normmatlevel == 0)
-					throw new Exception("Render matrix (Xnorm) stack underflow");
-				render.normmatlevel--;
-			}
 			return true;
 		}
 		catch (Exception e)
@@ -712,7 +700,6 @@ public class CS580GL
 	}
 
 	// HW4 start
-	// TODO CS580GL.calColor(): Finish calColor. need to convert N from model space to image space
 	private Color calColor(Render render, float[] Nm, float[] E) throws Exception
 	{
 		Color color = new Color(0, 0, 0);
@@ -722,7 +709,7 @@ public class CS580GL
 		float[] Kd = render.Kd.getVector();
 		float[][] le = new float[render.numlights][];
 		// Convert N to image space
-		float[][] NMatrix = ComUtils.Multiply(render.MXnorm[render.normmatlevel - 1].value, new float[][] { { Nm[0] }, { Nm[1] }, { Nm[2] }, { 0 } });
+		float[][] NMatrix = ComUtils.Multiply(render.MXnorm[render.matlevel - 1].value, new float[][] { { Nm[0] }, { Nm[1] }, { Nm[2] }, { 0 } });
 		float[] N = ComUtils.Normalize(new float[] { NMatrix[0][0], NMatrix[1][0], NMatrix[2][0] });
 		float[][] L = new float[render.numlights][];
 		float[][] R = new float[render.numlights][];
@@ -768,7 +755,7 @@ public class CS580GL
 
 		if (tempColor[0] < 1 || tempColor[1] < 1 || tempColor[2] < 1)
 			for (int i = 0; i < tempColor.length; i++)
-				tempColor[i] = Ka[i] * la[i];
+				tempColor[i] += Ka[i] * la[i];
 
 		color.red = tempColor[0] > 1 ? 1 : tempColor[0];
 		color.green = tempColor[1] > 1 ? 1 : tempColor[1];

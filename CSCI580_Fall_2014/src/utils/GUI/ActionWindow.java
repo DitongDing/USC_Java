@@ -1,7 +1,5 @@
 package utils.GUI;
 
-import hw3.Run;
-
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -189,7 +187,7 @@ public class ActionWindow extends JFrame
 								rotation = new Coord(0, 0, fvalue, 0);
 							}
 							UIInput input = new UIInput(type, UIInput.OBJECT, rotation);
-							parent.addAction(Run.method, input);
+							parent.addAction(parent.method, input);
 							frame.dispose();
 							refreshTable();
 						}
@@ -266,7 +264,7 @@ public class ActionWindow extends JFrame
 							short type = UIInput.TRANSLATION;
 							Coord translation = new Coord(fvalueX, fvalueY, fvalueZ, 0);
 							UIInput input = new UIInput(type, UIInput.OBJECT, translation);
-							parent.addAction(Run.method, input);
+							parent.addAction(parent.method, input);
 							frame.dispose();
 							refreshTable();
 						}
@@ -343,7 +341,7 @@ public class ActionWindow extends JFrame
 							short type = UIInput.SCALE;
 							Coord scale = new Coord(fvalueX, fvalueY, fvalueZ, 0);
 							UIInput input = new UIInput(type, UIInput.OBJECT, scale);
-							parent.addAction(Run.method, input);
+							parent.addAction(parent.method, input);
 							frame.dispose();
 							refreshTable();
 						}
@@ -460,7 +458,7 @@ public class ActionWindow extends JFrame
 							short type = UIInput.CAMERA;
 							Camera camera = new Camera(position, lookat, worldup, FOV);
 							UIInput input = new UIInput(type, UIInput.OBJECT, camera);
-							parent.addAction(Run.method, input);
+							parent.addAction(parent.method, input);
 							frame.dispose();
 							refreshTable();
 						}
@@ -495,7 +493,7 @@ public class ActionWindow extends JFrame
 						if (temp != null && temp != "")
 						{
 							time = Double.parseDouble(temp);
-							parent.editAction(Run.method, index, time);
+							parent.editAction(parent.method, index, time);
 							refreshTable();
 						}
 					}
@@ -516,7 +514,7 @@ public class ActionWindow extends JFrame
 					if (index != -1)
 						if (JOptionPane.showConfirmDialog(null, "Really want to delete action?", "Delete action", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 						{
-							parent.deleteAction(Run.method, index);
+							parent.deleteAction(parent.method, index);
 							refreshTable();
 						}
 				}

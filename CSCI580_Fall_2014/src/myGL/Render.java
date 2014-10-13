@@ -58,7 +58,6 @@ public class Render
 	public Camera camera;
 	public short matlevel = 0; // top of stack - current xform
 	public Matrix[] Ximage = new Matrix[MATLEVELS]; // stack of xforms (Xsm)
-	public short normmatlevel = 0; // top of stack - current xform
 	public Matrix[] Xnorm = new Matrix[MATLEVELS]; // xforms for norms (Xim)
 	public Matrix Xsp = new Matrix(); // NDC to screen (pers-to-screen)
 	public Color flatcolor; // color state for flat shaded triangles. Do not need to malloc, as every time we change value by "new"
