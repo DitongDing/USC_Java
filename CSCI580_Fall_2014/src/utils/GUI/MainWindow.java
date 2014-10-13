@@ -1,6 +1,8 @@
 package utils.GUI;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.Stack;
@@ -23,6 +25,7 @@ public class MainWindow extends JFrame
 
 	public Render render;
 	public Display display;
+	public CS580GL method;
 	public JMenuBar menuBar;
 	public JTextField inputPath;
 	public JTextField outputPath;
@@ -37,13 +40,14 @@ public class MainWindow extends JFrame
 	public short transformSize;
 	public ArrayList<UIInput> actionList;
 
-	public MainWindow(String title, int hwNumber)
+	public MainWindow(String title, int hwNumber) throws Exception
 	{
 		super(title);
 		XwmList = new ArrayList<UIInput>();
 		actionList = new ArrayList<UIInput>();
 		render = new Render();
 		display = new Display();
+		method = new CS580GL(hwNumber);
 		XwmSize = 0;
 		transformSize = 0;
 
@@ -69,15 +73,68 @@ public class MainWindow extends JFrame
 		if (hwNumber >= 3)
 		{
 			JMenu edit = new JMenu("edit");
-			JMenuItem editXwm = new JMenuItem("edit Xwm"), editAction = new JMenuItem("edit action");
+			JMenuItem editXwm = new JMenuItem("Edit Xwm"), editAction = new JMenuItem("Edit action");
 			editXwm.addActionListener(new XwmWindow.XWActionListener(this));
 			editAction.addActionListener(new ActionWindow.AWActionListener(this));
 			edit.add(editXwm);
 			edit.add(editAction);
+
+			if (hwNumber >= 4)
+			{
+				edit.addSeparator();
+				JMenuItem editLight = new JMenuItem("Edit Light");
+				editLight.addActionListener(new LightWindow.LWActionListener(this));
+				edit.add(editLight);
+				JMenu interpStyle = new JMenu("Color Style");
+				JRadioButtonMenuItem flat = new JRadioButtonMenuItem("Flat shading");
+				JRadioButtonMenuItem gouraud = new JRadioButtonMenuItem("Gouraud shading");
+				JRadioButtonMenuItem phong = new JRadioButtonMenuItem("Phong shading");
+
+				flat.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0)
+					{
+						int[] nameList = { Render.INTERPOLATE };
+						Object[] valueList = new Object[] { Render.FLAT };
+						method.PutAttribute(render, 1, nameList, valueList);
+					}
+				});
+				gouraud.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0)
+					{
+						int[] nameList = { Render.INTERPOLATE };
+						Object[] valueList = new Object[] { Render.COLOR };
+						method.PutAttribute(render, 1, nameList, valueList);
+					}
+				});
+				phong.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0)
+					{
+						int[] nameList = { Render.INTERPOLATE };
+						Object[] valueList = new Object[] { Render.NORMALS };
+						method.PutAttribute(render, 1, nameList, valueList);
+					}
+				});
+
+				ButtonGroup bg = new ButtonGroup();
+				bg.add(flat);
+				bg.add(gouraud);
+				bg.add(phong);
+				if (render.interp_mode == Render.FLAT)
+					flat.setSelected(true);
+				else if (render.interp_mode == Render.COLOR)
+					gouraud.setSelected(true);
+				else if (render.interp_mode == Render.NORMALS)
+					phong.setSelected(true);
+				else
+					throw new Exception("Render default color interpolate mode error");
+
+				interpStyle.add(flat);
+				interpStyle.add(gouraud);
+				interpStyle.add(phong);
+				edit.add(interpStyle);
+			}
+
 			menuBar.add(edit);
-			// TODO object space TSR (given origin, give a message to show that the default orign is (0,0,0)), world space TSR, Camera, Animation(From, To, interval)
-			// TODO action log: delete, add, edit
-			// TODO action definition: except camera, all of them have a default value. For camera, should find previous camera in Log
 			runAnimation = new JMenuItem("run animation");
 			run.add(runAnimation);
 		}
@@ -141,6 +198,7 @@ public class MainWindow extends JFrame
 					method.PopMatrix(render, matrixTemp);
 					temp.push(matrixTemp);
 				}
+				// TODO MainWindow.addAction(): finish the part of add Xwm construction action
 				if (input.space == UIInput.WORLD)
 				{
 					for (; render.matlevel > 3;)
@@ -192,7 +250,6 @@ public class MainWindow extends JFrame
 		}
 	}
 
-	// TODO MainWindow.deleteAction()
 	// 0-based index in actionList or XwmList
 	public boolean deleteAction(CS580GL method, int index) throws Exception
 	{
@@ -230,7 +287,7 @@ public class MainWindow extends JFrame
 				else
 				{
 					ListIterator<UIInput> li = actionList.listIterator(index);
-					int level = 3 + XwmSize+transformSize - index;
+					int level = 3 + XwmSize + transformSize - index;
 					while (li.hasPrevious())
 						if (li.previous().type == UIInput.CAMERA)
 							level++;

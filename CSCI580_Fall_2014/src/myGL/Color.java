@@ -6,10 +6,10 @@ public class Color
 	public float red;
 	public float green;
 	public float blue;
-	
+
 	public Color()
 	{
-		
+
 	}
 
 	public Color(float red, float green, float blue)
@@ -17,5 +17,12 @@ public class Color
 		this.red = red;
 		this.green = green;
 		this.blue = blue;
+	}
+
+	// Return vector represent.
+	public float[] getVector()
+	{
+		float[] re = { red, green, blue };
+		return re;
 	}
 }

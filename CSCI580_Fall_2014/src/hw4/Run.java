@@ -1,4 +1,4 @@
-package hw3;
+package hw4;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,8 +15,10 @@ import javax.swing.JOptionPane;
 
 import myGL.CS580GL;
 import myGL.Camera;
+import myGL.Color;
 import myGL.Coord;
 import myGL.Display;
+import myGL.Light;
 import myGL.Pixel;
 import myGL.Render;
 import myGL.Vertex;
@@ -33,7 +35,7 @@ public class Run
 	public static String defaultOutput = "output.ppm";
 	public static Pixel defaultPixel = new Pixel((short) 1000, (short) 1000, (short) 1000, (short) 1, Float.MAX_VALUE);
 	public static boolean status = true;
-	public static int hwNumber = 3;
+	public static int hwNumber = 4;
 	public static CS580GL method;
 
 	// Read asc file
@@ -90,9 +92,6 @@ public class Run
 
 		int[] nameListTriangle = new int[3]; // vertex attribute names
 		Object[] valueListTriangle = new Object[3]; // vertex attribute pointers
-		int[] nameListColor = new int[3]; // color type names
-		Object[] valueListColor = new Object[3]; // color type rgb pointers
-		float[] color = new float[3];
 		float[][] vertexList = new float[3][3]; // vertex position coordinates
 		float[][] normalList = new float[3][3]; // vertex normals
 		float[][] uvList = new float[3][2]; // vertex texture map indices
@@ -103,7 +102,8 @@ public class Run
 			throw new Exception("Initialize display error");
 
 		// Tokens associated with triangle vertex values
-		nameListTriangle[0] = Render.POSITION; // define vert coordinates only
+		nameListTriangle[0] = Render.POSITION;
+		nameListTriangle[1] = Render.NORMAL;
 
 		// Walk through the list of triangles, set color and pass vert info to render/scan convert each triangle
 		// read line by line
@@ -121,16 +121,21 @@ public class Run
 				uvList[i][1] = tri[i].V;
 			}
 
+			// ///// Test
 			// Set up shading attributes for each triangle
+			int[] nameListColor = new int[3]; // color type names
+			Object[] valueListColor = new Object[3]; // color type rgb pointers
+			float[] color = new float[3];
 			ComUtils.shade2(normalList[0], color);// shade based on the norm of vert0
 			valueListColor[0] = color;
 			nameListColor[0] = Render.RGB_COLOR;
 			method.PutAttribute(gui.render, 1, nameListColor, valueListColor);
+			// ///// Test
 
 			// Set the value pointers to the first vertex of the triangle, then feed it to the renderer
 			valueListTriangle[0] = vertexList;
-
-			method.DrawTriangle(gui.render, 1, nameListTriangle, valueListTriangle);
+			valueListTriangle[1] = normalList;
+			method.DrawTriangle(gui.render, 2, nameListTriangle, valueListTriangle);
 		}
 	}
 
@@ -166,6 +171,51 @@ public class Run
 			status &= gui.addAction(method, input);
 			input = new UIInput(UIInput.TRANSLATION, UIInput.WORLD, translation);
 			status &= gui.addAction(method, input);
+
+			int[] nameListShader = new int[9]; /* shader attribute names */
+			Object[] valueListShader = new Object[9]; /* shader attribute pointers */
+			int[] nameListLights = new int[10]; /* light info */
+			Object[] valueListLights = new Object[10];
+			int interpStyle;
+			float specpower;
+
+			/* Light */
+			Light light1 = new Light(new Coord(-0.7071f, 0.7071f, 0, 0), new Color(0.5f, 0.5f, 0.9f));
+			Light light2 = new Light(new Coord(0, -0.7071f, -0.7071f, 0), new Color(0.9f, 0.2f, 0.3f));
+			Light light3 = new Light(new Coord(0.7071f, 0, -0.7071f, 0), new Color(0.2f, 0.7f, 0.3f));
+			Light ambientlight = new Light(new Coord(0, 0, 0, 0), new Color(0.3f, 0.3f, 0.3f));
+
+			/* Material property */
+			Color specularCoefficient = new Color(0.3f, 0.3f, 0.3f);
+			Color ambientCoefficient = new Color(0.1f, 0.1f, 0.1f);
+			Color diffuseCoefficient = new Color(0.7f, 0.7f, 0.7f);
+
+			nameListLights[0] = Render.DIRECTIONAL_LIGHT;
+			valueListLights[0] = light1;
+			nameListLights[1] = Render.DIRECTIONAL_LIGHT;
+			valueListLights[1] = light2;
+			nameListLights[2] = Render.DIRECTIONAL_LIGHT;
+			valueListLights[2] = light3;
+			status &= method.PutAttribute(gui.render, 3, nameListLights, valueListLights);
+
+			nameListLights[0] = Render.AMBIENT_LIGHT;
+			valueListLights[0] = ambientlight;
+			status &= method.PutAttribute(gui.render, 1, nameListLights, valueListLights);
+
+			// Tokens associated with shading
+			nameListShader[0] = Render.DIFFUSE_COEFFICIENT;
+			valueListShader[0] = diffuseCoefficient;
+			nameListShader[1] = Render.INTERPOLATE;
+			interpStyle = gui.render.interp_mode;
+			valueListShader[1] = interpStyle;
+			nameListShader[2] = Render.AMBIENT_COEFFICIENT;
+			valueListShader[2] = ambientCoefficient;
+			nameListShader[3] = Render.SPECULAR_COEFFICIENT;
+			valueListShader[3] = specularCoefficient;
+			nameListShader[4] = Render.DISTRIBUTION_COEFFICIENT;
+			specpower = 32;
+			valueListShader[4] = specpower;
+			status &= method.PutAttribute(gui.render, 5, nameListShader, valueListShader);
 
 			if (!status)
 				throw new Exception("Initialize error");

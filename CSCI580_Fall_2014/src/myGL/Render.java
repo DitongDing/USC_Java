@@ -13,6 +13,7 @@ public class Render
 	public static int Z_BUFFER_RENDER = 1; // one type of renderClass
 
 	public static int RGB_COLOR = 99; // one type of nameList for putAttr and putTri
+	public static int INTERPOLATE = 95; // define interpolation mode
 	public static int SHADER = 96; // one type of nameList for putAttr and putTri
 
 	// flags fields for value list attributes
@@ -33,7 +34,8 @@ public class Render
 	public static int TEXTURE_MAP = 1010; // pointer to texture routine */
 
 	// select interpolation mode of the shader (either one - not both)
-	public static int GZ_COLOR = 1; // interpolate vertex color
+	public static int FLAT = 0;
+	public static int COLOR = 1; // interpolate vertex color
 	public static int NORMALS = 2; // interpolate normals
 
 	// coors constant
@@ -56,25 +58,27 @@ public class Render
 	public Camera camera;
 	public short matlevel = 0; // top of stack - current xform
 	public Matrix[] Ximage = new Matrix[MATLEVELS]; // stack of xforms (Xsm)
+	public short normmatlevel = 0; // top of stack - current xform
 	public Matrix[] Xnorm = new Matrix[MATLEVELS]; // xforms for norms (Xim)
 	public Matrix Xsp = new Matrix(); // NDC to screen (pers-to-screen)
 	public Color flatcolor; // color state for flat shaded triangles. Do not need to malloc, as every time we change value by "new"
-	public int interp_mode;
-	public int numlights;
+	public int interp_mode = COLOR;
+	public int numlights = 0;
 	public Light[] lights = new Light[MAX_LIGHTS];
 	public Light ambientlight;
 	public Color Ka = new Color(), Kd = new Color(), Ks = new Color();
 	public float spec; // specular power
-	
+
 	public Matrix[] MXimage = new Matrix[MATLEVELS]; // ***** Added by Ditong Ding, storing the multiplied matrix *****
+	public Matrix[] MXnorm = new Matrix[MATLEVELS]; // ***** Added by Ditong Ding, storing the multiplied matrix *****
 	public boolean begun = false; // ***** Added by Ditong Ding, to show if the begin function has been run *****
 
 	public Render()
 	{
-		for (int i = 0; i < Xnorm.length; i++)
-			Xnorm[i] = new Matrix();
 		for (int i = 0; i < MXimage.length; i++)
 			MXimage[i] = new Matrix();
+		for (int i = 0; i < MXnorm.length; i++)
+			MXnorm[i] = new Matrix();
 	}
 
 	public void tex_fun(float u, float v, float[] color)

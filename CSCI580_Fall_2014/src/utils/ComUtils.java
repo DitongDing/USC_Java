@@ -6,6 +6,7 @@ public class ComUtils
 {
 	public static double DEGREE_2_RAD = Math.PI / 180;
 
+	// For HW 1~3
 	public static void shade2(float[] norm, float[] color)
 	{
 

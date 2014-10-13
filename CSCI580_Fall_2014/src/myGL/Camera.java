@@ -6,7 +6,6 @@ public class Camera
 {
 	public Matrix Xiw = new Matrix(); // xform from world to image space
 	public Matrix Xpi = new Matrix(); // perspective projection xform
-
 	private Coord position = new Coord(-10, 5, -10, 1); // position of image plane origin, default is (-10, 5, -10, 1)
 	private Coord lookat = new Coord(0, 0, 0, 1); // position of look-at-point, default is (0, 0, 0, 1)
 	private Coord worldup = new Coord(0, 1, 0, 1); // world up-vector (almost screen up), default is (0, 1, 0, 1)

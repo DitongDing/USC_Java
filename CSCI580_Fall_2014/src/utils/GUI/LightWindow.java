@@ -6,33 +6,33 @@ import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-// TODO XwmWindow: finish construction of XwmWindow
-public class XwmWindow extends JFrame
+// TODO XwmWindow: finish construction of LightWindow. Do not forget to edit MainWindow to add light log
+public class LightWindow extends JFrame
 {
-	private static final long serialVersionUID = 651888265597284508L;
-	
-	public static class XWActionListener implements ActionListener
+	private static final long serialVersionUID = 2965669837557481504L;
+
+	public static class LWActionListener implements ActionListener
 	{
 		private MainWindow parent;
-		
-		public XWActionListener(MainWindow parent)
+
+		public LWActionListener(MainWindow parent)
 		{
 			this.parent = parent;
 		}
-		
+
 		public void actionPerformed(ActionEvent arg0)
 		{
-			new XwmWindow(parent);
+			new LightWindow(parent);
 		}
 	}
 
 	@SuppressWarnings("unused")
 	private MainWindow parent;
 
-	public XwmWindow(MainWindow parent)
+	public LightWindow(MainWindow parent)
 	{
 		this.parent = parent;
-		
+
 		JOptionPane.showMessageDialog(parent, "Under Construction", "error", JOptionPane.ERROR_MESSAGE);
 	}
 }
