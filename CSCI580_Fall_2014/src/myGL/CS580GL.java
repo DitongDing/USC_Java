@@ -42,10 +42,7 @@ public class CS580GL
 			display.dispClass = dispClass;
 			xRes = xRes < 0 ? 0 : (xRes > Display.MAXXRES ? Display.MAXXRES : xRes);
 			yRes = yRes < 0 ? 0 : (yRes > Display.MAXYRES ? Display.MAXYRES : yRes);
-			display.xres = (short) xRes;
-			display.yres = (short) yRes;
-			display.fbuf = new Pixel[display.xres * display.yres];
-			return true;
+			return NewImage(display, xRes, yRes);
 		}
 		catch (Exception e)
 		{
@@ -76,8 +73,7 @@ public class CS580GL
 	{
 		try
 		{
-			display.fbuf = null;
-			return true;
+			return FreeImage(display);
 		}
 		catch (Exception e)
 		{
@@ -762,5 +758,40 @@ public class CS580GL
 		color.blue = tempColor[2] > 1 ? 1 : tempColor[2];
 
 		return color;
+	}
+
+	// HW5 start
+	// Allocates memory for a new Display object
+	public boolean NewImage(Image image, int xRes, int yRes)
+	{
+		try
+		{
+			image.xres = (short) xRes;
+			image.yres = (short) yRes;
+			image.fbuf = new Pixel[image.xres * image.yres];
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.NewImage()");
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	// Frees up the memory allocated to a Display object
+	public boolean FreeImage(Image image)
+	{
+		try
+		{
+			image.fbuf = null;
+			return true;
+		}
+		catch (Exception e)
+		{
+			System.out.println("Error in CS580GL.FreeImage()");
+			e.printStackTrace();
+		}
+		return false;
 	}
 }

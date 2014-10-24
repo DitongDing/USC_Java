@@ -1,11 +1,12 @@
 package utils.GUI;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import javax.swing.*;
 
-import myGL.Display;
+import myGL.Image;
 import myGL.Pixel;
 
 public class ResultWindow extends JFrame
@@ -17,17 +18,17 @@ public class ResultWindow extends JFrame
 	private int imageIndex = -1;
 	public JPanel canvas;
 
-	public static BufferedImage Display2BufferedImage(Display display)
+	public static BufferedImage Display2BufferedImage(Image image)
 	{
-		if(display.changable)
+		if(image.changable)
 		{
-			BufferedImage bi = new BufferedImage(display.xres, display.yres, BufferedImage.TYPE_INT_RGB);
+			BufferedImage bi = new BufferedImage(image.xres, image.yres, BufferedImage.TYPE_INT_RGB);
 			for (int i = 0; i < bi.getWidth(); i++)
 				for (int j = 0; j < bi.getHeight(); j++)
 				{
-					Pixel pixel = display.getPixel(i, j);
-					bi.setRGB(i, j, new Color(pixel.red / (float) display.global_max, pixel.green / (float) display.global_max, pixel.blue
-							/ (float) display.global_max).getRGB());
+					Pixel pixel = image.getPixel(i, j);
+					bi.setRGB(i, j, new java.awt.Color(pixel.red / (float) image.global_max, pixel.green / (float) image.global_max, pixel.blue
+							/ (float) image.global_max).getRGB());
 				}
 			return bi;
 		}
