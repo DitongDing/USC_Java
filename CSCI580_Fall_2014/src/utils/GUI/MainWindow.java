@@ -259,8 +259,9 @@ public class MainWindow extends JFrame
 			// Delete camere change action
 			if (action.type == UIInput.CAMERA)
 			{
+				actionList.remove(index);
 				Camera prevCamera = null;
-				ListIterator<UIInput> li = actionList.listIterator(index);
+				ListIterator<UIInput> li = actionList.listIterator(actionList.size());
 				while (li.hasPrevious())
 				{
 					UIInput input = li.previous();
@@ -273,7 +274,6 @@ public class MainWindow extends JFrame
 				if (prevCamera == null)
 					prevCamera = new Camera();
 				method.PutCamera(render, prevCamera);
-				actionList.remove(index);
 			}
 			else
 			{
