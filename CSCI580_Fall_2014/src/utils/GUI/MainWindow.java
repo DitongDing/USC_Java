@@ -15,6 +15,7 @@ import myGL.Camera;
 import myGL.Display;
 import myGL.Matrix;
 import myGL.Render;
+import myGL.texture.*;
 
 public class MainWindow extends JFrame
 {
@@ -31,20 +32,21 @@ public class MainWindow extends JFrame
 	public JTextField outputPath;
 	public JMenuItem runRender;
 	public JMenuItem runAnimation;
+	public JRadioButtonMenuItem noTexture;
 
 	// For construction of Xwm
 	public short XwmSize;
-	public ArrayList<UIInput> XwmList;
+	public ArrayList<ActionInput> XwmList;
 
 	// For all actions, including transformation in object space, camera change
 	public short transformSize;
-	public ArrayList<UIInput> actionList;
+	public ArrayList<ActionInput> actionList;
 
 	public MainWindow(String title, int hwNumber) throws Exception
 	{
 		super(title);
-		XwmList = new ArrayList<UIInput>();
-		actionList = new ArrayList<UIInput>();
+		XwmList = new ArrayList<ActionInput>();
+		actionList = new ArrayList<ActionInput>();
 		render = new Render();
 		display = new Display();
 		method = new CS580GL(hwNumber);
@@ -115,10 +117,10 @@ public class MainWindow extends JFrame
 					}
 				});
 
-				ButtonGroup bg = new ButtonGroup();
-				bg.add(flat);
-				bg.add(gouraud);
-				bg.add(phong);
+				ButtonGroup bgI = new ButtonGroup();
+				bgI.add(flat);
+				bgI.add(gouraud);
+				bgI.add(phong);
 				if (render.interp_mode == Render.FLAT)
 					flat.setSelected(true);
 				else if (render.interp_mode == Render.COLOR)
@@ -132,6 +134,70 @@ public class MainWindow extends JFrame
 				interpStyle.add(gouraud);
 				interpStyle.add(phong);
 				edit.add(interpStyle);
+
+				if (hwNumber >= 5)
+				{
+					edit.addSeparator();
+					JMenu editTexture = new JMenu("Edit Texture");
+					noTexture = new JRadioButtonMenuItem("No texture");
+					JRadioButtonMenuItem fileTexture = new JRadioButtonMenuItem("File texture");
+					JRadioButtonMenuItem processTexture1 = new JRadioButtonMenuItem("Process texture - type 1");
+
+					noTexture.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0)
+						{
+							int[] nameList = { Render.TEXTURE_MAP };
+							Object[] valueList = new Object[] { null };
+							method.PutAttribute(render, 1, nameList, valueList);
+						}
+					});
+					fileTexture.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0)
+						{
+							FileTexture texture = null;
+							try
+							{
+								texture = new FileTexture(method, JOptionPane.showInputDialog(null, "Please input texture file path", "texture"));
+							}
+							catch (Exception e)
+							{
+								JOptionPane.showMessageDialog(null, "Texture file read error, reset to no texture", "error", JOptionPane.ERROR_MESSAGE);
+								e.printStackTrace();
+							}
+							int[] nameList = { Render.TEXTURE_MAP };
+							Object[] valueList = new Object[] { texture };
+							method.PutAttribute(render, 1, nameList, valueList);
+							if (texture == null)
+								noTexture.setSelected(true);
+						}
+					});
+					processTexture1.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0)
+						{
+							int[] nameList = { Render.TEXTURE_MAP };
+							Object[] valueList = new Object[] { new ProcessTexture1() };
+							method.PutAttribute(render, 1, nameList, valueList);
+						}
+					});
+
+					ButtonGroup bgT = new ButtonGroup();
+					bgT.add(noTexture);
+					bgT.add(fileTexture);
+					bgT.add(processTexture1);
+					if (render.textureFunction == null)
+						noTexture.setSelected(true);
+					else if (render.textureFunction instanceof FileTexture)
+						fileTexture.setSelected(true);
+					else if (render.textureFunction instanceof ProcessTexture1)
+						processTexture1.setSelected(true);
+					else
+						throw new Exception("Render default texture function error");
+
+					editTexture.add(noTexture);
+					editTexture.add(fileTexture);
+					editTexture.add(processTexture1);
+					edit.add(editTexture);
+				}
 			}
 
 			menuBar.add(edit);
@@ -165,29 +231,29 @@ public class MainWindow extends JFrame
 	}
 
 	// Add later action to actionlist
-	public boolean addAction(CS580GL method, UIInput input) throws Exception
+	public boolean addAction(CS580GL method, ActionInput input) throws Exception
 	{
 		try
 		{
-			if (input.type != UIInput.CAMERA && XwmSize + transformSize == Render.MATLEVELS - 3) // 3 means Xsp, Xpi, Xiw already in Ximage
+			if (input.type != ActionInput.CAMERA && XwmSize + transformSize == Render.MATLEVELS - 3) // 3 means Xsp, Xpi, Xiw already in Ximage
 				throw new Exception("Render Xforms stack overflow");
 
-			if (input.type != UIInput.CAMERA)
+			if (input.type != ActionInput.CAMERA)
 			{
 				// Pop until remains Xsp, Xpi and Xiw
 				Stack<Matrix> temp = new Stack<Matrix>();
 				Matrix matrix = null;
 
 				matrix = new Matrix();
-				if (input.type == UIInput.ROTATION_X)
+				if (input.type == ActionInput.ROTATION_X)
 					method.CreateRotationByXMatrix(input.rotation.x, matrix);
-				else if (input.type == UIInput.ROTATION_Y)
+				else if (input.type == ActionInput.ROTATION_Y)
 					method.CreateRotationByYMatrix(input.rotation.y, matrix);
-				else if (input.type == UIInput.ROTATION_Z)
+				else if (input.type == ActionInput.ROTATION_Z)
 					method.CreateRotationByZMatrix(input.rotation.z, matrix);
-				else if (input.type == UIInput.TRANSLATION)
+				else if (input.type == ActionInput.TRANSLATION)
 					method.CreateTranslationMatrix(input.translation, matrix);
-				else if (input.type == UIInput.SCALE)
+				else if (input.type == ActionInput.SCALE)
 					method.CreateScaleMatrix(input.scale, matrix);
 				else
 					throw new Exception("input type error");
@@ -199,7 +265,7 @@ public class MainWindow extends JFrame
 					temp.push(matrixTemp);
 				}
 				// TODO MainWindow.addAction(): finish the part of add Xwm construction action
-				if (input.space == UIInput.WORLD)
+				if (input.space == ActionInput.WORLD)
 				{
 					for (; render.matlevel > 3;)
 					{
@@ -255,17 +321,17 @@ public class MainWindow extends JFrame
 	{
 		try
 		{
-			UIInput action = actionList.get(index);
+			ActionInput action = actionList.get(index);
 			// Delete camere change action
-			if (action.type == UIInput.CAMERA)
+			if (action.type == ActionInput.CAMERA)
 			{
 				actionList.remove(index);
 				Camera prevCamera = null;
-				ListIterator<UIInput> li = actionList.listIterator(actionList.size());
+				ListIterator<ActionInput> li = actionList.listIterator(actionList.size());
 				while (li.hasPrevious())
 				{
-					UIInput input = li.previous();
-					if (input.type == UIInput.CAMERA)
+					ActionInput input = li.previous();
+					if (input.type == ActionInput.CAMERA)
 					{
 						prevCamera = input.camera;
 						break;
@@ -279,17 +345,17 @@ public class MainWindow extends JFrame
 			{
 				// Delete Xwm construction action
 				// TODO MainWindow.deleteAction(): finish the part of delete Xwm construction action
-				if (action.space == UIInput.WORLD)
+				if (action.space == ActionInput.WORLD)
 				{
 
 				}
 				// Delete object space transformation
 				else
 				{
-					ListIterator<UIInput> li = actionList.listIterator(index);
+					ListIterator<ActionInput> li = actionList.listIterator(index);
 					int level = 3 + XwmSize + transformSize - index;
 					while (li.hasPrevious())
-						if (li.previous().type == UIInput.CAMERA)
+						if (li.previous().type == ActionInput.CAMERA)
 							level++;
 
 					Stack<Matrix> temp = new Stack<Matrix>();

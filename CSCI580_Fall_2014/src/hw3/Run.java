@@ -3,13 +3,10 @@ package hw3;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.ListIterator;
-import java.util.StringTokenizer;
 
 import javax.swing.JOptionPane;
 
@@ -24,7 +21,7 @@ import myGL.Vertex;
 import utils.ComUtils;
 import utils.GUI.MainWindow;
 import utils.GUI.ResultWindow;
-import utils.GUI.UIInput;
+import utils.GUI.ActionInput;
 
 public class Run
 {
@@ -35,53 +32,6 @@ public class Run
 	public static boolean status = true;
 	public static int hwNumber = 3;
 	public static CS580GL method;
-
-	// Read asc file
-	public static ArrayList<Vertex[]> readASCFile(String inputFileName) throws Exception
-	{
-		ArrayList<Vertex[]> triList = new ArrayList<Vertex[]>();
-		BufferedReader br = new BufferedReader(new FileReader(inputFileName));
-		String name;
-		int count;
-
-		while ((name = br.readLine()) != null && name.startsWith("triangle"))
-		{
-			Vertex[] tri = new Vertex[3];
-			StringTokenizer[] st = new StringTokenizer[3];
-			for (count = 0; count < 3; count++)
-			{
-				String string = br.readLine();
-				if (string == null)
-					break;
-				st[count] = new StringTokenizer(string, " \t");
-				if (st[count].countTokens() != 8)
-					break;
-			}
-			// meets end of file
-			if (count < 3)
-				break;
-
-			for (int i = 0; i < 3; i++)
-			{
-				float x, y, z, w = 1, nx, ny, nz, u, v;
-				x = Float.parseFloat(st[i].nextToken());
-				y = Float.parseFloat(st[i].nextToken());
-				z = Float.parseFloat(st[i].nextToken());
-				nx = Float.parseFloat(st[i].nextToken());
-				ny = Float.parseFloat(st[i].nextToken());
-				nz = Float.parseFloat(st[i].nextToken());
-				u = Float.parseFloat(st[i].nextToken());
-				v = Float.parseFloat(st[i].nextToken());
-				tri[i] = new Vertex(x, y, z, w, new Coord(nx, ny, nz, 0), u, v);
-			}
-
-			triList.add(tri);
-		}
-
-		br.close();
-
-		return triList;
-	}
 
 	// Write render result to gui.display
 	public static void runRender(ArrayList<Vertex[]> triList) throws Exception
@@ -156,15 +106,15 @@ public class Run
 			Coord rotateX = new Coord(315f, 0f, 0f, 0f);
 			Camera camera = new Camera(new Coord(13.2f, -8.7f, -14.8f, 1f), new Coord(0.8f, 0.7f, 4.5f, 1f), new Coord(-0.2f, 1.0f, 0.0f, 0), 53.7f);
 
-			UIInput input = new UIInput(UIInput.CAMERA, UIInput.WORLD, camera);
+			ActionInput input = new ActionInput(ActionInput.CAMERA, ActionInput.WORLD, camera);
 			status &= gui.addAction(method, input);
-			input = new UIInput(UIInput.ROTATION_X, UIInput.WORLD, rotateX);
+			input = new ActionInput(ActionInput.ROTATION_X, ActionInput.WORLD, rotateX);
 			status &= gui.addAction(method, input);
-			input = new UIInput(UIInput.ROTATION_Y, UIInput.WORLD, rotateY);
+			input = new ActionInput(ActionInput.ROTATION_Y, ActionInput.WORLD, rotateY);
 			status &= gui.addAction(method, input);
-			input = new UIInput(UIInput.SCALE, UIInput.WORLD, scale);
+			input = new ActionInput(ActionInput.SCALE, ActionInput.WORLD, scale);
 			status &= gui.addAction(method, input);
-			input = new UIInput(UIInput.TRANSLATION, UIInput.WORLD, translation);
+			input = new ActionInput(ActionInput.TRANSLATION, ActionInput.WORLD, translation);
 			status &= gui.addAction(method, input);
 
 			if (!status)
@@ -180,7 +130,7 @@ public class Run
 						{
 							try
 							{
-								ArrayList<Vertex[]> triList = readASCFile(gui.inputPath.getText());
+								ArrayList<Vertex[]> triList = ComUtils.readASCFile(gui.inputPath.getText());
 
 								runRender(triList);
 
@@ -219,10 +169,10 @@ public class Run
 						{
 							try
 							{
-								ArrayList<Vertex[]> triList = readASCFile(gui.inputPath.getText());
+								ArrayList<Vertex[]> triList = ComUtils.readASCFile(gui.inputPath.getText());
 								ArrayList<BufferedImage> biList = new ArrayList<BufferedImage>();
 
-								ArrayList<UIInput> actionList = new ArrayList<UIInput>(gui.actionList);
+								ArrayList<ActionInput> actionList = new ArrayList<ActionInput>(gui.actionList);
 
 								// Remove all action for using addAction and deleteAction
 								for (int i = 0; i < actionList.size(); i++)
@@ -230,17 +180,17 @@ public class Run
 
 								// Render frames for every action and recover actionlist
 								int count = 0;
-								for (UIInput action : actionList)
+								for (ActionInput action : actionList)
 								{
 									int frameNum = (int) (action.period * ResultWindow.defaultFPS);
 
 									// Get previous camera
 									Camera prevCamera = null;
-									ListIterator<UIInput> li = actionList.listIterator(count);
+									ListIterator<ActionInput> li = actionList.listIterator(count);
 									while (li.hasPrevious())
 									{
-										UIInput input = li.previous();
-										if (input.type == UIInput.CAMERA)
+										ActionInput input = li.previous();
+										if (input.type == ActionInput.CAMERA)
 										{
 											prevCamera = input.camera;
 											break;
@@ -251,22 +201,23 @@ public class Run
 
 									for (int j = 0; j < frameNum; j++)
 									{
-										UIInput input = null;
-										if (action.type == UIInput.ROTATION_X || action.type == UIInput.ROTATION_Y || action.type == UIInput.ROTATION_Z)
-											input = new UIInput(action.type, action.space, (Object) ComUtils.interpolateCoord(new Coord(0, 0, 0, 0),
+										ActionInput input = null;
+										if (action.type == ActionInput.ROTATION_X || action.type == ActionInput.ROTATION_Y
+												|| action.type == ActionInput.ROTATION_Z)
+											input = new ActionInput(action.type, action.space, (Object) Coord.interpolateCoord(new Coord(0, 0, 0, 0),
 													action.rotation, j / (float) frameNum));
-										else if (action.type == UIInput.TRANSLATION)
-											input = new UIInput(action.type, action.space, (Object) ComUtils.interpolateCoord(new Coord(0, 0, 0, 0),
+										else if (action.type == ActionInput.TRANSLATION)
+											input = new ActionInput(action.type, action.space, (Object) Coord.interpolateCoord(new Coord(0, 0, 0, 0),
 													action.translation, j / (float) frameNum));
-										else if (action.type == UIInput.SCALE)
-											input = new UIInput(action.type, action.space, (Object) ComUtils.interpolateCoord(new Coord(1, 1, 1, 0),
+										else if (action.type == ActionInput.SCALE)
+											input = new ActionInput(action.type, action.space, (Object) Coord.interpolateCoord(new Coord(1, 1, 1, 0),
 													action.scale, j / (float) frameNum));
-										else if (action.type == UIInput.CAMERA)
+										else if (action.type == ActionInput.CAMERA)
 										{
 											Camera thisCamera = action.camera;
-											input = new UIInput(action.type, action.space, (Object) new Camera(ComUtils.interpolateCoord(
-													prevCamera.getPosition(), thisCamera.getPosition(), j / (float) frameNum), ComUtils.interpolateCoord(
-													prevCamera.getLookat(), thisCamera.getLookat(), j / (float) frameNum), ComUtils.interpolateCoord(
+											input = new ActionInput(action.type, action.space, (Object) new Camera(Coord.interpolateCoord(
+													prevCamera.getPosition(), thisCamera.getPosition(), j / (float) frameNum), Coord.interpolateCoord(
+													prevCamera.getLookat(), thisCamera.getLookat(), j / (float) frameNum), Coord.interpolateCoord(
 													prevCamera.getWorldup(), thisCamera.getWorldup(), j / (float) frameNum), ComUtils.interpolateFloat(
 													prevCamera.getFOV(), thisCamera.getFOV(), j / (float) frameNum)));
 										}

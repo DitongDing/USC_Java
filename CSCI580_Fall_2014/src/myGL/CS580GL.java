@@ -4,6 +4,8 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.Stack;
 
+import myGL.texture.TextureFunction;
+
 import utils.ComUtils;
 
 public class CS580GL
@@ -276,6 +278,8 @@ public class CS580GL
 						render.Ks = (Color) valueList[i];
 					else if (nameList[i] == Render.DISTRIBUTION_COEFFICIENT)
 						render.spec = (Float) valueList[i];
+					else if (nameList[i] == Render.TEXTURE_MAP)
+						render.textureFunction = (TextureFunction) valueList[i];
 					else
 						throw new Exception("attr name error in put attr for render");
 				}
@@ -301,12 +305,19 @@ public class CS580GL
 				// Apply LEE, not SLR. Try SLR later
 				float[][] vertexPosition = null;
 				float[][] vertexNorm = null;
+				float[][] vertexUV = null;
 				if (numParts == 1 && nameList[0] == Render.POSITION) // Only vertex position
 					vertexPosition = (float[][]) valueList[0];
 				else if (numParts == 2 && nameList[0] == Render.POSITION && nameList[1] == Render.NORMAL) // Vertex position and vertex norms
 				{
 					vertexPosition = (float[][]) valueList[0];
 					vertexNorm = (float[][]) valueList[1];
+				}
+				else if (numParts == 3 && nameList[0] == Render.POSITION && nameList[1] == Render.NORMAL && nameList[2] == Render.TEXTURE_INDEX) // Vertex position and vertex norms
+				{
+					vertexPosition = (float[][]) valueList[0];
+					vertexNorm = (float[][]) valueList[1];
+					vertexUV = (float[][]) valueList[2];
 				}
 				else
 					throw new Exception("Draw Triangle numPart error");
@@ -358,6 +369,8 @@ public class CS580GL
 				float[] N1N = new float[3];
 				float[] N2N = new float[3];
 				float[] N3N = new float[3];
+				float[] TUN = new float[3];
+				float[] TVN = new float[3];
 				Color[] vertexColor = new Color[3];
 
 				// Calculate normal vector of plane v1,v2,v3 in screen space
@@ -369,48 +382,82 @@ public class CS580GL
 
 				if (hwNumber >= 4)
 				{
-					// TODO CS580GL.DrawTriangle(): Some assumptions for calculate color
+					// Some assumptions for calculate color
 					// Transform all to image space
 					// Interpolate color/norms in screen space (ignore the fact that norms are in model space.)
 					// Use constant E vector
-					for (int j = 0; j < 3; j++)
-						vertexColor[j] = this.calColor(render, vertexNorm[j], new float[] { 0, 0, -1 });
-					// Calculate normal vector of plane v1,v2,v3 in XYCr space
-					for (int j = 0; j < 2; j++)
-						vectors[j][2] = vertexColor[j].red - vertexColor[j + 1].red;
-					CrN[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
-					CrN[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
-					CrN[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
-					// Calculate normal vector of plane v1,v2,v3 in XYCg space
-					for (int j = 0; j < 2; j++)
-						vectors[j][2] = vertexColor[j].green - vertexColor[j + 1].green;
-					CgN[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
-					CgN[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
-					CgN[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
-					// Calculate normal vector of plane v1,v2,v3 in XYCb space
-					for (int j = 0; j < 2; j++)
-						vectors[j][2] = vertexColor[j].blue - vertexColor[j + 1].blue;
-					CbN[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
-					CbN[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
-					CbN[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
-					// Calculate normal vector of plane v1,v2,v3 in XYN1 space
-					for (int j = 0; j < 2; j++)
-						vectors[j][2] = vertexNorm[j][0] - vertexNorm[j + 1][0];
-					N1N[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
-					N1N[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
-					N1N[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
-					// Calculate normal vector of plane v1,v2,v3 in XYN2 space
-					for (int j = 0; j < 2; j++)
-						vectors[j][2] = vertexNorm[j][1] - vertexNorm[j + 1][1];
-					N2N[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
-					N2N[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
-					N2N[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
-					// Calculate normal vector of plane v1,v2,v3 in XYN3 space
-					for (int j = 0; j < 2; j++)
-						vectors[j][2] = vertexNorm[j][2] - vertexNorm[j + 1][2];
-					N3N[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
-					N3N[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
-					N3N[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
+					if (render.interp_mode == Render.NORMALS)
+					{
+						// Calculate normal vector of plane v1,v2,v3 in XYN1 space
+						for (int j = 0; j < 2; j++)
+							vectors[j][2] = vertexNorm[j][0] - vertexNorm[j + 1][0];
+						N1N[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
+						N1N[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
+						N1N[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
+						// Calculate normal vector of plane v1,v2,v3 in XYN2 space
+						for (int j = 0; j < 2; j++)
+							vectors[j][2] = vertexNorm[j][1] - vertexNorm[j + 1][1];
+						N2N[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
+						N2N[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
+						N2N[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
+						// Calculate normal vector of plane v1,v2,v3 in XYN3 space
+						for (int j = 0; j < 2; j++)
+							vectors[j][2] = vertexNorm[j][2] - vertexNorm[j + 1][2];
+						N3N[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
+						N3N[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
+						N3N[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
+					}
+					else
+					{
+						if (hwNumber == 4 || render.tex_fun(0, 0) == null)
+							for (int j = 0; j < 3; j++)
+								vertexColor[j] = calColor(render, render.Ka, render.Kd, render.Ks, vertexNorm[j], new float[] { 0, 0, -1 });
+						else
+							for (int j = 0; j < 3; j++)
+							{
+								// Assume for HW5, flat color mode use Kt as Ka, Kd, Kd
+								Color texture = render.tex_fun(vertexUV[j][0], vertexUV[j][1]);
+								vertexColor[j] = calColor(render, texture, texture, texture, vertexNorm[j], new float[] { 0, 0, -1 });
+							}
+						if (render.interp_mode == Render.COLOR)
+						{
+							// Calculate normal vector of plane v1,v2,v3 in XYCr space
+							for (int j = 0; j < 2; j++)
+								vectors[j][2] = vertexColor[j].red - vertexColor[j + 1].red;
+							CrN[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
+							CrN[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
+							CrN[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
+							// Calculate normal vector of plane v1,v2,v3 in XYCg space
+							for (int j = 0; j < 2; j++)
+								vectors[j][2] = vertexColor[j].green - vertexColor[j + 1].green;
+							CgN[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
+							CgN[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
+							CgN[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
+							// Calculate normal vector of plane v1,v2,v3 in XYCb space
+							for (int j = 0; j < 2; j++)
+								vectors[j][2] = vertexColor[j].blue - vertexColor[j + 1].blue;
+							CbN[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
+							CbN[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
+							CbN[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
+						}
+					}
+					if (hwNumber >= 5 && render.interp_mode == Render.NORMALS && render.tex_fun(0, 0) != null)
+					{
+						// transform UV to perspective space
+						for (int j = 0; j < 3; j++)
+							for (int k = 0; k < 2; k++)
+								vertexUV[j][k] = vertexUV[j][k] / (1 + vertexList[j][2] / (render.camera.getD() - vertexList[j][2]));
+						for (int j = 0; j < 2; j++)
+							vectors[j][2] = vertexUV[j][0] - vertexUV[j + 1][0];
+						TUN[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
+						TUN[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
+						TUN[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
+						for (int j = 0; j < 2; j++)
+							vectors[j][2] = vertexUV[j][1] - vertexUV[j + 1][1];
+						TVN[0] = vectors[0][1] * vectors[1][2] - vectors[0][2] * vectors[1][1];
+						TVN[1] = vectors[0][2] * vectors[1][0] - vectors[0][0] * vectors[1][2];
+						TVN[2] = vectors[0][0] * vectors[1][1] - vectors[0][1] * vectors[1][0];
+					}
 				}
 
 				// calculate ulx, uly, lrx, lry
@@ -461,7 +508,6 @@ public class CS580GL
 										color = vertexColor[0];
 									else if (render.interp_mode == Render.COLOR)
 									{
-										// TODO CS580GL.DrawTriangle(): Haven't test Gouraud shading
 										float r = vertexColor[0].red - ((X - vertexList[0][0]) * CrN[0] + (Y - vertexList[0][1]) * CrN[1]) / CrN[2];
 										float g = vertexColor[0].green - ((X - vertexList[0][0]) * CgN[0] + (Y - vertexList[0][1]) * CgN[1]) / CgN[2];
 										float b = vertexColor[0].blue - ((X - vertexList[0][0]) * CbN[0] + (Y - vertexList[0][1]) * CbN[1]) / CbN[2];
@@ -469,11 +515,19 @@ public class CS580GL
 									}
 									else if (render.interp_mode == Render.NORMALS)
 									{
-										// TODO CS580GL.DrawTriangle(): Haven't test Phong shading
 										float N1 = vertexNorm[0][0] - ((X - vertexList[0][0]) * N1N[0] + (Y - vertexList[0][1]) * N1N[1]) / N1N[2];
 										float N2 = vertexNorm[0][1] - ((X - vertexList[0][0]) * N2N[0] + (Y - vertexList[0][1]) * N2N[1]) / N2N[2];
 										float N3 = vertexNorm[0][2] - ((X - vertexList[0][0]) * N3N[0] + (Y - vertexList[0][1]) * N3N[1]) / N3N[2];
-										color = this.calColor(render, new float[] { N1, N2, N3 }, new float[] { 0, 0, -1 });
+										if (hwNumber == 4 || render.tex_fun(0, 0) == null)
+											color = calColor(render, render.Ka, render.Kd, render.Ks, new float[] { N1, N2, N3 }, new float[] { 0, 0, -1 });
+										else
+										{
+											float multiplier = 1+Z/(render.camera.getD()-Z);
+											float U = vertexUV[0][0] - ((X - vertexList[0][0]) * TUN[0] + (Y - vertexList[0][1]) * TUN[1]) / TUN[2];
+											float V = vertexUV[0][1] - ((X - vertexList[0][0]) * TVN[0] + (Y - vertexList[0][1]) * TVN[1]) / TVN[2];
+											Color texture = render.tex_fun(U*multiplier, V*multiplier);
+											color = calColor(render, texture, texture, render.Ks, new float[] { N1, N2, N3 }, new float[] { 0, 0, -1 });
+										}
 									}
 									else
 										throw new Exception("render's color interpolate mode error");
@@ -696,13 +750,13 @@ public class CS580GL
 	}
 
 	// HW4 start
-	private Color calColor(Render render, float[] Nm, float[] E) throws Exception
+	private Color calColor(Render render, Color KA, Color KD, Color KS, float[] Nm, float[] E) throws Exception
 	{
 		Color color = new Color(0, 0, 0);
 
-		float[] Ka = render.Ka.getVector();
+		float[] Ka = KA.getVector();
 		float[] la = render.ambientlight.color.getVector();
-		float[] Kd = render.Kd.getVector();
+		float[] Kd = KD.getVector();
 		float[][] le = new float[render.numlights][];
 		// Convert N to image space
 		float[][] NMatrix = ComUtils.Multiply(render.MXnorm[render.matlevel - 1].value, new float[][] { { Nm[0] }, { Nm[1] }, { Nm[2] }, { 0 } });
@@ -715,7 +769,7 @@ public class CS580GL
 			L[i] = new float[] { render.lights[i].direction.x, render.lights[i].direction.y, render.lights[i].direction.z };
 			R[i] = ComUtils.Plus(ComUtils.Multiply(2 * ComUtils.Multiply(N, L[i]), N), ComUtils.Multiply(-1, L[i]));
 		}
-		float[] Ks = render.Ks.getVector();
+		float[] Ks = KS.getVector();
 		float s = render.spec;
 
 		if (ComUtils.Multiply(N, E) < 0)

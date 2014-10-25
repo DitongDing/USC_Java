@@ -173,20 +173,20 @@ public class ActionWindow extends JFrame
 							Coord rotation;
 							if (X.isSelected())
 							{
-								type = UIInput.ROTATION_X;
+								type = ActionInput.ROTATION_X;
 								rotation = new Coord(fvalue, 0, 0, 0);
 							}
 							else if (Y.isSelected())
 							{
-								type = UIInput.ROTATION_Y;
+								type = ActionInput.ROTATION_Y;
 								rotation = new Coord(0, fvalue, 0, 0);
 							}
 							else
 							{
-								type = UIInput.ROTATION_Z;
+								type = ActionInput.ROTATION_Z;
 								rotation = new Coord(0, 0, fvalue, 0);
 							}
-							UIInput input = new UIInput(type, UIInput.OBJECT, rotation);
+							ActionInput input = new ActionInput(type, ActionInput.OBJECT, rotation);
 							parent.addAction(parent.method, input);
 							frame.dispose();
 							refreshTable();
@@ -261,9 +261,9 @@ public class ActionWindow extends JFrame
 							float fvalueX = Float.parseFloat(valueX.getText());
 							float fvalueY = Float.parseFloat(valueY.getText());
 							float fvalueZ = Float.parseFloat(valueZ.getText());
-							short type = UIInput.TRANSLATION;
+							short type = ActionInput.TRANSLATION;
 							Coord translation = new Coord(fvalueX, fvalueY, fvalueZ, 0);
-							UIInput input = new UIInput(type, UIInput.OBJECT, translation);
+							ActionInput input = new ActionInput(type, ActionInput.OBJECT, translation);
 							parent.addAction(parent.method, input);
 							frame.dispose();
 							refreshTable();
@@ -338,9 +338,9 @@ public class ActionWindow extends JFrame
 							float fvalueX = Float.parseFloat(valueX.getText());
 							float fvalueY = Float.parseFloat(valueY.getText());
 							float fvalueZ = Float.parseFloat(valueZ.getText());
-							short type = UIInput.SCALE;
+							short type = ActionInput.SCALE;
 							Coord scale = new Coord(fvalueX, fvalueY, fvalueZ, 0);
-							UIInput input = new UIInput(type, UIInput.OBJECT, scale);
+							ActionInput input = new ActionInput(type, ActionInput.OBJECT, scale);
 							parent.addAction(parent.method, input);
 							frame.dispose();
 							refreshTable();
@@ -455,9 +455,9 @@ public class ActionWindow extends JFrame
 							Coord worldup = new Coord(Float.parseFloat(Wvalue[0].getText()), Float.parseFloat(Wvalue[1].getText()), Float.parseFloat(Wvalue[2]
 									.getText()), 1);
 							float FOV = Float.parseFloat(FOVvalue.getText());
-							short type = UIInput.CAMERA;
+							short type = ActionInput.CAMERA;
 							Camera camera = new Camera(position, lookat, worldup, FOV);
-							UIInput input = new UIInput(type, UIInput.OBJECT, camera);
+							ActionInput input = new ActionInput(type, ActionInput.OBJECT, camera);
 							parent.addAction(parent.method, input);
 							frame.dispose();
 							refreshTable();
@@ -541,38 +541,38 @@ public class ActionWindow extends JFrame
 		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
 		tableModel.setRowCount(0);
 		int no = 1;
-		for (UIInput input : parent.actionList)
+		for (ActionInput input : parent.actionList)
 		{
 			String number = new Integer(no++).toString();
 			String type = "";
 			String description = "";
 			String timePeriod = new Double(input.period).toString();
-			if (input.type == UIInput.ROTATION_X)
+			if (input.type == ActionInput.ROTATION_X)
 			{
 				type = "rotation";
 				description = "rotate by X in " + input.rotation.x + " degree";
 			}
-			else if (input.type == UIInput.ROTATION_Y)
+			else if (input.type == ActionInput.ROTATION_Y)
 			{
 				type = "rotation";
 				description = "rotate by Y in " + input.rotation.y + " degree";
 			}
-			else if (input.type == UIInput.ROTATION_Z)
+			else if (input.type == ActionInput.ROTATION_Z)
 			{
 				type = "rotation";
 				description = "rotate by Z in " + input.rotation.z + " degree";
 			}
-			else if (input.type == UIInput.TRANSLATION)
+			else if (input.type == ActionInput.TRANSLATION)
 			{
 				type = "translation";
 				description = "translation by (" + input.translation.x + ", " + input.translation.y + ", " + input.translation.z + ")";
 			}
-			else if (input.type == UIInput.SCALE)
+			else if (input.type == ActionInput.SCALE)
 			{
 				type = "scale";
 				description = "scale X by " + input.scale.x + " times, scale Y by " + input.scale.y + " times, scale Z by " + input.scale.z + " times";
 			}
-			else if (input.type == UIInput.CAMERA)
+			else if (input.type == ActionInput.CAMERA)
 			{
 				type = "camera";
 				description = "";

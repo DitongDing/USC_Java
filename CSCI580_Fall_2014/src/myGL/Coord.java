@@ -1,5 +1,7 @@
 package myGL;
 
+import utils.ComUtils;
+
 public class Coord
 {
 	public float x;
@@ -47,5 +49,11 @@ public class Coord
 	{
 		float[] re = { x, y, z, w };
 		return re;
+	}
+
+	public static Coord interpolateCoord(Coord start, Coord end, float progress)
+	{
+		return new Coord(ComUtils.interpolateFloat(start.x, end.x, progress), ComUtils.interpolateFloat(start.y, end.y, progress), ComUtils.interpolateFloat(
+				start.z, end.z, progress), ComUtils.interpolateFloat(start.w, end.w, progress));
 	}
 }

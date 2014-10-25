@@ -1,5 +1,7 @@
 package myGL;
 
+import myGL.texture.TextureFunction;
+
 public class Render
 {
 	public static int MATLEVELS = 10; // how many matrix pushes allowed
@@ -61,12 +63,13 @@ public class Render
 	public Matrix[] Xnorm = new Matrix[MATLEVELS]; // xforms for norms (Xim)
 	public Matrix Xsp = new Matrix(); // NDC to screen (pers-to-screen)
 	public Color flatcolor; // color state for flat shaded triangles. Do not need to malloc, as every time we change value by "new"
-	public int interp_mode = COLOR;
+	public int interp_mode = NORMALS;
 	public int numlights = 0;
 	public Light[] lights = new Light[MAX_LIGHTS];
 	public Light ambientlight;
 	public Color Ka = new Color(), Kd = new Color(), Ks = new Color();
 	public float spec; // specular power
+	public TextureFunction textureFunction = null;
 
 	public Matrix[] MXimage = new Matrix[MATLEVELS]; // ***** Added by Ditong Ding, storing the multiplied matrix *****
 	public Matrix[] MXnorm = new Matrix[MATLEVELS]; // ***** Added by Ditong Ding, storing the multiplied matrix *****
@@ -80,7 +83,9 @@ public class Render
 			MXnorm[i] = new Matrix();
 	}
 
-	public void tex_fun(float u, float v, float[] color)
+	// NULL means do not add texture
+	public Color tex_fun(float u, float v)
 	{
+		return textureFunction == null ? null : textureFunction.getColor(u, v);
 	}
 }

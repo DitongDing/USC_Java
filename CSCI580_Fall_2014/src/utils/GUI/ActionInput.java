@@ -3,7 +3,7 @@ package utils.GUI;
 import myGL.Camera;
 import myGL.Coord;
 
-public class UIInput
+public class ActionInput
 {
 	public static short ROTATION_X = 0; // incremental, only x can be non-zero;
 	public static short ROTATION_Y = 1; // incremental, only y can be non-zero;
@@ -23,7 +23,7 @@ public class UIInput
 	public Camera camera = null;
 	public double period = 1; // the length of interval to perform this input. Zero means no animation.
 
-	public UIInput(short type, short space, Object action)
+	public ActionInput(short type, short space, Object action)
 	{
 		if (type == ROTATION_X || type == ROTATION_Y || type == ROTATION_Z)
 			rotation = (Coord) action;

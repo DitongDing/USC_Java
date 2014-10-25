@@ -2,8 +2,11 @@ package utils;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 import javax.imageio.ImageIO;
@@ -12,6 +15,7 @@ import myGL.CS580GL;
 import myGL.Coord;
 import myGL.Image;
 import myGL.Pixel;
+import myGL.Vertex;
 
 public class ComUtils
 {
@@ -122,12 +126,6 @@ public class ComUtils
 		for (int i = 0; i < re.length; i++)
 			re[i] = (float) (vector[i] / length);
 		return re;
-	}
-
-	public static Coord interpolateCoord(Coord start, Coord end, float progress)
-	{
-		return new Coord(interpolateFloat(start.x, end.x, progress), interpolateFloat(start.y, end.y, progress), interpolateFloat(start.z, end.z, progress),
-				interpolateFloat(start.w, end.w, progress));
 	}
 
 	public static float interpolateFloat(float start, float end, float progress)
@@ -256,5 +254,52 @@ public class ComUtils
 		}
 
 		return result;
+	}
+
+	// Read asc file
+	public static ArrayList<Vertex[]> readASCFile(String inputFileName) throws Exception
+	{
+		ArrayList<Vertex[]> triList = new ArrayList<Vertex[]>();
+		BufferedReader br = new BufferedReader(new FileReader(inputFileName));
+		String name;
+		int count;
+
+		while ((name = br.readLine()) != null && name.startsWith("triangle"))
+		{
+			Vertex[] tri = new Vertex[3];
+			StringTokenizer[] st = new StringTokenizer[3];
+			for (count = 0; count < 3; count++)
+			{
+				String string = br.readLine();
+				if (string == null)
+					break;
+				st[count] = new StringTokenizer(string, " \t");
+				if (st[count].countTokens() != 8)
+					break;
+			}
+			// meets end of file
+			if (count < 3)
+				break;
+
+			for (int i = 0; i < 3; i++)
+			{
+				float x, y, z, w = 1, nx, ny, nz, u, v;
+				x = Float.parseFloat(st[i].nextToken());
+				y = Float.parseFloat(st[i].nextToken());
+				z = Float.parseFloat(st[i].nextToken());
+				nx = Float.parseFloat(st[i].nextToken());
+				ny = Float.parseFloat(st[i].nextToken());
+				nz = Float.parseFloat(st[i].nextToken());
+				u = Float.parseFloat(st[i].nextToken());
+				v = Float.parseFloat(st[i].nextToken());
+				tri[i] = new Vertex(x, y, z, w, new Coord(nx, ny, nz, 0), u, v);
+			}
+
+			triList.add(tri);
+		}
+
+		br.close();
+
+		return triList;
 	}
 }
