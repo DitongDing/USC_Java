@@ -141,7 +141,8 @@ public class MainWindow extends JFrame
 					JMenu editTexture = new JMenu("Edit Texture");
 					noTexture = new JRadioButtonMenuItem("No texture");
 					JRadioButtonMenuItem fileTexture = new JRadioButtonMenuItem("File texture");
-					JRadioButtonMenuItem processTexture1 = new JRadioButtonMenuItem("Process texture - type 1");
+					JRadioButtonMenuItem processTexture1 = new JRadioButtonMenuItem("Process texture - chess board");
+					JRadioButtonMenuItem processTexture2 = new JRadioButtonMenuItem("Process texture - simple ray");
 
 					noTexture.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0)
@@ -179,23 +180,35 @@ public class MainWindow extends JFrame
 							method.PutAttribute(render, 1, nameList, valueList);
 						}
 					});
+					processTexture2.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent arg0)
+						{
+							int[] nameList = { Render.TEXTURE_MAP };
+							Object[] valueList = new Object[] { new ProcessTexture2() };
+							method.PutAttribute(render, 1, nameList, valueList);
+						}
+					});
 
 					ButtonGroup bgT = new ButtonGroup();
 					bgT.add(noTexture);
 					bgT.add(fileTexture);
 					bgT.add(processTexture1);
+					bgT.add(processTexture2);
 					if (render.textureFunction == null)
 						noTexture.setSelected(true);
 					else if (render.textureFunction instanceof FileTexture)
 						fileTexture.setSelected(true);
 					else if (render.textureFunction instanceof ProcessTexture1)
 						processTexture1.setSelected(true);
+					else if (render.textureFunction instanceof ProcessTexture2)
+						processTexture2.setSelected(true);
 					else
 						throw new Exception("Render default texture function error");
 
 					editTexture.add(noTexture);
 					editTexture.add(fileTexture);
 					editTexture.add(processTexture1);
+					editTexture.add(processTexture2);
 					edit.add(editTexture);
 				}
 			}
