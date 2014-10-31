@@ -9,6 +9,13 @@ public class Display extends Image
 
 	private int dispClass;
 	private Matrix Xsp = new Matrix(); // NDC to screen (pers-to-screen)
+	
+	public Display(Display display)
+	{
+		super(display.xres, display.yres);
+		dispClass = display.dispClass;
+		Xsp = display.Xsp;
+	}
 
 	public Display(int dispClass, int xRes, int yRes)
 	{

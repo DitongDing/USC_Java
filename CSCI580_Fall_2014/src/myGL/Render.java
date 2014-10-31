@@ -55,6 +55,7 @@ public class Render
 	private float spec; // specular power
 	private TextureFunction textureFunction = null;
 	private int hwNumber;
+	private float[][] aaOffset = { { 0, 0, 1 } }; // in (x, y, w) manner, (0, 0, 1) means no aa
 
 	private Matrix[] MXimage = new Matrix[MATLEVELS]; // ***** Added by Ditong Ding, storing the multiplied matrix *****
 	private Matrix[] MXnorm = new Matrix[MATLEVELS]; // ***** Added by Ditong Ding, storing the multiplied matrix *****
@@ -78,21 +79,43 @@ public class Render
 	}
 
 	// Write render result to display
+	// IMPORTANT: NO valid A, Z value in final result if use Multipass aa.
 	public void runRender(ArrayList<Vertex[]> triList, Display display, Pixel defaultPixel) throws Exception
 	{
 		display.Reset(defaultPixel);
 
-		// Walk through the list of triangles, set color and pass vert info to render/scan convert each triangle
-		for (Vertex[] tri : triList)
+		Display[] aaDisplay = new Display[aaOffset.length];
+		for (int i = 0; i < aaOffset.length; i++)
 		{
-			if (hwNumber < 4)
+			aaDisplay[i] = new Display(display);
+			aaDisplay[i].Reset(defaultPixel);
+			// Walk through the list of triangles, set color and pass vert info to render/scan convert each triangle
+			for (Vertex[] tri : triList)
 			{
-				// Set up shading attributes for each triangle
-				float[] color = ComUtils.shade2(tri[0].norm.getVector());// shade based on the norm of vert0
-				flatcolor = new Color(color[Render.R], color[Render.G], color[Render.B]);
+				if (hwNumber < 4)
+				{
+					// Set up shading attributes for each triangle
+					float[] color = ComUtils.shade2(tri[0].norm.getVector());// shade based on the norm of vert0
+					flatcolor = new Color(color[Render.R], color[Render.G], color[Render.B]);
+				}
+				DrawTriangle(aaDisplay[i], tri, aaOffset[i]);
 			}
-			DrawTriangle(display, tri);
 		}
+
+		for (int x = 0; x < display.getXres(); x++)
+			for (int y = 0; y < display.getYres(); y++)
+			{
+				float r = 0, g = 0, b = 0, a = 0, z = 0;
+				for (int i = 0; i < aaOffset.length; i++)
+				{
+					r += aaDisplay[i].getPixel(x, y).red * aaOffset[i][2];
+					g += aaDisplay[i].getPixel(x, y).green * aaOffset[i][2];
+					b += aaDisplay[i].getPixel(x, y).blue * aaOffset[i][2];
+					a += aaDisplay[i].getPixel(x, y).alpha * aaOffset[i][2];
+					z += aaDisplay[i].getPixel(x, y).z * aaOffset[i][2];
+				}
+				display.setPixel(x, y, new Pixel((short) r, (short) g, (short) b, (short) a, z));
+			}
 
 		display.calculateGM();
 	}
@@ -157,7 +180,7 @@ public class Render
 	}
 
 	// Adapted for different homework
-	public void DrawTriangle(Display display, Vertex[] tri) throws Exception
+	public void DrawTriangle(Display display, Vertex[] tri, float[] aaOffset) throws Exception
 	{
 		if (tri == null || tri.length != 3)
 			throw new Exception("Triangle data error");
@@ -202,6 +225,12 @@ public class Render
 			}
 			if (countOfTooNearVertices == vertexPosition.length)
 				return;
+		}
+
+		for (float[] value : vertexPosition)
+		{
+			value[X] += aaOffset[X];
+			value[Y] += aaOffset[Y];
 		}
 
 		// The way to implement:
@@ -576,5 +605,21 @@ public class Render
 	public short getMatlevel()
 	{
 		return matlevel;
+	}
+
+	public void setAaOffset(float[][] aaOffset) throws Exception
+	{
+		if (aaOffset == null)
+			throw new Exception("AAOffset value error");
+		float w = 0;
+		for (float[] value : aaOffset)
+		{
+			if (value == null || value.length != 3)
+				throw new Exception("AAOffset value error");
+			w += value[2];
+		}
+		if (w != 1)
+			throw new Exception("AAOffset value error");
+		this.aaOffset = aaOffset;
 	}
 }
