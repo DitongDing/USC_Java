@@ -20,7 +20,7 @@ public class Pixel
 		this.alpha = alpha;
 		this.z = z;
 	}
-	
+
 	public Pixel(Pixel pixel)
 	{
 		red = pixel.red;

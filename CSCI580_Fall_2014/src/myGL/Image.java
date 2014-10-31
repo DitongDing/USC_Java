@@ -10,7 +10,7 @@ public class Image
 	private Pixel[][] fbuf; // frame buffer array, fbuf[yres][xres], for pixel in (x, y), it is fbuf[y][x]
 
 	protected short global_max = Short.MIN_VALUE; // ******Added by Ditong Ding******can only be used after FlushToFile
-	
+
 	public Image(int xRes, int yRes)
 	{
 		xres = (short) xRes;
@@ -46,18 +46,11 @@ public class Image
 		pw.println("P3");
 		pw.println("" + xres + " " + yres);
 		StringBuffer output = new StringBuffer("");
-		global_max = Short.MIN_VALUE;
 		for (int j = 0; j < yres; j++)
 		{
 			for (int i = 0; i < xres; i++)
 			{
 				Pixel pixel = getPixel(i, j);
-				if (pixel.red > global_max)
-					global_max = pixel.red;
-				if (pixel.green > global_max)
-					global_max = pixel.green;
-				if (pixel.blue > global_max)
-					global_max = pixel.blue;
 				output.append("" + pixel.red + " " + pixel.green + " " + pixel.blue + " ");
 			}
 			output.deleteCharAt(output.length() - 1);

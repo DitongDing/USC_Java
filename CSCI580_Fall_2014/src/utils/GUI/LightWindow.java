@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
-// TODO XwmWindow: finish construction of LightWindow. Do not forget to edit MainWindow to add light log
+// TODO LightWindow: finish construction of LightWindow. Do not forget to edit MainWindow to add light log
 public class LightWindow extends JFrame
 {
 	private static final long serialVersionUID = 2965669837557481504L;

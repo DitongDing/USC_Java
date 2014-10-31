@@ -20,15 +20,15 @@ public class ResultWindow extends JFrame
 
 	public static BufferedImage Display2BufferedImage(Image image)
 	{
-		if(image.changable)
+		if (image.isChangable())
 		{
-			BufferedImage bi = new BufferedImage(image.xres, image.yres, BufferedImage.TYPE_INT_RGB);
+			BufferedImage bi = new BufferedImage(image.getXres(), image.getYres(), BufferedImage.TYPE_INT_RGB);
 			for (int i = 0; i < bi.getWidth(); i++)
 				for (int j = 0; j < bi.getHeight(); j++)
 				{
 					Pixel pixel = image.getPixel(i, j);
-					bi.setRGB(i, j, new java.awt.Color(pixel.red / (float) image.global_max, pixel.green / (float) image.global_max, pixel.blue
-							/ (float) image.global_max).getRGB());
+					bi.setRGB(i, j, new java.awt.Color(pixel.red / (float) image.getGlobal_max(), pixel.green / (float) image.getGlobal_max(), pixel.blue
+							/ (float) image.getGlobal_max()).getRGB());
 				}
 			return bi;
 		}

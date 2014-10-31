@@ -41,12 +41,12 @@ public class Camera
 		float[][] XpiValue = { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 1 / d, 1 } };
 		Xpi.value = XpiValue;
 	}
-	
+
 	public float getD()
 	{
 		return d;
 	}
-	
+
 	public float getFOV()
 	{
 		return FOV;

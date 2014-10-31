@@ -1,7 +1,9 @@
 package myGL;
 
+import java.util.ArrayList;
 import java.util.Stack;
 
+import utils.ComUtils;
 import utils.MathUtils;
 import myGL.texture.TextureFunction;
 
@@ -10,19 +12,12 @@ public class Render
 	public static int MATLEVELS = 10; // how many matrix pushes allowed
 	public static int MAX_LIGHTS = 10; // how many lights allowed
 
-	public static int NULL_TOKEN = 0;// one type of nameList for putAttr and putTri. triangle vert attributes */
+	public static int NULL_TOKEN = 0;// one type of nameList for putAttr and putTri. triangle vert attributes
 	public static int POSITION = 1;// one type of nameList for putAttr and putTri
 	public static int NORMAL = 2;// one type of nameList for putAttr and putTri
 	public static int TEXTURE_INDEX = 3;// one type of nameList for putAttr and putTri
 
 	public static int Z_BUFFER_RENDER = 1; // one type of renderClass
-
-	// // flags fields for value list attributes
-	// // shade mode flags combine the bit fields below
-	// public static int NONE = 0; // flat shading only
-	// public static int AMBIENT = 1; // can be selected or not
-	// public static int DIFFUSE = 2; // can be selected or not
-	// public static int SPECULAR = 4; // can be selected or not
 
 	// select interpolation mode of the shader (either one - not both)
 	public static int FLAT = 0;
@@ -49,7 +44,7 @@ public class Render
 	private int renderClass;
 	private Camera camera;
 	private short matlevel = 0; // top of stack - current xform
-	private Matrix[] Ximage = new Matrix[MATLEVELS]; // stack of xforms (Xpm) TODO remember to change Ximage in Render, as I remove Xsp from it.
+	private Matrix[] Ximage = new Matrix[MATLEVELS]; // stack of xforms (Xpm)
 	private Matrix[] Xnorm = new Matrix[MATLEVELS]; // xforms for norms (Xim)
 	private Color flatcolor; // color state for flat shaded triangles. Do not need to malloc, as every time we change value by "new"
 	private int interp_mode = NORMALS;
@@ -80,6 +75,26 @@ public class Render
 
 		PushMatrix(camera.getXpi());
 		PushMatrix(camera.getXiw());
+	}
+
+	// Write render result to display
+	public void runRender(ArrayList<Vertex[]> triList, Display display, Pixel defaultPixel) throws Exception
+	{
+		display.Reset(defaultPixel);
+
+		// Walk through the list of triangles, set color and pass vert info to render/scan convert each triangle
+		for (Vertex[] tri : triList)
+		{
+			if (hwNumber < 4)
+			{
+				// Set up shading attributes for each triangle
+				float[] color = ComUtils.shade2(tri[0].norm.getVector());// shade based on the norm of vert0
+				flatcolor = new Color(color[Render.R], color[Render.G], color[Render.B]);
+			}
+			DrawTriangle(display, tri);
+		}
+
+		display.calculateGM();
 	}
 
 	// Push a matrix onto the Ximage, Xnorm stack and push a multipled matrix onto the MXimage, MXnorm stack
@@ -441,7 +456,7 @@ public class Render
 		return color;
 	}
 
-	public static Matrix CreateRotationByXMatrix(float degree, Matrix matrix)
+	public static Matrix CreateRotationByXMatrix(float degree)
 	{
 		float sin = (float) Math.sin(degree * MathUtils.DEGREE_2_RAD);
 		float cos = (float) Math.cos(degree * MathUtils.DEGREE_2_RAD);
@@ -449,7 +464,7 @@ public class Render
 		return new Matrix(value);
 	}
 
-	public static Matrix CreateRotationByYMatrix(float degree, Matrix matrix)
+	public static Matrix CreateRotationByYMatrix(float degree)
 	{
 		float sin = (float) Math.sin(degree * MathUtils.DEGREE_2_RAD);
 		float cos = (float) Math.cos(degree * MathUtils.DEGREE_2_RAD);
@@ -457,7 +472,7 @@ public class Render
 		return new Matrix(value);
 	}
 
-	public static Matrix CreateRotationByZMatrix(float degree, Matrix matrix)
+	public static Matrix CreateRotationByZMatrix(float degree)
 	{
 		float sin = (float) Math.sin(degree * MathUtils.DEGREE_2_RAD);
 		float cos = (float) Math.cos(degree * MathUtils.DEGREE_2_RAD);
@@ -465,13 +480,13 @@ public class Render
 		return new Matrix(value);
 	}
 
-	public static Matrix CreateTranslationMatrix(Coord translate, Matrix matrix)
+	public static Matrix CreateTranslationMatrix(Coord translate)
 	{
 		float[][] value = { { 1, 0, 0, translate.x }, { 0, 1, 0, translate.y }, { 0, 0, 1, translate.z }, { 0, 0, 0, 1 } };
 		return new Matrix(value);
 	}
 
-	public static Matrix CreateScaleMatrix(Coord scale, Matrix matrix)
+	public static Matrix CreateScaleMatrix(Coord scale)
 	{
 		float[][] value = { { scale.x, 0, 0, 0 }, { 0, scale.y, 0, 0 }, { 0, 0, scale.z, 0 }, { 0, 0, 0, 1 } };
 		return new Matrix(value);

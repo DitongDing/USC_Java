@@ -11,7 +11,6 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 import myGL.Camera;
-import myGL.Display;
 import myGL.Matrix;
 import myGL.Render;
 import myGL.texture.*;
@@ -166,7 +165,7 @@ public class MainWindow extends JFrame
 					processTexture2.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0)
 						{
-							render.setTextureFunction(new ProcessTexture1());
+							render.setTextureFunction(new ProcessTexture2());
 						}
 					});
 
@@ -239,17 +238,16 @@ public class MainWindow extends JFrame
 				Stack<Matrix> temp = new Stack<Matrix>();
 				Matrix matrix = null;
 
-				matrix = new Matrix();
 				if (input.type == ActionInput.ROTATION_X)
-					Render.CreateRotationByXMatrix(input.rotation.x, matrix);
+					matrix = Render.CreateRotationByXMatrix(input.rotation.x);
 				else if (input.type == ActionInput.ROTATION_Y)
-					Render.CreateRotationByYMatrix(input.rotation.y, matrix);
+					matrix = Render.CreateRotationByYMatrix(input.rotation.y);
 				else if (input.type == ActionInput.ROTATION_Z)
-					Render.CreateRotationByZMatrix(input.rotation.z, matrix);
+					matrix = Render.CreateRotationByZMatrix(input.rotation.z);
 				else if (input.type == ActionInput.TRANSLATION)
-					Render.CreateTranslationMatrix(input.translation, matrix);
+					matrix = Render.CreateTranslationMatrix(input.translation);
 				else if (input.type == ActionInput.SCALE)
-					Render.CreateScaleMatrix(input.scale, matrix);
+					matrix = Render.CreateScaleMatrix(input.scale);
 				else
 					throw new Exception("input type error");
 
@@ -340,6 +338,7 @@ public class MainWindow extends JFrame
 				else
 				{
 					ListIterator<ActionInput> li = actionList.listIterator(index);
+					// As the index is in a reversed order of stack, so use the following euqation.
 					int level = Render.XIW_IN_TOP + XwmSize + transformSize - index;
 					while (li.hasPrevious())
 						if (li.previous().type == ActionInput.CAMERA)

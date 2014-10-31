@@ -2,9 +2,10 @@ package myGL;
 
 public class Display extends Image
 {
+	public static int RGBAZ_DISPLAY = 1; // one type of dispClass. DONOT consider other types right now
+
 	private static short MAXXRES = 1024; // put some bounds on size in case of error
 	private static short MAXYRES = 1024;
-	private static int RGBAZ_DISPLAY = 1; // one type of dispClass. DONOT consider other types right now
 
 	private int dispClass;
 	private Matrix Xsp = new Matrix(); // NDC to screen (pers-to-screen)

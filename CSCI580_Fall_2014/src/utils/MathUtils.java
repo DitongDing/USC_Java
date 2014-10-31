@@ -3,7 +3,7 @@ package utils;
 public class MathUtils
 {
 	public static double DEGREE_2_RAD = Math.PI / 180;
-	
+
 	// Do matrix plus, without check
 	public static float[][] Plus(float[][] matrix1, float[][] matrix2) throws Exception
 	{
@@ -114,7 +114,7 @@ public class MathUtils
 		float left = 1 - progress;
 		return start * left + end * progress;
 	}
-	
+
 	public static int PixelJudge_LEE(float A, float B, float C, int X, int Y)
 	{
 		float value = A * X + B * Y + C;

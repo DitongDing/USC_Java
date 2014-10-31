@@ -19,8 +19,9 @@ import myGL.Vertex;
 public class ComUtils
 {
 	// For HW 1~3
-	public static void shade2(float[] norm, float[] color)
+	public static float[] shade2(float[] norm)
 	{
+		float[] color = new float[3];
 
 		float[] light = new float[3];
 		float coef;
@@ -38,6 +39,8 @@ public class ComUtils
 		color[0] = coef * 0.95f;
 		color[1] = coef * 0.65f;
 		color[2] = coef * 0.88f;
+
+		return color;
 	}
 
 	public static Image readTextureFile(String filename) throws Exception

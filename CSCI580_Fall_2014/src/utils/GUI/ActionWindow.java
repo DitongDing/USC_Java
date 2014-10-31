@@ -187,7 +187,7 @@ public class ActionWindow extends JFrame
 								rotation = new Coord(0, 0, fvalue, 0);
 							}
 							ActionInput input = new ActionInput(type, ActionInput.OBJECT, rotation);
-							parent.addAction(parent.method, input);
+							parent.addAction(input);
 							frame.dispose();
 							refreshTable();
 						}
@@ -264,7 +264,7 @@ public class ActionWindow extends JFrame
 							short type = ActionInput.TRANSLATION;
 							Coord translation = new Coord(fvalueX, fvalueY, fvalueZ, 0);
 							ActionInput input = new ActionInput(type, ActionInput.OBJECT, translation);
-							parent.addAction(parent.method, input);
+							parent.addAction(input);
 							frame.dispose();
 							refreshTable();
 						}
@@ -341,7 +341,7 @@ public class ActionWindow extends JFrame
 							short type = ActionInput.SCALE;
 							Coord scale = new Coord(fvalueX, fvalueY, fvalueZ, 0);
 							ActionInput input = new ActionInput(type, ActionInput.OBJECT, scale);
-							parent.addAction(parent.method, input);
+							parent.addAction(input);
 							frame.dispose();
 							refreshTable();
 						}
@@ -403,10 +403,10 @@ public class ActionWindow extends JFrame
 				panel5.setLayout(new GridLayout(1, 2));
 				mainPanel.add(panel5);
 
-				Coord position = parent.render.camera.getPosition();
-				Coord lookat = parent.render.camera.getLookat();
-				Coord worldup = parent.render.camera.getWorldup();
-				float FOV = parent.render.camera.getFOV();
+				Coord position = parent.render.getCamera().getPosition();
+				Coord lookat = parent.render.getCamera().getLookat();
+				Coord worldup = parent.render.getCamera().getWorldup();
+				float FOV = parent.render.getCamera().getFOV();
 
 				Pvalue[0] = new JTextField(8);
 				Pvalue[0].setText(new Float(position.x).toString());
@@ -458,7 +458,7 @@ public class ActionWindow extends JFrame
 							short type = ActionInput.CAMERA;
 							Camera camera = new Camera(position, lookat, worldup, FOV);
 							ActionInput input = new ActionInput(type, ActionInput.OBJECT, camera);
-							parent.addAction(parent.method, input);
+							parent.addAction(input);
 							frame.dispose();
 							refreshTable();
 						}
@@ -493,7 +493,7 @@ public class ActionWindow extends JFrame
 						if (temp != null && temp != "")
 						{
 							time = Double.parseDouble(temp);
-							parent.editAction(parent.method, index, time);
+							parent.editAction(index, time);
 							refreshTable();
 						}
 					}
@@ -514,7 +514,7 @@ public class ActionWindow extends JFrame
 					if (index != -1)
 						if (JOptionPane.showConfirmDialog(null, "Really want to delete action?", "Delete action", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 						{
-							parent.deleteAction(parent.method, index);
+							parent.deleteAction(index);
 							refreshTable();
 						}
 				}

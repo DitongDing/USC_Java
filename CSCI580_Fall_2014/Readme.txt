@@ -1,1 +1,1 @@
-1. add adaption for different homework in: MainGUI's construction function, CS580GL.DrawTriangle(), CS580GL.calColor()
+1. add adaption for different homework in: MainGUI's construction function, Render.DrawTriangle(), Render.calColor(), Render.runRender()
