@@ -11,7 +11,6 @@ import java.util.StringTokenizer;
 
 import javax.imageio.ImageIO;
 
-import myGL.CS580GL;
 import myGL.Coord;
 import myGL.Image;
 import myGL.Pixel;
@@ -19,8 +18,6 @@ import myGL.Vertex;
 
 public class ComUtils
 {
-	public static double DEGREE_2_RAD = Math.PI / 180;
-
 	// For HW 1~3
 	public static void shade2(float[] norm, float[] color)
 	{
@@ -43,100 +40,9 @@ public class ComUtils
 		color[2] = coef * 0.88f;
 	}
 
-	// Do matrix plus, without check
-	public static float[][] Plus(float[][] matrix1, float[][] matrix2) throws Exception
+	public static Image readTextureFile(String filename) throws Exception
 	{
-		float[][] re = new float[matrix1.length][matrix1[0].length];
-		for (int i = 0; i < re.length; i++)
-			for (int j = 0; j < re[i].length; j++)
-				re[i][j] = matrix1[i][j] + matrix2[i][j];
-		return re;
-	}
-
-	// Do matrix multiply, without check
-	public static float[][] Multiply(float[][] matrix1, float[][] matrix2) throws Exception
-	{
-		float[][] re = new float[matrix1.length][matrix2[0].length];
-		for (int i = 0; i < re.length; i++)
-			for (int j = 0; j < re[i].length; j++)
-			{
-				float temp = 0;
-				for (int k = 0; k < matrix1[0].length; k++)
-					temp += matrix1[i][k] * matrix2[k][j];
-				re[i][j] = temp;
-			}
-		return re;
-	}
-
-	// Do constant matrix multiply, without check
-	public static float[][] Multiply(float constant, float[][] matrix) throws Exception
-	{
-		float[][] re = new float[matrix.length][matrix[0].length];
-		for (int i = 0; i < re.length; i++)
-			for (int j = 0; j < re[i].length; j++)
-				re[i][j] = matrix[i][j] * constant;
-		return re;
-	}
-
-	// Do matrix Transpose, without check
-	public static float[][] Transpose(float[][] matrix) throws Exception
-	{
-		float[][] re = new float[matrix[0].length][matrix.length];
-		for (int i = 0; i < re.length; i++)
-			for (int j = 0; j < re[i].length; j++)
-				re[i][j] = matrix[j][i];
-		return re;
-	}
-
-	// Do vector multiply, without check
-	public static float Multiply(float[] vector1, float[] vector2) throws Exception
-	{
-		float re = 0;
-		for (int i = 0; i < vector1.length; i++)
-			re += vector1[i] * vector2[i];
-		return re;
-	}
-
-	// Do constant vector multiply, without check
-	public static float[] Multiply(float constant, float[] vector) throws Exception
-	{
-		float[] re = new float[vector.length];
-		for (int i = 0; i < vector.length; i++)
-			re[i] = constant * vector[i];
-		return re;
-	}
-
-	// Do vector plus, without check
-	public static float[] Plus(float[] vector1, float[] vector2) throws Exception
-	{
-		float[] re = new float[vector1.length];
-		for (int i = 0; i < vector1.length; i++)
-			re[i] = vector1[i] + vector2[i];
-		return re;
-	}
-
-	// Do vector normalize, without check
-	public static float[] Normalize(float[] vector) throws Exception
-	{
-		float[] re = new float[vector.length];
-		double length = 0;
-		for (float value : vector)
-			length += value * value;
-		length = Math.sqrt(length);
-		for (int i = 0; i < re.length; i++)
-			re[i] = (float) (vector[i] / length);
-		return re;
-	}
-
-	public static float interpolateFloat(float start, float end, float progress)
-	{
-		float left = 1 - progress;
-		return start * left + end * progress;
-	}
-
-	public static Image readTextureFile(CS580GL method, String filename) throws Exception
-	{
-		Image result = new Image();
+		Image result = null;
 		FileInputStream fis = new FileInputStream(filename);
 
 		BufferedImage bi = ImageIO.read(fis);
@@ -144,23 +50,23 @@ public class ComUtils
 		{
 			// reset FileInputStream
 			fis.getChannel().position(0);
-			result = readPPMTextureFile(method, fis);
+			result = readPPMTextureFile(fis);
 		}
 		else
-			result = transformBufferedImage(method, bi);
+			result = transformBufferedImage(bi);
 
 		fis.close();
 		return result;
 	}
 
-	public static Image transformBufferedImage(CS580GL method, BufferedImage bufferedImage)
+	public static Image transformBufferedImage(BufferedImage bufferedImage)
 	{
-		Image result = new Image();
+		Image result = null;
 
 		// Read w & h
 		int width = bufferedImage.getWidth();
 		int height = bufferedImage.getHeight();
-		method.NewImage(result, width, height);
+		result = new Image(width, height);
 		// read global max line
 		result.setGM((short) 255);
 		// fill pixel
@@ -192,9 +98,9 @@ public class ComUtils
 		return sb.toString();
 	}
 
-	public static Image readPPMTextureFile(CS580GL method, FileInputStream fis) throws Exception
+	public static Image readPPMTextureFile(FileInputStream fis) throws Exception
 	{
-		Image result = new Image();
+		Image result = null;
 		int width = 0, height = 0;
 		DataInputStream in = new DataInputStream(new BufferedInputStream(fis));
 
@@ -207,7 +113,7 @@ public class ComUtils
 				// Read w & h
 				width = Integer.parseInt(readLine(in));
 				height = Integer.parseInt(readLine(in));
-				method.NewImage(result, width, height);
+				result = new Image(width, height);
 				// read global max line
 				result.setGM(Short.parseShort(readLine(in)));
 				// fill pixel
@@ -227,7 +133,7 @@ public class ComUtils
 				StringTokenizer st = new StringTokenizer(readLine(in));
 				width = Integer.parseInt(st.nextToken());
 				height = Integer.parseInt(st.nextToken());
-				method.NewImage(result, width, height);
+				result = new Image(width, height);
 				// read global max line
 				st = new StringTokenizer(readLine(in));
 				result.setGM(Short.parseShort(st.nextToken()));

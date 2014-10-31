@@ -1,6 +1,6 @@
 package myGL;
 
-import utils.ComUtils;
+import utils.MathUtils;
 
 // Different from color in class Pixel. The latter one is short type, for writing to file. This one is for calculating.
 public class Color
@@ -37,7 +37,7 @@ public class Color
 
 	public static Color interpolateColor(Color start, Color end, float progress)
 	{
-		return new Color(ComUtils.interpolateFloat(start.red, end.red, progress), ComUtils.interpolateFloat(start.green, end.green, progress),
-				ComUtils.interpolateFloat(start.blue, end.blue, progress));
+		return new Color(MathUtils.interpolateFloat(start.red, end.red, progress), MathUtils.interpolateFloat(start.green, end.green, progress),
+				MathUtils.interpolateFloat(start.blue, end.blue, progress));
 	}
 }

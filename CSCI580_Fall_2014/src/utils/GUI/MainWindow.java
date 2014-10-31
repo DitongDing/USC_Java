@@ -10,7 +10,6 @@ import java.util.Stack;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
-import myGL.CS580GL;
 import myGL.Camera;
 import myGL.Display;
 import myGL.Matrix;
@@ -25,8 +24,6 @@ public class MainWindow extends JFrame
 	private int GUIwidth = 700;
 
 	public Render render;
-	public Display display;
-	public CS580GL method;
 	public JMenuBar menuBar;
 	public JTextField inputPath;
 	public JTextField outputPath;
@@ -47,9 +44,7 @@ public class MainWindow extends JFrame
 		super(title);
 		XwmList = new ArrayList<ActionInput>();
 		actionList = new ArrayList<ActionInput>();
-		render = new Render();
-		display = new Display();
-		method = new CS580GL(hwNumber);
+		render = new Render(Render.Z_BUFFER_RENDER, hwNumber);
 		XwmSize = 0;
 		transformSize = 0;
 
@@ -95,25 +90,19 @@ public class MainWindow extends JFrame
 				flat.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0)
 					{
-						int[] nameList = { Render.INTERPOLATE };
-						Object[] valueList = new Object[] { Render.FLAT };
-						method.PutAttribute(render, 1, nameList, valueList);
+						render.setInterp_mode(Render.FLAT);
 					}
 				});
 				gouraud.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0)
 					{
-						int[] nameList = { Render.INTERPOLATE };
-						Object[] valueList = new Object[] { Render.COLOR };
-						method.PutAttribute(render, 1, nameList, valueList);
+						render.setInterp_mode(Render.COLOR);
 					}
 				});
 				phong.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0)
 					{
-						int[] nameList = { Render.INTERPOLATE };
-						Object[] valueList = new Object[] { Render.NORMALS };
-						method.PutAttribute(render, 1, nameList, valueList);
+						render.setInterp_mode(Render.NORMALS);
 					}
 				});
 
@@ -121,11 +110,11 @@ public class MainWindow extends JFrame
 				bgI.add(flat);
 				bgI.add(gouraud);
 				bgI.add(phong);
-				if (render.interp_mode == Render.FLAT)
+				if (render.getInterp_mode() == Render.FLAT)
 					flat.setSelected(true);
-				else if (render.interp_mode == Render.COLOR)
+				else if (render.getInterp_mode() == Render.COLOR)
 					gouraud.setSelected(true);
-				else if (render.interp_mode == Render.NORMALS)
+				else if (render.getInterp_mode() == Render.NORMALS)
 					phong.setSelected(true);
 				else
 					throw new Exception("Render default color interpolate mode error");
@@ -147,9 +136,7 @@ public class MainWindow extends JFrame
 					noTexture.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0)
 						{
-							int[] nameList = { Render.TEXTURE_MAP };
-							Object[] valueList = new Object[] { null };
-							method.PutAttribute(render, 1, nameList, valueList);
+							render.setTextureFunction(null);
 						}
 					});
 					fileTexture.addActionListener(new ActionListener() {
@@ -158,16 +145,14 @@ public class MainWindow extends JFrame
 							FileTexture texture = null;
 							try
 							{
-								texture = new FileTexture(method, JOptionPane.showInputDialog(null, "Please input texture file path", "texture"));
+								texture = new FileTexture(JOptionPane.showInputDialog(null, "Please input texture file path", "texture"));
 							}
 							catch (Exception e)
 							{
 								JOptionPane.showMessageDialog(null, "Texture file read error, reset to no texture", "error", JOptionPane.ERROR_MESSAGE);
 								e.printStackTrace();
 							}
-							int[] nameList = { Render.TEXTURE_MAP };
-							Object[] valueList = new Object[] { texture };
-							method.PutAttribute(render, 1, nameList, valueList);
+							render.setTextureFunction(texture);
 							if (texture == null)
 								noTexture.setSelected(true);
 						}
@@ -175,17 +160,13 @@ public class MainWindow extends JFrame
 					processTexture1.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0)
 						{
-							int[] nameList = { Render.TEXTURE_MAP };
-							Object[] valueList = new Object[] { new ProcessTexture1() };
-							method.PutAttribute(render, 1, nameList, valueList);
+							render.setTextureFunction(new ProcessTexture1());
 						}
 					});
 					processTexture2.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent arg0)
 						{
-							int[] nameList = { Render.TEXTURE_MAP };
-							Object[] valueList = new Object[] { new ProcessTexture2() };
-							method.PutAttribute(render, 1, nameList, valueList);
+							render.setTextureFunction(new ProcessTexture1());
 						}
 					});
 
@@ -194,13 +175,13 @@ public class MainWindow extends JFrame
 					bgT.add(fileTexture);
 					bgT.add(processTexture1);
 					bgT.add(processTexture2);
-					if (render.textureFunction == null)
+					if (render.getTextureFunction() == null)
 						noTexture.setSelected(true);
-					else if (render.textureFunction instanceof FileTexture)
+					else if (render.getTextureFunction() instanceof FileTexture)
 						fileTexture.setSelected(true);
-					else if (render.textureFunction instanceof ProcessTexture1)
+					else if (render.getTextureFunction() instanceof ProcessTexture1)
 						processTexture1.setSelected(true);
-					else if (render.textureFunction instanceof ProcessTexture2)
+					else if (render.getTextureFunction() instanceof ProcessTexture2)
 						processTexture2.setSelected(true);
 					else
 						throw new Exception("Render default texture function error");
@@ -244,11 +225,12 @@ public class MainWindow extends JFrame
 	}
 
 	// Add later action to actionlist
-	public boolean addAction(CS580GL method, ActionInput input) throws Exception
+	public boolean addAction(ActionInput input) throws Exception
 	{
 		try
 		{
-			if (input.type != ActionInput.CAMERA && XwmSize + transformSize == Render.MATLEVELS - 3) // 3 means Xsp, Xpi, Xiw already in Ximage
+			// XIW_IN_TOP means Xpi, Xiw already in Ximage
+			if (input.type != ActionInput.CAMERA && XwmSize + transformSize == Render.MATLEVELS - Render.XIW_IN_TOP)
 				throw new Exception("Render Xforms stack overflow");
 
 			if (input.type != ActionInput.CAMERA)
@@ -259,33 +241,25 @@ public class MainWindow extends JFrame
 
 				matrix = new Matrix();
 				if (input.type == ActionInput.ROTATION_X)
-					method.CreateRotationByXMatrix(input.rotation.x, matrix);
+					Render.CreateRotationByXMatrix(input.rotation.x, matrix);
 				else if (input.type == ActionInput.ROTATION_Y)
-					method.CreateRotationByYMatrix(input.rotation.y, matrix);
+					Render.CreateRotationByYMatrix(input.rotation.y, matrix);
 				else if (input.type == ActionInput.ROTATION_Z)
-					method.CreateRotationByZMatrix(input.rotation.z, matrix);
+					Render.CreateRotationByZMatrix(input.rotation.z, matrix);
 				else if (input.type == ActionInput.TRANSLATION)
-					method.CreateTranslationMatrix(input.translation, matrix);
+					Render.CreateTranslationMatrix(input.translation, matrix);
 				else if (input.type == ActionInput.SCALE)
-					method.CreateScaleMatrix(input.scale, matrix);
+					Render.CreateScaleMatrix(input.scale, matrix);
 				else
 					throw new Exception("input type error");
 
-				for (; render.matlevel > 3 + XwmSize;)
-				{
-					Matrix matrixTemp = new Matrix();
-					method.PopMatrix(render, matrixTemp);
-					temp.push(matrixTemp);
-				}
+				for (; render.getMatlevel() > Render.XIW_IN_TOP + XwmSize;)
+					temp.push(render.PopMatrix());
 				// TODO MainWindow.addAction(): finish the part of add Xwm construction action
 				if (input.space == ActionInput.WORLD)
 				{
-					for (; render.matlevel > 3;)
-					{
-						Matrix matrixTemp = new Matrix();
-						method.PopMatrix(render, matrixTemp);
-						temp.push(matrixTemp);
-					}
+					for (; render.getMatlevel() > Render.XIW_IN_TOP;)
+						temp.push(render.PopMatrix());
 					XwmSize++;
 					XwmList.add(input);
 				}
@@ -294,13 +268,13 @@ public class MainWindow extends JFrame
 					transformSize++;
 					actionList.add(input);
 				}
-				method.PushMatrix(render, matrix);
+				render.PushMatrix(matrix);
 				while (!temp.isEmpty())
-					method.PushMatrix(render, temp.pop());
+					render.PushMatrix(temp.pop());
 			}
 			else
 			{
-				method.PutCamera(render, input.camera);
+				render.PutCamera(input.camera);
 				actionList.add(input);
 			}
 
@@ -314,7 +288,7 @@ public class MainWindow extends JFrame
 	}
 
 	// Only permit to edit time period
-	public boolean editAction(CS580GL method, int index, double newTimePeriod) throws Exception
+	public boolean editAction(int index, double newTimePeriod) throws Exception
 	{
 		try
 		{
@@ -330,7 +304,7 @@ public class MainWindow extends JFrame
 	}
 
 	// 0-based index in actionList or XwmList
-	public boolean deleteAction(CS580GL method, int index) throws Exception
+	public boolean deleteAction(int index) throws Exception
 	{
 		try
 		{
@@ -352,7 +326,7 @@ public class MainWindow extends JFrame
 				}
 				if (prevCamera == null)
 					prevCamera = new Camera();
-				method.PutCamera(render, prevCamera);
+				render.PutCamera(prevCamera);
 			}
 			else
 			{
@@ -366,21 +340,17 @@ public class MainWindow extends JFrame
 				else
 				{
 					ListIterator<ActionInput> li = actionList.listIterator(index);
-					int level = 3 + XwmSize + transformSize - index;
+					int level = Render.XIW_IN_TOP + XwmSize + transformSize - index;
 					while (li.hasPrevious())
 						if (li.previous().type == ActionInput.CAMERA)
 							level++;
 
 					Stack<Matrix> temp = new Stack<Matrix>();
-					for (; render.matlevel > level;)
-					{
-						Matrix matrixTemp = new Matrix();
-						method.PopMatrix(render, matrixTemp);
-						temp.push(matrixTemp);
-					}
-					method.PopMatrix(render, new Matrix());
+					for (; render.getMatlevel() > level;)
+						temp.push(render.PopMatrix());
+					render.PopMatrix();
 					while (!temp.isEmpty())
-						method.PushMatrix(render, temp.pop());
+						render.PushMatrix(temp.pop());
 					actionList.remove(index);
 					transformSize--;
 				}

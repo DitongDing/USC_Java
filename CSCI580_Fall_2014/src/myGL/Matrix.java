@@ -23,4 +23,9 @@ public class Matrix
 				}
 		}
 	}
+	
+	public Matrix(float[][] value)
+	{
+		this.value = value;
+	}
 }

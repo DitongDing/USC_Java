@@ -1,6 +1,6 @@
 package test;
 
-import utils.ComUtils;
+import utils.MathUtils;
 
 public class TestMatrix
 {
@@ -19,14 +19,14 @@ public class TestMatrix
 				{ 0.0f, 0.0f, 0.0f, 1.0f } };
 		for (int i = 0; i < verts.length; i++)
 		{
-			verts[i] = ComUtils.Multiply(Xx, verts[i]);
-			verts[i] = ComUtils.Multiply(Xy, verts[i]);
-			verts[i] = ComUtils.Multiply(Xs, verts[i]);
-			verts[i] = ComUtils.Multiply(Xt, verts[i]);
-			verts[i] = ComUtils.Multiply(Xiw, verts[i]);
-			verts[i] = ComUtils.Multiply(Xpi, verts[i]);
-			verts[i] = ComUtils.Multiply(1 / verts[i][3][0], verts[i]);
-			verts[i] = ComUtils.Multiply(Xsp, verts[i]);
+			verts[i] = MathUtils.Multiply(Xx, verts[i]);
+			verts[i] = MathUtils.Multiply(Xy, verts[i]);
+			verts[i] = MathUtils.Multiply(Xs, verts[i]);
+			verts[i] = MathUtils.Multiply(Xt, verts[i]);
+			verts[i] = MathUtils.Multiply(Xiw, verts[i]);
+			verts[i] = MathUtils.Multiply(Xpi, verts[i]);
+			verts[i] = MathUtils.Multiply(1 / verts[i][3][0], verts[i]);
+			verts[i] = MathUtils.Multiply(Xsp, verts[i]);
 			System.out.print("(" + verts[i][0][0]);
 			for (int j = 1; j < verts[i].length; j++)
 				System.out.print(", " + verts[i][j][0]);

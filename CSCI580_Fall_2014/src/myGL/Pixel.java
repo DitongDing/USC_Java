@@ -20,8 +20,8 @@ public class Pixel
 		this.alpha = alpha;
 		this.z = z;
 	}
-
-	public void copy(Pixel pixel)
+	
+	public Pixel(Pixel pixel)
 	{
 		red = pixel.red;
 		green = pixel.green;
