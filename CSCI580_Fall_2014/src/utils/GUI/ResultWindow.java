@@ -1,13 +1,15 @@
 package utils.GUI;
 
+import gl.Image;
+import gl.Pixel;
+
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import javax.swing.*;
 
-import myGL.Image;
-import myGL.Pixel;
+
 
 public class ResultWindow extends JFrame
 {

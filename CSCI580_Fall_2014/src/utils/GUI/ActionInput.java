@@ -1,7 +1,7 @@
 package utils.GUI;
 
-import myGL.Camera;
-import myGL.Coord;
+import gl.Camera;
+import gl.Coord;
 
 public class ActionInput
 {

@@ -1,16 +1,17 @@
 package utils;
 
+import gl.Camera;
+import gl.Coord;
+import gl.Display;
+import gl.Pixel;
+import gl.Vertex;
+
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
 import javax.swing.JOptionPane;
 
-import myGL.Camera;
-import myGL.Coord;
-import myGL.Display;
-import myGL.Pixel;
-import myGL.Vertex;
 import utils.GUI.ActionInput;
 import utils.GUI.MainWindow;
 import utils.GUI.ResultWindow;
@@ -32,7 +33,7 @@ public class RunAnimation extends Thread
 	{
 		try
 		{
-			ArrayList<Vertex[]> triList = ComUtils.readASCFile(gui.inputPath.getText());
+			ArrayList<Vertex[]> triList = ComUtils.readModelFile(gui.inputPath.getText());
 			ArrayList<BufferedImage> biList = new ArrayList<BufferedImage>();
 
 			ArrayList<ActionInput> actionList = new ArrayList<ActionInput>(gui.actionList);

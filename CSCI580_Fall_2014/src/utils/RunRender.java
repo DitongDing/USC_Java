@@ -1,5 +1,9 @@
 package utils;
 
+import gl.Display;
+import gl.Pixel;
+import gl.Vertex;
+
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -7,9 +11,6 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
-import myGL.Display;
-import myGL.Pixel;
-import myGL.Vertex;
 import utils.GUI.MainWindow;
 import utils.GUI.ResultWindow;
 
@@ -31,7 +32,7 @@ public class RunRender extends Thread
 		try
 		{
 			FileOutputStream fos = new FileOutputStream(gui.outputPath.getText());
-			ArrayList<Vertex[]> triList = ComUtils.readASCFile(gui.inputPath.getText());
+			ArrayList<Vertex[]> triList = ComUtils.readModelFile(gui.inputPath.getText());
 			gui.render.runRender(triList, display, defaultPixel);
 
 			display.FlushToPPMFile(fos); /* write out or update display to file */

@@ -1,5 +1,10 @@
 package utils;
 
+import gl.Coord;
+import gl.Image;
+import gl.Pixel;
+import gl.Vertex;
+
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -11,38 +16,10 @@ import java.util.StringTokenizer;
 
 import javax.imageio.ImageIO;
 
-import myGL.Coord;
-import myGL.Image;
-import myGL.Pixel;
-import myGL.Vertex;
+
 
 public class ComUtils
 {
-	// For HW 1~3
-	public static float[] shade2(float[] norm)
-	{
-		float[] color = new float[3];
-
-		float[] light = new float[3];
-		float coef;
-
-		light[0] = 0.707f;
-		light[1] = 0.5f;
-		light[2] = 0.5f;
-
-		coef = light[0] * norm[0] + light[1] * norm[1] + light[2] * norm[2];
-		if (coef < 0)
-			coef *= -1;
-
-		if (coef > 1.0)
-			coef = 1.0f;
-		color[0] = coef * 0.95f;
-		color[1] = coef * 0.65f;
-		color[2] = coef * 0.88f;
-
-		return color;
-	}
-
 	public static Image readTextureFile(String filename) throws Exception
 	{
 		Image result = null;
@@ -163,6 +140,49 @@ public class ComUtils
 		}
 
 		return result;
+	}
+
+	public static ArrayList<Vertex[]> readModelFile(String inputFileName) throws Exception
+	{
+		ArrayList<Vertex[]> triList = new ArrayList<Vertex[]>();
+		triList = readASCFile(inputFileName);
+		if (triList.size() == 0)
+			triList = readOBJFile(inputFileName);
+		return triList;
+	}
+
+	// TODO Improve readOBJFile
+	public static ArrayList<Vertex[]> readOBJFile(String inputFileName) throws Exception
+	{
+		ArrayList<Vertex[]> triList = new ArrayList<Vertex[]>();
+
+		com.obj.WavefrontObject obj = new com.obj.WavefrontObject(inputFileName);
+
+		for (com.obj.Group group : obj.getGroups())
+			for (com.obj.Face face : group.getFaces())
+			{
+				Vertex[] tri = new Vertex[3];
+				com.obj.Vertex[] vertexes = face.getVertices();
+				com.obj.Vertex[] normals = face.getNormals();
+				com.obj.TextureCoordinate[] textures = face.getTextures();
+				for (int i = 0; i < tri.length; i++)
+				{
+
+					float x, y, z, w = 1, nx, ny, nz, u, v;
+					x = vertexes[i].getX();
+					y = vertexes[i].getY();
+					z = vertexes[i].getZ();
+					nx = normals[i].getX();
+					ny = normals[i].getY();
+					nz = normals[i].getZ();
+					u = textures[i].getU();
+					v = textures[i].getV();
+					tri[i] = new Vertex(x, y, z, w, new Coord(nx, ny, nz, 0), u, v);
+				}
+				triList.add(tri);
+			}
+
+		return triList;
 	}
 
 	// Read asc file

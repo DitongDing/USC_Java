@@ -1,5 +1,10 @@
 package utils.GUI;
 
+import gl.Camera;
+import gl.Matrix;
+import gl.Render;
+import gl.texture.*;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,10 +15,7 @@ import java.util.Stack;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
-import myGL.Camera;
-import myGL.Matrix;
-import myGL.Render;
-import myGL.texture.*;
+
 
 public class MainWindow extends JFrame
 {
@@ -38,12 +40,12 @@ public class MainWindow extends JFrame
 	public short transformSize;
 	public ArrayList<ActionInput> actionList;
 
-	public MainWindow(String title, int hwNumber) throws Exception
+	public MainWindow(String title) throws Exception
 	{
 		super(title);
 		XwmList = new ArrayList<ActionInput>();
 		actionList = new ArrayList<ActionInput>();
-		render = new Render(Render.Z_BUFFER_RENDER, hwNumber);
+		render = new Render(Render.Z_BUFFER_RENDER);
 		XwmSize = 0;
 		transformSize = 0;
 
@@ -57,149 +59,142 @@ public class MainWindow extends JFrame
 		int height = this.getContentPane().getSize().height;
 		int width = this.getContentPane().getSize().width;
 
+		// For setting menu
 		menuBar = new JMenuBar();
 		menuBar.setLocation(0, 0);
 		menuBar.setSize(width, 20);
 		add(menuBar);
 
+		// MenuItem Edit
+		JMenu edit = new JMenu("edit");
+		JMenuItem editXwm = new JMenuItem("Edit Xwm"), editAction = new JMenuItem("Edit action");
+		editXwm.addActionListener(new XwmWindow.XWActionListener(this));
+		editAction.addActionListener(new ActionWindow.AWActionListener(this));
+		edit.add(editXwm);
+		edit.add(editAction);
+		edit.addSeparator();
+		JMenuItem editLight = new JMenuItem("Edit Light");
+		editLight.addActionListener(new LightWindow.LWActionListener(this));
+		edit.add(editLight);
+		JMenu interpStyle = new JMenu("Color Style");
+		JRadioButtonMenuItem flat = new JRadioButtonMenuItem("Flat shading");
+		JRadioButtonMenuItem gouraud = new JRadioButtonMenuItem("Gouraud shading");
+		JRadioButtonMenuItem phong = new JRadioButtonMenuItem("Phong shading");
+
+		flat.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0)
+			{
+				render.setInterp_mode(Render.FLAT);
+			}
+		});
+		gouraud.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0)
+			{
+				render.setInterp_mode(Render.COLOR);
+			}
+		});
+		phong.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0)
+			{
+				render.setInterp_mode(Render.NORMALS);
+			}
+		});
+
+		ButtonGroup bgI = new ButtonGroup();
+		bgI.add(flat);
+		bgI.add(gouraud);
+		bgI.add(phong);
+		if (render.getInterp_mode() == Render.FLAT)
+			flat.setSelected(true);
+		else if (render.getInterp_mode() == Render.COLOR)
+			gouraud.setSelected(true);
+		else if (render.getInterp_mode() == Render.NORMALS)
+			phong.setSelected(true);
+		else
+			throw new Exception("Render default color interpolate mode error");
+
+		interpStyle.add(flat);
+		interpStyle.add(gouraud);
+		interpStyle.add(phong);
+		edit.add(interpStyle);
+
+		edit.addSeparator();
+		JMenu editTexture = new JMenu("Edit Texture");
+		noTexture = new JRadioButtonMenuItem("No texture");
+		JRadioButtonMenuItem fileTexture = new JRadioButtonMenuItem("File texture");
+		JRadioButtonMenuItem processTexture1 = new JRadioButtonMenuItem("Process texture - chess board");
+		JRadioButtonMenuItem processTexture2 = new JRadioButtonMenuItem("Process texture - simple ray");
+
+		noTexture.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0)
+			{
+				render.setTextureFunction(null);
+			}
+		});
+		fileTexture.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0)
+			{
+				FileTexture texture = null;
+				try
+				{
+					texture = new FileTexture(JOptionPane.showInputDialog(null, "Please input texture file path", "texture"));
+				}
+				catch (Exception e)
+				{
+					JOptionPane.showMessageDialog(null, "Texture file read error, reset to no texture", "error", JOptionPane.ERROR_MESSAGE);
+					e.printStackTrace();
+				}
+				render.setTextureFunction(texture);
+				if (texture == null)
+					noTexture.setSelected(true);
+			}
+		});
+		processTexture1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0)
+			{
+				render.setTextureFunction(new ProcessTexture1());
+			}
+		});
+		processTexture2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0)
+			{
+				render.setTextureFunction(new ProcessTexture2());
+			}
+		});
+
+		ButtonGroup bgT = new ButtonGroup();
+		bgT.add(noTexture);
+		bgT.add(fileTexture);
+		bgT.add(processTexture1);
+		bgT.add(processTexture2);
+		if (render.getTextureFunction() == null)
+			noTexture.setSelected(true);
+		else if (render.getTextureFunction() instanceof FileTexture)
+			fileTexture.setSelected(true);
+		else if (render.getTextureFunction() instanceof ProcessTexture1)
+			processTexture1.setSelected(true);
+		else if (render.getTextureFunction() instanceof ProcessTexture2)
+			processTexture2.setSelected(true);
+		else
+			throw new Exception("Render default texture function error");
+
+		editTexture.add(noTexture);
+		editTexture.add(fileTexture);
+		editTexture.add(processTexture1);
+		editTexture.add(processTexture2);
+		edit.add(editTexture);
+
+		menuBar.add(edit);
+
+		// MenuItem Run.
 		JMenu run = new JMenu("run");
 		runRender = new JMenuItem("run render");
 		run.add(runRender);
-
-		if (hwNumber >= 3)
-		{
-			JMenu edit = new JMenu("edit");
-			JMenuItem editXwm = new JMenuItem("Edit Xwm"), editAction = new JMenuItem("Edit action");
-			editXwm.addActionListener(new XwmWindow.XWActionListener(this));
-			editAction.addActionListener(new ActionWindow.AWActionListener(this));
-			edit.add(editXwm);
-			edit.add(editAction);
-
-			if (hwNumber >= 4)
-			{
-				edit.addSeparator();
-				JMenuItem editLight = new JMenuItem("Edit Light");
-				editLight.addActionListener(new LightWindow.LWActionListener(this));
-				edit.add(editLight);
-				JMenu interpStyle = new JMenu("Color Style");
-				JRadioButtonMenuItem flat = new JRadioButtonMenuItem("Flat shading");
-				JRadioButtonMenuItem gouraud = new JRadioButtonMenuItem("Gouraud shading");
-				JRadioButtonMenuItem phong = new JRadioButtonMenuItem("Phong shading");
-
-				flat.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0)
-					{
-						render.setInterp_mode(Render.FLAT);
-					}
-				});
-				gouraud.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0)
-					{
-						render.setInterp_mode(Render.COLOR);
-					}
-				});
-				phong.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent arg0)
-					{
-						render.setInterp_mode(Render.NORMALS);
-					}
-				});
-
-				ButtonGroup bgI = new ButtonGroup();
-				bgI.add(flat);
-				bgI.add(gouraud);
-				bgI.add(phong);
-				if (render.getInterp_mode() == Render.FLAT)
-					flat.setSelected(true);
-				else if (render.getInterp_mode() == Render.COLOR)
-					gouraud.setSelected(true);
-				else if (render.getInterp_mode() == Render.NORMALS)
-					phong.setSelected(true);
-				else
-					throw new Exception("Render default color interpolate mode error");
-
-				interpStyle.add(flat);
-				interpStyle.add(gouraud);
-				interpStyle.add(phong);
-				edit.add(interpStyle);
-
-				if (hwNumber >= 5)
-				{
-					edit.addSeparator();
-					JMenu editTexture = new JMenu("Edit Texture");
-					noTexture = new JRadioButtonMenuItem("No texture");
-					JRadioButtonMenuItem fileTexture = new JRadioButtonMenuItem("File texture");
-					JRadioButtonMenuItem processTexture1 = new JRadioButtonMenuItem("Process texture - chess board");
-					JRadioButtonMenuItem processTexture2 = new JRadioButtonMenuItem("Process texture - simple ray");
-
-					noTexture.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent arg0)
-						{
-							render.setTextureFunction(null);
-						}
-					});
-					fileTexture.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent arg0)
-						{
-							FileTexture texture = null;
-							try
-							{
-								texture = new FileTexture(JOptionPane.showInputDialog(null, "Please input texture file path", "texture"));
-							}
-							catch (Exception e)
-							{
-								JOptionPane.showMessageDialog(null, "Texture file read error, reset to no texture", "error", JOptionPane.ERROR_MESSAGE);
-								e.printStackTrace();
-							}
-							render.setTextureFunction(texture);
-							if (texture == null)
-								noTexture.setSelected(true);
-						}
-					});
-					processTexture1.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent arg0)
-						{
-							render.setTextureFunction(new ProcessTexture1());
-						}
-					});
-					processTexture2.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent arg0)
-						{
-							render.setTextureFunction(new ProcessTexture2());
-						}
-					});
-
-					ButtonGroup bgT = new ButtonGroup();
-					bgT.add(noTexture);
-					bgT.add(fileTexture);
-					bgT.add(processTexture1);
-					bgT.add(processTexture2);
-					if (render.getTextureFunction() == null)
-						noTexture.setSelected(true);
-					else if (render.getTextureFunction() instanceof FileTexture)
-						fileTexture.setSelected(true);
-					else if (render.getTextureFunction() instanceof ProcessTexture1)
-						processTexture1.setSelected(true);
-					else if (render.getTextureFunction() instanceof ProcessTexture2)
-						processTexture2.setSelected(true);
-					else
-						throw new Exception("Render default texture function error");
-
-					editTexture.add(noTexture);
-					editTexture.add(fileTexture);
-					editTexture.add(processTexture1);
-					editTexture.add(processTexture2);
-					edit.add(editTexture);
-				}
-			}
-
-			menuBar.add(edit);
-			runAnimation = new JMenuItem("run animation");
-			run.add(runAnimation);
-		}
-
+		runAnimation = new JMenuItem("run animation");
+		run.add(runAnimation);
 		menuBar.add(run);
 
+		// Type in panel
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLocation(5, menuBar.getSize().height);
 		mainPanel.setSize(width - 10, height - menuBar.getSize().height);

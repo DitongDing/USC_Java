@@ -1,5 +1,8 @@
 package utils.GUI;
 
+import gl.Camera;
+import gl.Coord;
+
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -19,8 +22,7 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-import myGL.Camera;
-import myGL.Coord;
+
 
 public class ActionWindow extends JFrame
 {

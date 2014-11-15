@@ -1,1 +1,0 @@
-1. add adaption for different homework in: MainGUI's construction function, Render.DrawTriangle(), Render.calColor(), Render.runRender()
