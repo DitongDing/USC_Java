@@ -6,13 +6,13 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import gl.Pixel;
-
+import utils.ComUtils;
 import utils.MathUtils;
 
 public class Render
 {
 	// TODO: remove test flag
-	public static boolean TEST_TOON = true;
+	public static boolean TEST_TOON = false;
 
 	public static int MATLEVELS = 100; // how many matrix pushes allowed
 	public static int MAX_LIGHTS = 10; // how many lights allowed
@@ -89,34 +89,36 @@ public class Render
 	{
 		display.Reset(defaultPixel);
 
-		Display[] aaDisplay = new Display[aaOffset.length];
+		float[][] r = new float[display.getXres()][display.getYres()];
+		float[][] g = new float[display.getXres()][display.getYres()];
+		float[][] b = new float[display.getXres()][display.getYres()];
+		float[][] a = new float[display.getXres()][display.getYres()];
+		float[][] z = new float[display.getXres()][display.getYres()];
 		for (int i = 0; i < aaOffset.length; i++)
 		{
-			aaDisplay[i] = new Display(display);
-			aaDisplay[i].Reset(defaultPixel);
+			display.Reset(defaultPixel);
 			// Walk through the list of triangles, set color and pass vert info to render/scan convert each triangle
 			for (Vertex[] tri : triList)
 			{
 				if (TEST_TOON)
-					DrawTriangleLine(aaDisplay[i], tri, aaOffset[i]);
-				DrawTriangle(aaDisplay[i], tri, aaOffset[i]);
+					DrawTriangleLine(display, tri, aaOffset[i]);
+				DrawTriangle(display, tri, aaOffset[i]);
 			}
+			Image image = ComUtils.edgeDetector(display, camera.getD());
+			for (int x = 0; x < display.getXres(); x++)
+				for (int y = 0; y < display.getYres(); y++)
+				{
+					r[x][y] += image.getPixel(x, y).red * aaOffset[i][2];
+					g[x][y] += image.getPixel(x, y).green * aaOffset[i][2];
+					b[x][y] += image.getPixel(x, y).blue * aaOffset[i][2];
+					a[x][y] += image.getPixel(x, y).alpha * aaOffset[i][2];
+					z[x][y] += image.getPixel(x, y).z * aaOffset[i][2];
+				}
 		}
 
 		for (int x = 0; x < display.getXres(); x++)
 			for (int y = 0; y < display.getYres(); y++)
-			{
-				float r = 0, g = 0, b = 0, a = 0, z = 0;
-				for (int i = 0; i < aaOffset.length; i++)
-				{
-					r += aaDisplay[i].getPixel(x, y).red * aaOffset[i][2];
-					g += aaDisplay[i].getPixel(x, y).green * aaOffset[i][2];
-					b += aaDisplay[i].getPixel(x, y).blue * aaOffset[i][2];
-					a += aaDisplay[i].getPixel(x, y).alpha * aaOffset[i][2];
-					z += aaDisplay[i].getPixel(x, y).z * aaOffset[i][2];
-				}
-				display.setPixel(x, y, new Pixel((short) r, (short) g, (short) b, (short) a, z));
-			}
+				display.setPixel(x, y, new Pixel((short) r[x][y], (short) g[x][y], (short) b[x][y], (short) a[x][y], z[x][y]));
 
 		display.calculateGM();
 	}
@@ -560,6 +562,7 @@ public class Render
 		return textureFunction == null ? null : textureFunction.getColor(u, v);
 	}
 
+	// TODO 思考怎样转换成toon shading的渲染方式
 	private Color calColor(Color KA, Color KD, Color KS, float[] Nm, float[] E) throws Exception
 	{
 		Color color = new Color(0, 0, 0);

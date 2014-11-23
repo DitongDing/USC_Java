@@ -16,8 +16,6 @@ import java.util.StringTokenizer;
 
 import javax.imageio.ImageIO;
 
-
-
 public class ComUtils
 {
 	public static Image readTextureFile(String filename) throws Exception
@@ -230,5 +228,35 @@ public class ComUtils
 		br.close();
 
 		return triList;
+	}
+
+	// TODO Use Sobel filters on depth map to calculate edge. and return a new Image with black edge
+	public static Image edgeDetector(Image image, float ZMax)
+	{
+		Image re = new Image(image.getXres(), image.getYres());
+
+		double threshold = 0.005;
+
+		for (int x = 0; x < re.getXres(); x++)
+			for (int y = 0; y < re.getYres(); y++)
+				re.setPixel(x, y, new Pixel(image.getPixel(x, y)));
+
+		Pixel black = new Pixel((short) 0, (short) 0, (short) 0, (short) 1, 0);
+
+		for (int x = 1; x < re.getXres() - 1; x++)
+			for (int y = 1; y < re.getYres() - 1; y++)
+			{
+				double Gx = ((image.getPixel(x + 1, y - 1).z + 2 * image.getPixel(x + 1, y).z + image.getPixel(x + 1, y + 1).z) - (image.getPixel(x - 1, y - 1).z
+						+ 2 * image.getPixel(x - 1, y).z + image.getPixel(x - 1, y + 1).z))
+						/ ZMax;
+				double Gy = ((image.getPixel(x - 1, y - 1).z + 2 * image.getPixel(x, y - 1).z + image.getPixel(x + 1, y - 1).z) - (image.getPixel(x - 1, y + 1).z
+						+ 2 * image.getPixel(x, y + 1).z + image.getPixel(x + 1, y + 1).z))
+						/ ZMax;
+				double G = Math.sqrt(Gx * Gx + Gy * Gy);
+				if (G > threshold)
+					re.setPixel(x, y, black);
+			}
+
+		return re;
 	}
 }
