@@ -30,7 +30,7 @@ public class Render
 	public static int NORMALS = 2; // interpolate normals
 
 	// select draw triangle mode
-	public static int WIRE_WIDTH = 1;
+	public static int WIRE_WIDTH = 3;
 
 	// coors constant
 	public static int X = 0;
@@ -98,13 +98,21 @@ public class Render
 		{
 			display.Reset(defaultPixel);
 			// Walk through the list of triangles, set color and pass vert info to render/scan convert each triangle
-			for (Vertex[] tri : triList)
+			if (TEST_TOON)
 			{
-				if (TEST_TOON)
-					DrawTriangleLine(display, tri, aaOffset[i]);
-				DrawTriangle(display, tri, aaOffset[i]);
+				double[][] zmap = new double[display.getXres()][display.getYres()];
+				for (int x = 0; x < zmap.length; x++)
+					for (int y = 0; y < zmap[x].length; y++)
+						zmap[x][y] = Float.MAX_VALUE;
+				for (Vertex[] tri : triList)
+					DrawTriangleOutLine(display, tri, aaOffset[i], zmap);
+				for (Vertex[] tri : triList)
+					DrawTriangleLine(display, tri, aaOffset[i], zmap);
 			}
-			Image image = ComUtils.edgeDetector(display, camera.getD());
+			for (Vertex[] tri : triList)
+				DrawTriangle(display, tri, aaOffset[i]);
+			// Image image = ComUtils.edgeDetector(display, camera.getD());
+			Image image = display;
 			for (int x = 0; x < display.getXres(); x++)
 				for (int y = 0; y < display.getYres(); y++)
 				{
@@ -183,7 +191,7 @@ public class Render
 	}
 
 	// TODO: Think about how to combine draw line and draw face
-	public void DrawTriangleLine(Display display, Vertex[] tri, float[] aaOffset) throws Exception
+	public void DrawTriangleOutLine(Display display, Vertex[] tri, float[] aaOffset, double[][] zmap) throws Exception
 	{
 		if (tri == null || tri.length != 3)
 			throw new Exception("Triangle data error");
@@ -268,8 +276,6 @@ public class Render
 		C[1] = -(A[1] * vertexList[1][Render.X] + B[1] * vertexList[1][Render.Y]);
 		C[2] = -(A[2] * vertexList[2][Render.X] + B[2] * vertexList[2][Render.Y]);
 
-		float[] point = { vertexList[0][0], vertexList[0][1], vertexList[0][2] };
-		float m = (float) 1.005;
 		for (int i = 0; i < 3; i++)
 		{
 			{
@@ -285,18 +291,25 @@ public class Render
 				float h = -C[i] / (float) B[i];
 				for (; X <= End; X++)
 				{
-					int Y = (int) (k * X + h);
-					float Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y, point, VN) * m);
-					if (display.getPixel(X, Y).z > Z)
-						display.setPixel(X, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
-					for (int j = 1; j <= WIRE_WIDTH; j++)
+					if (X >= 0 && X < display.getXres())
 					{
-						Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y + j, point, VN) * m);
-						if (display.getPixel(X, Y + j).z > Z)
-							display.setPixel(X, Y + j, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
-						Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y - j, point, VN) * m);
-						if (display.getPixel(X, Y - j).z > Z)
-							display.setPixel(X, Y - j, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+						int Y = (int) (k * X + h);
+						if (Y >= 0 && Y < display.getYres())
+							if (display.getPixel(X, Y).z == Float.MAX_VALUE)
+								display.setPixel(X, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Float.MAX_VALUE));
+						if (Y + 1 >= 0 && Y + 1 < display.getYres())
+							if (display.getPixel(X, Y + 1).z == Float.MAX_VALUE)
+								display.setPixel(X, Y + 1, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Float.MAX_VALUE));
+						// for line balance, use Y+1+j
+						for (int j = 1; j <= WIRE_WIDTH; j++)
+						{
+							if (Y + 1 + j >= 0 && Y + 1 + j < display.getYres())
+								if (display.getPixel(X, Y + 1 + j).z == Float.MAX_VALUE)
+									display.setPixel(X, Y + 1 + j, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Float.MAX_VALUE));
+							if (Y - j >= 0 && Y - j < display.getYres())
+								if (display.getPixel(X, Y - j).z == Float.MAX_VALUE)
+									display.setPixel(X, Y - j, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Float.MAX_VALUE));
+						}
 					}
 				}
 			}
@@ -313,22 +326,352 @@ public class Render
 				float h = -C[i] / (float) A[i];
 				for (; Y <= End; Y++)
 				{
-					int X = (int) (k * Y + h);
-					float Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y, point, VN) * m);
-					if (display.getPixel(X, Y).z > Z)
-						display.setPixel(X, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
-					for (int j = 1; j <= WIRE_WIDTH; j++)
+					if (Y >= 0 && Y < display.getYres())
 					{
-						Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X + j, Y, point, VN) * m);
-						if (display.getPixel(X + j, Y).z > Z)
-							display.setPixel(X + j, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
-						Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y - j, point, VN) * m);
-						if (display.getPixel(X - j, Y).z > Z)
-							display.setPixel(X - j, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+						int X = (int) (k * Y + h);
+						if (X >= 0 && X < display.getYres())
+							if (display.getPixel(X, Y).z == Float.MAX_VALUE)
+								display.setPixel(X, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Float.MAX_VALUE));
+						if (X + 1 >= 0 && X + 1 < display.getYres())
+							if (display.getPixel(X + 1, Y).z == Float.MAX_VALUE)
+								display.setPixel(X + 1, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Float.MAX_VALUE));
+						for (int j = 1; j <= WIRE_WIDTH; j++)
+						{
+							if (X + 1 + j >= 0 && X + 1 + j < display.getYres())
+								if (display.getPixel(X + 1 + j, Y).z == Float.MAX_VALUE)
+									display.setPixel(X + 1 + j, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Float.MAX_VALUE));
+							if (X - j >= 0 && X - j < display.getYres())
+								if (display.getPixel(X - j, Y).z == Float.MAX_VALUE)
+									display.setPixel(X - j, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Float.MAX_VALUE));
+						}
 					}
 				}
 			}
 		}
+
+		float ulx = vertexList[0][Render.X], uly = vertexList[0][Render.Y], lrx = vertexList[0][Render.X], lry = vertexList[0][Render.Y];
+		for (int j = 1; j < vertexList.length; j++)
+		{
+			if (vertexList[j][Render.X] < ulx)
+				ulx = vertexList[j][Render.X];
+			if (vertexList[j][Render.X] > lrx)
+				lrx = vertexList[j][Render.X];
+			if (vertexList[j][Render.Y] < uly)
+				uly = vertexList[j][Render.Y];
+			if (vertexList[j][Render.Y] > lry)
+				lry = vertexList[j][Render.Y];
+		}
+
+		int x1 = (int) Math.floor(ulx), x2 = (int) Math.ceil(lrx), y1 = (int) Math.floor(uly), y2 = (int) Math.ceil(lry);
+		x1 = x1 < 0 ? 0 : (x1 >= display.getXres() ? display.getXres() : x1);
+		x2 = x2 < 0 ? 0 : (x2 >= display.getXres() ? display.getXres() : x2);
+		y1 = y1 < 0 ? 0 : (y1 >= display.getYres() ? display.getYres() : y1);
+		y2 = y2 < 0 ? 0 : (y2 >= display.getYres() ? display.getYres() : y2);
+		for (int Y = y1; Y < y2; Y++)
+			for (int X = x1; X < x2; X++)
+				if (Math.abs(MathUtils.PixelJudge_LEE(A[0], B[0], C[0], X, Y) + MathUtils.PixelJudge_LEE(A[1], B[1], C[1], X, Y)
+						+ MathUtils.PixelJudge_LEE(A[2], B[2], C[2], X, Y)) == 3)
+				{
+					float[] point1 = { vertexList[0][0], vertexList[0][1], vertexList[0][2] };
+					float Z = MathUtils.InterpolateValueByXYAndNorm(X, Y, point1, VN);
+					if (zmap[X][Y] > Z)
+						zmap[X][Y] = Z;
+				}
+
+	}
+
+	public void DrawTriangleLine(Display display, Vertex[] tri, float[] aaOffset, double[][] zmap) throws Exception
+	{
+		if (tri == null || tri.length != 3)
+			throw new Exception("Triangle data error");
+		// Interpolate to X:[0, xRes], Y:[0, yRes];
+		// Apply LEE, not SLR. Try SLR later
+		float[][] vertexPosition = new float[3][3];
+		float[][] vertexNorm = new float[3][3];
+		float[][] vertexUV = new float[3][2];
+		for (int i = 0; i < tri.length; i++)
+		{
+			vertexPosition[i][0] = tri[i].x;
+			vertexPosition[i][1] = tri[i].y;
+			vertexPosition[i][2] = tri[i].z;
+			vertexNorm[i][0] = tri[i].norm.x;
+			vertexNorm[i][1] = tri[i].norm.y;
+			vertexNorm[i][2] = tri[i].norm.z;
+			vertexUV[i][0] = tri[i].U;
+			vertexUV[i][1] = tri[i].V;
+		}
+
+		int countOfTooNearVertices = 0;
+		float[][] verticalVector = new float[4][1];
+		for (int iTri = 0; iTri < vertexPosition.length; iTri++)
+		{
+			int iValue;
+			for (iValue = 0; iValue < verticalVector.length - 1; iValue++)
+				verticalVector[iValue][0] = vertexPosition[iTri][iValue];
+			verticalVector[iValue][0] = 1;
+			// ***** perform Xwm, Xiw, Xpi, Xsp and Homogeneous Coordinate *****
+			Matrix matrix = MXimage[matlevel - 1];
+			verticalVector = MathUtils.Multiply(matrix.value, verticalVector);
+			verticalVector = MathUtils.Multiply(display.getXsp().value, verticalVector);
+			// ***** detect off screen vertices *****
+			if (verticalVector[verticalVector.length - 1][0] < 1)
+				countOfTooNearVertices++;
+			// TODO Render.DrawTriangle(): I think we need to consider verticalVector[verticalVector.length - 1][0] may be zero
+			verticalVector = MathUtils.Multiply(1 / verticalVector[verticalVector.length - 1][0], verticalVector);
+			for (iValue = 0; iValue < verticalVector.length - 1; iValue++)
+				vertexPosition[iTri][iValue] = verticalVector[iValue][0];
+		}
+		if (countOfTooNearVertices == vertexPosition.length)
+			return;
+
+		for (float[] value : vertexPosition)
+		{
+			value[X] += aaOffset[X];
+			value[Y] += aaOffset[Y];
+		}
+
+		// The way to implement:
+		// Do not need to arrange vertex. To consider the sign of three judgment.
+		// Calculate normal of plane, then calculate Z value with normal, X and Y. These two vector is vertical with each other.
+		// It is faster, and comparison shows, the difference is plus-minus 0.00003%, which can be considered as the lose of float calculation.
+		float[][] vertexList = vertexPosition;
+
+		// check if three points in xOy plane are in the same line
+		float[][] vectors = new float[2][3];
+		for (int j = 0; j < 2; j++)
+			for (int k = 0; k < 2; k++)
+				vectors[j][k] = vertexList[j][k] - vertexList[j + 1][k];
+		// They are in the same line
+		if (vectors[0][0] * vectors[1][1] == vectors[0][1] * vectors[1][0])
+			return;
+
+		float[] VN = new float[3];
+
+		// Calculate normal vector of plane v1,v2,v3 in screen space
+		for (int j = 0; j < 2; j++)
+			vectors[j][2] = vertexList[j][2] - vertexList[j + 1][2];
+		VN = MathUtils.CrossProduct(vectors[0], vectors[1]);
+
+		float[] A = new float[3];
+		float[] B = new float[3];
+		float[] C = new float[3];
+		A[0] = vertexList[1][Render.Y] - vertexList[0][Render.Y];
+		A[1] = vertexList[2][Render.Y] - vertexList[1][Render.Y];
+		A[2] = vertexList[0][Render.Y] - vertexList[2][Render.Y];
+		B[0] = vertexList[0][Render.X] - vertexList[1][Render.X];
+		B[1] = vertexList[1][Render.X] - vertexList[2][Render.X];
+		B[2] = vertexList[2][Render.X] - vertexList[0][Render.X];
+		C[0] = -(A[0] * vertexList[0][Render.X] + B[0] * vertexList[0][Render.Y]);
+		C[1] = -(A[1] * vertexList[1][Render.X] + B[1] * vertexList[1][Render.Y]);
+		C[2] = -(A[2] * vertexList[2][Render.X] + B[2] * vertexList[2][Render.Y]);
+
+		float ulx = vertexList[0][Render.X], uly = vertexList[0][Render.Y], lrx = vertexList[0][Render.X], lry = vertexList[0][Render.Y];
+		for (int j = 1; j < vertexList.length; j++)
+		{
+			if (vertexList[j][Render.X] < ulx)
+				ulx = vertexList[j][Render.X];
+			if (vertexList[j][Render.X] > lrx)
+				lrx = vertexList[j][Render.X];
+			if (vertexList[j][Render.Y] < uly)
+				uly = vertexList[j][Render.Y];
+			if (vertexList[j][Render.Y] > lry)
+				lry = vertexList[j][Render.Y];
+		}
+
+		boolean flag = true;
+		int x1 = (int) Math.floor(ulx), x2 = (int) Math.ceil(lrx), y1 = (int) Math.floor(uly), y2 = (int) Math.ceil(lry);
+		x1 = x1 < 0 ? 0 : (x1 >= display.getXres() ? display.getXres() : x1);
+		x2 = x2 < 0 ? 0 : (x2 >= display.getXres() ? display.getXres() : x2);
+		y1 = y1 < 0 ? 0 : (y1 >= display.getYres() ? display.getYres() : y1);
+		y2 = y2 < 0 ? 0 : (y2 >= display.getYres() ? display.getYres() : y2);
+		for (int Y = y1; Y < y2 && flag; Y++)
+			for (int X = x1; X < x2 && flag; X++)
+				if (Math.abs(MathUtils.PixelJudge_LEE(A[0], B[0], C[0], X, Y) + MathUtils.PixelJudge_LEE(A[1], B[1], C[1], X, Y)
+						+ MathUtils.PixelJudge_LEE(A[2], B[2], C[2], X, Y)) == 3)
+				{
+					float[] point1 = { vertexList[0][0], vertexList[0][1], vertexList[0][2] };
+					float Z = MathUtils.InterpolateValueByXYAndNorm(X, Y, point1, VN);
+					if (zmap[X][Y] == Z)
+						flag = false;
+				}
+
+		if (flag)
+		{
+			float[] point = { vertexList[0][0], vertexList[0][1], vertexList[0][2] };
+			for (int i = 0; i < 3; i++)
+			{
+				{
+					int X = (int) Math.ceil(vertexList[i][0]);
+					int End = (int) Math.floor(vertexList[(i + 1) % 3][0]);
+					if (X > End)
+					{
+						int M = X;
+						X = End + 1;
+						End = M - 1;
+					}
+					float k = -A[i] / (float) B[i];
+					float h = -C[i] / (float) B[i];
+					for (; X <= End; X++)
+					{
+						if (X >= 0 && X < display.getXres())
+						{
+							int Y = (int) (k * X + h);
+							if (Y >= 0 && Y < display.getYres())
+							{
+								// //////////////////////
+								if (X == 620 && Y == 670)
+									System.out.println(1);
+								// //////////////////////
+								float Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y, point, VN));
+								if (display.getPixel(X, Y).z > Z)
+									display.setPixel(X, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+							}
+							if (Y + 1 >= 0 && Y + 1 < display.getYres())
+							{
+								// //////////////////////
+								if (X == 620 && Y + 1 == 670)
+									System.out.println(2);
+								// //////////////////////
+								float Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y + 1, point, VN));
+								if (display.getPixel(X, Y + 1).z > Z)
+									display.setPixel(X, Y + 1, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+							}
+							for (int j = 1; j <= WIRE_WIDTH; j++)
+							{
+								if (Y + 1 + j >= 0 && Y + 1 + j < display.getYres())
+								{
+									float Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y + 1 + j, point, VN));
+									if (display.getPixel(X, Y + 1 + j).z > Z)
+										display.setPixel(X, Y + 1 + j, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+								}
+								if (Y - j >= 0 && Y - j < display.getYres())
+								{
+									float Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y - j, point, VN));
+									if (display.getPixel(X, Y - j).z > Z)
+										display.setPixel(X, Y - j, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+								}
+							}
+						}
+					}
+				}
+				{
+					int Y = (int) Math.ceil(vertexList[i][1]);
+					int End = (int) Math.floor(vertexList[(i + 1) % 3][1]);
+					if (Y > End)
+					{
+						int M = Y;
+						Y = End + 1;
+						End = M - 1;
+					}
+					float k = -B[i] / (float) A[i];
+					float h = -C[i] / (float) A[i];
+					for (; Y <= End; Y++)
+					{
+						if (Y >= 0 && Y < display.getYres())
+						{
+							int X = (int) (k * Y + h);
+							if (X >= 0 && X < display.getXres())
+							{
+								// //////////////////////
+								if (X == 620 && Y == 670)
+									System.out.println(3);
+								// //////////////////////
+								float Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y, point, VN));
+								if (display.getPixel(X, Y).z > Z)
+									display.setPixel(X, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+							}
+							if (X + 1 >= 0 && X + 1 < display.getXres())
+							{
+								// //////////////////////
+								if (X + 1 == 620 && Y == 670)
+									System.out.println(3);
+								// //////////////////////
+								float Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X + 1, Y, point, VN));
+								if (display.getPixel(X + 1, Y).z > Z)
+									display.setPixel(X + 1, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+							}
+							for (int j = 1; j <= WIRE_WIDTH; j++)
+							{
+								if (X + 1 + j >= 0 && X + 1 + j < display.getXres())
+								{
+									float Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X + 1 + j, Y, point, VN));
+									if (display.getPixel(X + 1 + j, Y).z > Z)
+										display.setPixel(X + 1 + j, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+								}
+								if (X - j >= 0 && X - j < display.getXres())
+								{
+									float Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X - j, Y, point, VN));
+									if (display.getPixel(X - j, Y).z > Z)
+										display.setPixel(X - j, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// float[] point = { vertexList[0][0], vertexList[0][1], vertexList[0][2] };
+		// float m = (float) 1.005;
+		// for (int i = 0; i < 3; i++)
+		// {
+		// {
+		// int X = (int) Math.ceil(vertexList[i][0]);
+		// int End = (int) Math.floor(vertexList[(i + 1) % 3][0]);
+		// if (X > End)
+		// {
+		// int M = X;
+		// X = End + 1;
+		// End = M - 1;
+		// }
+		// float k = -A[i] / (float) B[i];
+		// float h = -C[i] / (float) B[i];
+		// for (; X <= End; X++)
+		// {
+		// int Y = (int) (k * X + h);
+		// float Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y, point, VN) * m);
+		// if (display.getPixel(X, Y).z > Z)
+		// display.setPixel(X, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+		// for (int j = 1; j <= WIRE_WIDTH; j++)
+		// {
+		// Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y + j, point, VN) * m);
+		// if (display.getPixel(X, Y + j).z > Z)
+		// display.setPixel(X, Y + j, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+		// Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y - j, point, VN) * m);
+		// if (display.getPixel(X, Y - j).z > Z)
+		// display.setPixel(X, Y - j, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+		// }
+		// }
+		// }
+		// {
+		// int Y = (int) Math.ceil(vertexList[i][1]);
+		// int End = (int) Math.floor(vertexList[(i + 1) % 3][1]);
+		// if (Y > End)
+		// {
+		// int M = Y;
+		// Y = End + 1;
+		// End = M - 1;
+		// }
+		// float k = -B[i] / (float) A[i];
+		// float h = -C[i] / (float) A[i];
+		// for (; Y <= End; Y++)
+		// {
+		// int X = (int) (k * Y + h);
+		// float Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y, point, VN) * m);
+		// if (display.getPixel(X, Y).z > Z)
+		// display.setPixel(X, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+		// for (int j = 1; j <= WIRE_WIDTH; j++)
+		// {
+		// Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X + j, Y, point, VN) * m);
+		// if (display.getPixel(X + j, Y).z > Z)
+		// display.setPixel(X + j, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+		// Z = (float) (MathUtils.InterpolateValueByXYAndNorm(X, Y - j, point, VN) * m);
+		// if (display.getPixel(X - j, Y).z > Z)
+		// display.setPixel(X - j, Y, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, Z));
+		// }
+		// }
+		// }
+		// }
 	}
 
 	public void DrawTriangle(Display display, Vertex[] tri, float[] aaOffset) throws Exception
@@ -512,6 +855,8 @@ public class Render
 				{
 					float[] point = { vertexList[0][0], vertexList[0][1], vertexList[0][2] };
 					float Z = MathUtils.InterpolateValueByXYAndNorm(X, Y, point, VN);
+					if (X == 620 && Y == 720)
+						System.out.println();
 					if (display.getPixel(X, Y).z > Z)
 					{
 						Color color = null;
