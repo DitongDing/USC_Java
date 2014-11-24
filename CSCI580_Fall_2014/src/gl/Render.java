@@ -358,8 +358,6 @@ public class Render
 				{
 					float[] point = { vertexList[0][0], vertexList[0][1], vertexList[0][2] };
 					float Z = MathUtils.InterpolateValueByXYAndNorm(X, Y, point, VN);
-					if (X == 620 && Y == 720)
-						System.out.println();
 					if (display.getPixel(X, Y).z > Z)
 					{
 						Color color = null;
@@ -438,19 +436,39 @@ public class Render
 
 		float[] tempColor = { 0, 0, 0 };
 
-		float[] Sle = { 0, 0, 0 };
-		for (int i = 0; i < numlights; i++)
+		if (!TEST_TOON)
 		{
-			float RE = MathUtils.Multiply(R[i], E);
-			if (RE <= 0)
-				continue;
-			RE = (float) Math.pow(RE, s);
-			Sle = MathUtils.Plus(Sle, MathUtils.Multiply(RE, le[i]));
-		}
-		for (int i = 0; i < tempColor.length; i++)
-			tempColor[i] += Ks[i] * Sle[i];
+			float[] Sle = { 0, 0, 0 };
+			for (int i = 0; i < numlights; i++)
+			{
+				float RE = MathUtils.Multiply(R[i], E);
+				if (RE <= 0)
+					continue;
+				RE = (float) Math.pow(RE, s);
+				Sle = MathUtils.Plus(Sle, MathUtils.Multiply(RE, le[i]));
+			}
+			for (int i = 0; i < tempColor.length; i++)
+				tempColor[i] += Ks[i] * Sle[i];
 
-		if (tempColor[0] < 1 || tempColor[1] < 1 || tempColor[2] < 1)
+			if (tempColor[0] < 1 || tempColor[1] < 1 || tempColor[2] < 1)
+			{
+				float[] Dle = { 0, 0, 0 };
+				for (int i = 0; i < numlights; i++)
+				{
+					float NL = MathUtils.Multiply(N, L[i]);
+					if (NL < 0)
+						continue;
+					Dle = MathUtils.Plus(Dle, MathUtils.Multiply(NL, le[i]));
+				}
+				for (int i = 0; i < tempColor.length; i++)
+					tempColor[i] += Kd[i] * Dle[i];
+			}
+
+			if (tempColor[0] < 1 || tempColor[1] < 1 || tempColor[2] < 1)
+				for (int i = 0; i < tempColor.length; i++)
+					tempColor[i] += Ka[i] * la[i];
+		}
+		else
 		{
 			float[] Dle = { 0, 0, 0 };
 			for (int i = 0; i < numlights; i++)
@@ -458,15 +476,12 @@ public class Render
 				float NL = MathUtils.Multiply(N, L[i]);
 				if (NL < 0)
 					continue;
+				NL = NL < 0.3 ? 0.3f : (NL < 0.7 ? 0.6f : 0.9f);
 				Dle = MathUtils.Plus(Dle, MathUtils.Multiply(NL, le[i]));
 			}
 			for (int i = 0; i < tempColor.length; i++)
 				tempColor[i] += Kd[i] * Dle[i];
 		}
-
-		if (tempColor[0] < 1 || tempColor[1] < 1 || tempColor[2] < 1)
-			for (int i = 0; i < tempColor.length; i++)
-				tempColor[i] += Ka[i] * la[i];
 
 		color.red = tempColor[0] > 1 ? 1 : tempColor[0];
 		color.green = tempColor[1] > 1 ? 1 : tempColor[1];

@@ -19,13 +19,13 @@ import utils.GUI.ActionInput;
 public class Main
 {
 	public static MainWindow gui;
-	public static String defaultInput = "data/Winnie-the-Pooh/Winnie-the-Pooh.obj";
-	// public static String defaultInput = "pot4.asc";
+//	public static String defaultInput = "data/Winnie-the-Pooh/Winnie-the-Pooh.obj";
+	public static String defaultInput = "data/M_L/Luigi_obj.obj";
 	public static String defaultOutput = "output.ppm";
 	public static Pixel defaultPixel = new Pixel((short) 1000, (short) 1000, (short) 1000, (short) 1, Float.MAX_VALUE);
 	public static boolean status = true;
-	public static int width = 1024; // frame buffer and display width
-	public static int height = 1024; // frame buffer and display height
+	public static int width = 256; // frame buffer and display width
+	public static int height = 256; // frame buffer and display height
 	public static Display display = null;
 
 	public static Coord translation = new Coord(0f, -3.25f, 3.5f, 1f);
@@ -51,29 +51,30 @@ public class Main
 		{
 			display = new Display(Display.RGBAZ_DISPLAY, width, height);
 
+			// Initialize
 			// Do not put it in run render, as it will force render to add default action every time it runs.
 			gui = new MainWindow("Final_Muse");
 
 			// initialize Xwm and camera
-			gui.addAction(new ActionInput(ActionInput.ROTATION_X, ActionInput.WORLD, rotateX));
-			gui.addAction(new ActionInput(ActionInput.ROTATION_Y, ActionInput.WORLD, rotateY));
-			gui.addAction(new ActionInput(ActionInput.SCALE, ActionInput.WORLD, scale));
-			gui.addAction(new ActionInput(ActionInput.TRANSLATION, ActionInput.WORLD, translation));
+			gui.actionManager.addAction(new ActionInput(ActionInput.ROTATION_X, ActionInput.WORLD, rotateX));
+			gui.actionManager.addAction(new ActionInput(ActionInput.ROTATION_Y, ActionInput.WORLD, rotateY));
+			gui.actionManager.addAction(new ActionInput(ActionInput.SCALE, ActionInput.WORLD, scale));
+			gui.actionManager.addAction(new ActionInput(ActionInput.TRANSLATION, ActionInput.WORLD, translation));
 
 			// Light
-			gui.render.PushLight(light1);
-			gui.render.PushLight(light2);
-			gui.render.PushLight(light3);
-			gui.render.setAmbientlight(ambientlight);
+			gui.actionManager.render.PushLight(light1);
+			gui.actionManager.render.PushLight(light2);
+			gui.actionManager.render.PushLight(light3);
+			gui.actionManager.render.setAmbientlight(ambientlight);
 
 			// Material property
-			gui.render.setKa(ambientCoefficient);
-			gui.render.setKd(diffuseCoefficient);
-			gui.render.setKs(specularCoefficient);
-			gui.render.setSpec(specpower);
+			gui.actionManager.render.setKa(ambientCoefficient);
+			gui.actionManager.render.setKd(diffuseCoefficient);
+			gui.actionManager.render.setKs(specularCoefficient);
+			gui.actionManager.render.setSpec(specpower);
 
 			// Set aaOffset.
-			gui.render.setAaOffset(aaOffset);
+			gui.actionManager.render.setAaOffset(aaOffset);
 
 			gui.inputPath.setText(defaultInput);
 			gui.outputPath.setText(defaultOutput);

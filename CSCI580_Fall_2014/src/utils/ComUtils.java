@@ -163,6 +163,8 @@ public class ComUtils
 				com.obj.Vertex[] vertexes = face.getVertices();
 				com.obj.Vertex[] normals = face.getNormals();
 				com.obj.TextureCoordinate[] textures = face.getTextures();
+				if(vertexes.length > 3)
+					System.out.println();
 				for (int i = 0; i < tri.length; i++)
 				{
 
@@ -230,7 +232,7 @@ public class ComUtils
 		return triList;
 	}
 
-	// TODO Use Sobel filters on depth map to calculate edge. and return a new Image with black edge
+	// TODO ComUtils.edgeDetector: try some other ways to detect edge
 	public static Image edgeDetector(Image image, float ZMax)
 	{
 		Image re = new Image(image.getXres(), image.getYres());
@@ -258,5 +260,26 @@ public class ComUtils
 			}
 
 		return re;
+	}
+
+	public static BufferedImage Display2BufferedImage(Image image)
+	{
+		if (image.isChangable())
+		{
+			BufferedImage bi = new BufferedImage(image.getXres(), image.getYres(), BufferedImage.TYPE_INT_RGB);
+			for (int i = 0; i < bi.getWidth(); i++)
+				for (int j = 0; j < bi.getHeight(); j++)
+				{
+					Pixel pixel = image.getPixel(i, j);
+					bi.setRGB(i, j, new java.awt.Color(pixel.red / (float) image.getGlobal_max(), pixel.green / (float) image.getGlobal_max(), pixel.blue
+							/ (float) image.getGlobal_max()).getRGB());
+				}
+			return bi;
+		}
+		else
+		{
+			System.out.println("Display global_max hasn't been initialized");
+			return null;
+		}
 	}
 }

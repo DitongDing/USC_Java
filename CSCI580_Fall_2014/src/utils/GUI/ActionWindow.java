@@ -22,8 +22,6 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 
-
-
 public class ActionWindow extends JFrame
 {
 	private static final long serialVersionUID = 6391527580602385909L;
@@ -189,7 +187,7 @@ public class ActionWindow extends JFrame
 								rotation = new Coord(0, 0, fvalue, 0);
 							}
 							ActionInput input = new ActionInput(type, ActionInput.OBJECT, rotation);
-							parent.addAction(input);
+							parent.actionManager.addAction(input);
 							frame.dispose();
 							refreshTable();
 						}
@@ -266,7 +264,7 @@ public class ActionWindow extends JFrame
 							short type = ActionInput.TRANSLATION;
 							Coord translation = new Coord(fvalueX, fvalueY, fvalueZ, 0);
 							ActionInput input = new ActionInput(type, ActionInput.OBJECT, translation);
-							parent.addAction(input);
+							parent.actionManager.addAction(input);
 							frame.dispose();
 							refreshTable();
 						}
@@ -343,7 +341,7 @@ public class ActionWindow extends JFrame
 							short type = ActionInput.SCALE;
 							Coord scale = new Coord(fvalueX, fvalueY, fvalueZ, 0);
 							ActionInput input = new ActionInput(type, ActionInput.OBJECT, scale);
-							parent.addAction(input);
+							parent.actionManager.addAction(input);
 							frame.dispose();
 							refreshTable();
 						}
@@ -405,10 +403,10 @@ public class ActionWindow extends JFrame
 				panel5.setLayout(new GridLayout(1, 2));
 				mainPanel.add(panel5);
 
-				Coord position = parent.render.getCamera().getPosition();
-				Coord lookat = parent.render.getCamera().getLookat();
-				Coord worldup = parent.render.getCamera().getWorldup();
-				float FOV = parent.render.getCamera().getFOV();
+				Coord position = parent.actionManager.render.getCamera().getPosition();
+				Coord lookat = parent.actionManager.render.getCamera().getLookat();
+				Coord worldup = parent.actionManager.render.getCamera().getWorldup();
+				float FOV = parent.actionManager.render.getCamera().getFOV();
 
 				Pvalue[0] = new JTextField(8);
 				Pvalue[0].setText(new Float(position.x).toString());
@@ -460,7 +458,7 @@ public class ActionWindow extends JFrame
 							short type = ActionInput.CAMERA;
 							Camera camera = new Camera(position, lookat, worldup, FOV);
 							ActionInput input = new ActionInput(type, ActionInput.OBJECT, camera);
-							parent.addAction(input);
+							parent.actionManager.addAction(input);
 							frame.dispose();
 							refreshTable();
 						}
@@ -495,7 +493,7 @@ public class ActionWindow extends JFrame
 						if (temp != null && temp != "")
 						{
 							time = Double.parseDouble(temp);
-							parent.editAction(index, time);
+							parent.actionManager.editAction(index, time);
 							refreshTable();
 						}
 					}
@@ -516,7 +514,7 @@ public class ActionWindow extends JFrame
 					if (index != -1)
 						if (JOptionPane.showConfirmDialog(null, "Really want to delete action?", "Delete action", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
 						{
-							parent.deleteAction(index);
+							parent.actionManager.deleteAction(index);
 							refreshTable();
 						}
 				}
@@ -543,7 +541,7 @@ public class ActionWindow extends JFrame
 		DefaultTableModel tableModel = (DefaultTableModel) table.getModel();
 		tableModel.setRowCount(0);
 		int no = 1;
-		for (ActionInput input : parent.actionList)
+		for (ActionInput input : parent.actionManager.actionList)
 		{
 			String number = new Integer(no++).toString();
 			String type = "";

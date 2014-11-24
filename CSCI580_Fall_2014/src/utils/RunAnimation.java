@@ -36,11 +36,11 @@ public class RunAnimation extends Thread
 			ArrayList<Vertex[]> triList = ComUtils.readModelFile(gui.inputPath.getText());
 			ArrayList<BufferedImage> biList = new ArrayList<BufferedImage>();
 
-			ArrayList<ActionInput> actionList = new ArrayList<ActionInput>(gui.actionList);
+			ArrayList<ActionInput> actionList = new ArrayList<ActionInput>(gui.actionManager.actionList);
 
 			// Remove all action for using addAction and deleteAction
 			for (int i = 0; i < actionList.size(); i++)
-				gui.deleteAction(0);
+				gui.actionManager.deleteAction(0);
 
 			// Render frames for every action and recover actionlist
 			int count = 0;
@@ -85,21 +85,21 @@ public class RunAnimation extends Thread
 					}
 					else
 						throw new Exception("action type error in run animation");
-					gui.addAction(input);
-					gui.render.runRender(triList, display, defaultPixel);
-					biList.add(ResultWindow.Display2BufferedImage(display));
-					gui.deleteAction(count);
+					gui.actionManager.addAction(input);
+					gui.actionManager.render.runRender(triList, display, defaultPixel);
+					biList.add(ComUtils.Display2BufferedImage(display));
+					gui.actionManager.deleteAction(count);
 				}
 				// assume last frame for every action is the previous action, for recovering actionlist.
-				gui.addAction(action);
-				gui.render.runRender(triList, display, defaultPixel);
-				biList.add(ResultWindow.Display2BufferedImage(display));
+				gui.actionManager.addAction(action);
+				gui.actionManager.render.runRender(triList, display, defaultPixel);
+				biList.add(ComUtils.Display2BufferedImage(display));
 				count++;
 			}
 
 			// For last frame. In case there is no action
-			gui.render.runRender(triList, display, defaultPixel);
-			biList.add(ResultWindow.Display2BufferedImage(display));
+			gui.actionManager.render.runRender(triList, display, defaultPixel);
+			biList.add(ComUtils.Display2BufferedImage(display));
 
 			ResultWindow rw = new ResultWindow(biList.toArray(new BufferedImage[0]));
 			for (int i = 1; i < biList.size(); i++)

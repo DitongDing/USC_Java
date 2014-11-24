@@ -33,11 +33,11 @@ public class RunRender extends Thread
 		{
 			FileOutputStream fos = new FileOutputStream(gui.outputPath.getText());
 			ArrayList<Vertex[]> triList = ComUtils.readModelFile(gui.inputPath.getText());
-			gui.render.runRender(triList, display, defaultPixel);
+			gui.actionManager.render.runRender(triList, display, defaultPixel);
 
 			display.FlushToPPMFile(fos); /* write out or update display to file */
 			BufferedImage[] biList = new BufferedImage[1];
-			biList[0] = ResultWindow.Display2BufferedImage(display);
+			biList[0] = ComUtils.Display2BufferedImage(display);
 			new ResultWindow(biList);
 
 			// Clean up and exit
