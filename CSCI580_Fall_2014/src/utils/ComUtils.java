@@ -163,7 +163,7 @@ public class ComUtils
 				com.obj.Vertex[] vertexes = face.getVertices();
 				com.obj.Vertex[] normals = face.getNormals();
 				com.obj.TextureCoordinate[] textures = face.getTextures();
-				if(vertexes.length > 3)
+				if (vertexes.length > 3)
 					System.out.println();
 				for (int i = 0; i < tri.length; i++)
 				{
@@ -232,49 +232,26 @@ public class ComUtils
 		return triList;
 	}
 
-	// TODO ComUtils.edgeDetector: try some other ways to detect edge.
 	public static Image edgeDetector(Image image, float ZMax)
 	{
 		Image re = new Image(image.getXres(), image.getYres());
 
-//		double threshold = 0.025;
-//
-//		for (int x = 0; x < re.getXres(); x++)
-//			for (int y = 0; y < re.getYres(); y++)
-//				re.setPixel(x, y, new Pixel(image.getPixel(x, y)));
-//
-//		Pixel black = new Pixel((short) 0, (short) 0, (short) 0, (short) 1, 0);
-//
-//		for (int x = 1; x < re.getXres() - 1; x++)
-//			for (int y = 1; y < re.getYres() - 1; y++)
-//			{
-//				double Gx = ((image.getPixel(x + 1, y - 1).z + 2 * image.getPixel(x + 1, y).z + image.getPixel(x + 1, y + 1).z) - (image.getPixel(x - 1, y - 1).z
-//						+ 2 * image.getPixel(x - 1, y).z + image.getPixel(x - 1, y + 1).z))
-//						/ ZMax;
-//				double Gy = ((image.getPixel(x - 1, y - 1).z + 2 * image.getPixel(x, y - 1).z + image.getPixel(x + 1, y - 1).z) - (image.getPixel(x - 1, y + 1).z
-//						+ 2 * image.getPixel(x, y + 1).z + image.getPixel(x + 1, y + 1).z))
-//						/ ZMax;
-//				double G = Math.sqrt(Gx * Gx + Gy * Gy);
-//				if (G > threshold)
-//					re.setPixel(x, y, black);
-//			}
-		
 		double threshold = 0.25;
 
 		for (int x = 0; x < re.getXres(); x++)
 			for (int y = 0; y < re.getYres(); y++)
 			{
 				re.setPixel(x, y, new Pixel(image.getPixel(x, y)));
-				re.getPixel(x, y).z = 1/(1/re.getPixel(x, y).z-1/ZMax);
+				re.getPixel(x, y).z = 1 / (1 / re.getPixel(x, y).z - 1 / ZMax);
 			}
-		
+
 		float min = Float.MAX_VALUE;
 		float max = -1;
-		
+
 		for (int x = 0; x < re.getXres(); x++)
 			for (int y = 0; y < re.getYres(); y++)
 			{
-				if(re.getPixel(x, y).z != Float.MAX_VALUE && re.getPixel(x, y).z > max)
+				if (re.getPixel(x, y).z != Float.MAX_VALUE && re.getPixel(x, y).z > max)
 					max = re.getPixel(x, y).z;
 				else if (re.getPixel(x, y).z < min)
 					min = re.getPixel(x, y).z;
@@ -290,7 +267,7 @@ public class ComUtils
 				double Gy = ((image.getPixel(x - 1, y - 1).z + 2 * image.getPixel(x, y - 1).z + image.getPixel(x + 1, y - 1).z) - (image.getPixel(x - 1, y + 1).z
 						+ 2 * image.getPixel(x, y + 1).z + image.getPixel(x + 1, y + 1).z));
 				double G = Math.sqrt(Gx * Gx + Gy * Gy);
-				if (G > threshold*(max-min))
+				if (G > threshold * (max - min))
 					re.setPixel(x, y, black);
 			}
 
@@ -316,5 +293,41 @@ public class ComUtils
 			System.out.println("Display global_max hasn't been initialized");
 			return null;
 		}
+	}
+
+	public static Image stippling(Image image, boolean isColorStippling)
+	{
+		Image re = new Image(image.getXres(), image.getYres());
+		int size = re.getXres() * re.getYres();
+
+		for (int x = 0; x < re.getXres(); x++)
+			for (int y = 0; y < re.getYres(); y++)
+				re.setPixel(x, y, new Pixel(image.getPixel(x, y)));
+
+		if (isColorStippling)
+		{
+			for (int index = 0; index < size; index += 4)
+			{
+//				stipBL(index, image, re);
+//				stipG(index, image, re);
+//				stipR(index, image, re);
+				if (index % re.getXres() == re.getXres() - 4)
+				{
+					index += (3 * re.getXres());
+				}
+			}
+		}
+		else
+		{
+			for (int index = 0; index < size; index += 4)
+			{
+				if (index % re.getXres() == re.getXres() - 4)
+				{
+					index += (3 * re.getXres());
+				}
+			}
+		}
+
+		return re;
 	}
 }
