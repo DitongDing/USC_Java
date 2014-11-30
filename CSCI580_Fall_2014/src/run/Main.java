@@ -19,8 +19,8 @@ import utils.GUI.ActionInput;
 public class Main
 {
 	public static MainWindow gui;
-//	public static String defaultInput = "data/Winnie-the-Pooh/Winnie-the-Pooh.obj";
-	public static String defaultInput = "data/M_L/Luigi_obj.obj";
+	public static String defaultInput = "data/Winnie-the-Pooh/Winnie-the-Pooh.obj";
+//	public static String defaultInput = "data/obj_ZXC/apple.obj";
 	public static String defaultOutput = "output.ppm";
 	public static Pixel defaultPixel = new Pixel((short) 1000, (short) 1000, (short) 1000, (short) 1, Float.MAX_VALUE);
 	public static boolean status = true;
