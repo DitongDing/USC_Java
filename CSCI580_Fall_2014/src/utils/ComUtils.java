@@ -11,7 +11,10 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 import java.util.StringTokenizer;
 
 import javax.imageio.ImageIO;
@@ -308,9 +311,9 @@ public class ComUtils
 		{
 			for (int index = 0; index < size; index += 4)
 			{
-//				stipBL(index, image, re);
-//				stipG(index, image, re);
-//				stipR(index, image, re);
+				colorStip(index, re, image, new String[] { "red", "green" });
+				colorStip(index, re, image, new String[] { "red", "blue" });
+				colorStip(index, re, image, new String[] { "green", "blue" });
 				if (index % re.getXres() == re.getXres() - 4)
 				{
 					index += (3 * re.getXres());
@@ -321,6 +324,7 @@ public class ComUtils
 		{
 			for (int index = 0; index < size; index += 4)
 			{
+				stip(index, re, image);
 				if (index % re.getXres() == re.getXres() - 4)
 				{
 					index += (3 * re.getXres());
@@ -329,5 +333,75 @@ public class ComUtils
 		}
 
 		return re;
+	}
+
+	public static class Pair implements Comparable<Pair>
+	{
+		int pos;
+		short value;
+
+		public Pair(int pos, short value)
+		{
+			this.pos = pos;
+			this.value = value;
+		}
+
+		public int compareTo(Pair arg0)
+		{
+			return value < arg0.value ? -1 : (value == arg0.value ? 0 : 1);
+		}
+	}
+
+	public static void colorStip(int index, Image re, Image image, String[] color)
+	{
+		try
+		{
+			Field color1 = new Pixel().getClass().getDeclaredField(color[0]);
+			Field color2 = new Pixel().getClass().getDeclaredField(color[1]);
+
+			int x = re.getXres();
+			int[] data = { index + x + 1, index + x + 2, index + 2 * x + 2, index + 2 * x + 1, index + 2 * x, index + x, index, index + 1, index + 2,
+					index + 3, index + x + 3, index + 2 * x + 3, index + 3 * x + 3, index + 3 * x + 2, index + 3 * x + 1, index + 3 * x };
+			ArrayList<Pair> arr = new ArrayList<Pair>();
+			short C1 = 0;
+			short C2 = 0;
+			for (int i = 0; i < 16; ++i)
+			{
+				int pos = data[i];
+				Pixel temp = image.getPixel(pos);
+				C1 += color1.getShort(temp) / 16;
+				C2 += color2.getShort(temp) / 16;
+				short value = (short) ((color1.getShort(temp) + color2.getShort(temp)) / 2);
+				Pair cur = new Pair(pos, value);
+				arr.add(cur);
+			}
+			Collections.sort(arr);
+			short mean = (short) ((C1 + C2) / 2);
+			mean = (short) (mean >> 4);
+			int lev = mean / 20 + 1;
+			Random r = new Random();
+			for (int i = lev; i <= 10; ++i)
+			{
+				int target = 0;
+				while (r.nextInt(3) != 0 && target < arr.size() - 1)
+					++target;
+				int pos = arr.get(target).pos;
+				arr.remove(target);
+				Pixel pixel = new Pixel(re.getPixel(pos));
+				pixel.red = pixel.green = pixel.blue = 255 << 4;
+				color1.set(pixel, (short) 0);
+				color2.set(pixel, (short) 0);
+				re.setPixel(pos, pixel);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public static void stip(int index, Image re, Image image)
+	{
+
 	}
 }

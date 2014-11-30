@@ -101,9 +101,9 @@ public class Render
 				DrawTriangle(display, tri, aaOffset[i]);
 			Image image = display;
 			if (TEST_STIPPLING)
-				image = ComUtils.stippling(display, TEST_STIPPLING_COLOR);
+				image = ComUtils.stippling(image, TEST_STIPPLING_COLOR);
 			if (TEST_TOON || TEST_STIPPLING)
-				image = ComUtils.edgeDetector(display, camera.getD());
+				image = ComUtils.edgeDetector(image, camera.getD());
 			for (int x = 0; x < display.getXres(); x++)
 				for (int y = 0; y < display.getYres(); y++)
 				{

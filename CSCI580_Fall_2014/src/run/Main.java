@@ -24,8 +24,8 @@ public class Main
 	public static String defaultOutput = "output.ppm";
 	public static Pixel defaultPixel = new Pixel((short) 1000, (short) 1000, (short) 1000, (short) 1, Float.MAX_VALUE);
 	public static boolean status = true;
-	public static int width = 256; // frame buffer and display width
-	public static int height = 256; // frame buffer and display height
+	public static int width = 512; // frame buffer and display width
+	public static int height = 512; // frame buffer and display height
 	public static Display display = null;
 
 	public static Coord translation = new Coord(0f, -3.25f, 3.5f, 1f);
