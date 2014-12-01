@@ -100,10 +100,10 @@ public class Render
 			for (Vertex[] tri : triList)
 				DrawTriangle(display, tri, aaOffset[i]);
 			Image image = display;
-			if (TEST_STIPPLING)
-				image = ComUtils.stippling(image, TEST_STIPPLING_COLOR);
 			if (TEST_TOON || TEST_STIPPLING)
 				image = ComUtils.edgeDetector(image, camera.getD());
+			if (TEST_STIPPLING)
+				image = ComUtils.stippling(image, camera, TEST_STIPPLING_COLOR);
 			for (int x = 0; x < display.getXres(); x++)
 				for (int y = 0; y < display.getYres(); y++)
 				{

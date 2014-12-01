@@ -1,5 +1,6 @@
 package utils;
 
+import gl.Camera;
 import gl.Coord;
 import gl.Image;
 import gl.Pixel;
@@ -298,14 +299,18 @@ public class ComUtils
 		}
 	}
 
-	public static Image stippling(Image image, boolean isColorStippling)
-	{
+	public static Image stippling(Image image, Camera camera, boolean isColorStippling)
+	{		
 		Image re = new Image(image.getXres(), image.getYres());
 		int size = re.getXres() * re.getYres();
 
 		for (int x = 0; x < re.getXres(); x++)
 			for (int y = 0; y < re.getYres(); y++)
-				re.setPixel(x, y, new Pixel(image.getPixel(x, y)));
+			{
+				Pixel pixel = image.getPixel(x, y);
+				pixel.red = pixel.green = pixel.blue = 255 << 4;
+				re.setPixel(x, y, pixel);
+			}
 
 		if (isColorStippling)
 		{
@@ -388,7 +393,6 @@ public class ComUtils
 				int pos = arr.get(target).pos;
 				arr.remove(target);
 				Pixel pixel = new Pixel(re.getPixel(pos));
-				pixel.red = pixel.green = pixel.blue = 255 << 4;
 				color1.set(pixel, (short) 0);
 				color2.set(pixel, (short) 0);
 				re.setPixel(pos, pixel);
@@ -402,6 +406,39 @@ public class ComUtils
 
 	public static void stip(int index, Image re, Image image)
 	{
-
+		int x = re.getXres();
+		int[] data = { index + x + 1, index + x + 2, index + 2 * x + 2, index + 2 * x + 1, index + 2 * x, index + x, index, index + 1, index + 2,
+				index + 3, index + x + 3, index + 2 * x + 3, index + 3 * x + 3, index + 3 * x + 2, index + 3 * x + 1, index + 3 * x };
+		ArrayList<Pair> arr = new ArrayList<Pair>();
+		short red = 0;
+		short green = 0;
+		short blue = 0;
+		for (int i = 0; i < 16; ++i)
+		{
+			int pos = data[i];
+			Pixel temp = image.getPixel(pos);
+			red += temp.red / 16;
+			green += temp.green / 16;
+			blue += temp.blue / 16;
+			short value = (short) ((temp.red * 30 + temp.green * 59 + temp.blue * 11) / 100);
+			Pair cur = new Pair(pos, value);
+			arr.add(cur);
+		}
+		Collections.sort(arr);
+		short mean = (short) ((red * 30 + green * 59 + blue * 11) / 100);
+		mean = (short) (mean >> 4);
+		int lev = mean / 20 + 1;
+		Random r = new Random();
+		for (int i = lev; i <= 12; ++i)
+		{
+			int target = 0;
+			while (r.nextInt(3) == 0 && target < arr.size() - 1)
+				++target;
+			int pos = arr.get(target).pos;
+			arr.remove(target);
+			Pixel pixel = new Pixel(re.getPixel(pos));
+			pixel.red = pixel.green = pixel.blue = 0;
+			re.setPixel(pos, pixel);
+		}
 	}
 }
