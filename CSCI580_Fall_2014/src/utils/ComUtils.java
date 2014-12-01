@@ -1,6 +1,5 @@
 package utils;
 
-import gl.Camera;
 import gl.Coord;
 import gl.Image;
 import gl.Pixel;
@@ -12,10 +11,7 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
 import java.util.StringTokenizer;
 
 import javax.imageio.ImageIO;
@@ -236,48 +232,6 @@ public class ComUtils
 		return triList;
 	}
 
-	public static Image edgeDetector(Image image, float ZMax)
-	{
-		Image re = new Image(image.getXres(), image.getYres());
-
-		double threshold = 0.25;
-
-		for (int x = 0; x < re.getXres(); x++)
-			for (int y = 0; y < re.getYres(); y++)
-			{
-				re.setPixel(x, y, new Pixel(image.getPixel(x, y)));
-				re.getPixel(x, y).z = 1 / (1 / re.getPixel(x, y).z - 1 / ZMax);
-			}
-
-		float min = Float.MAX_VALUE;
-		float max = -1;
-
-		for (int x = 0; x < re.getXres(); x++)
-			for (int y = 0; y < re.getYres(); y++)
-			{
-				if (re.getPixel(x, y).z != Float.MAX_VALUE && re.getPixel(x, y).z > max)
-					max = re.getPixel(x, y).z;
-				else if (re.getPixel(x, y).z < min)
-					min = re.getPixel(x, y).z;
-			}
-
-		Pixel black = new Pixel((short) 0, (short) 0, (short) 0, (short) 1, 0);
-
-		for (int x = 1; x < re.getXres() - 1; x++)
-			for (int y = 1; y < re.getYres() - 1; y++)
-			{
-				double Gx = ((image.getPixel(x + 1, y - 1).z + 2 * image.getPixel(x + 1, y).z + image.getPixel(x + 1, y + 1).z) - (image.getPixel(x - 1, y - 1).z
-						+ 2 * image.getPixel(x - 1, y).z + image.getPixel(x - 1, y + 1).z));
-				double Gy = ((image.getPixel(x - 1, y - 1).z + 2 * image.getPixel(x, y - 1).z + image.getPixel(x + 1, y - 1).z) - (image.getPixel(x - 1, y + 1).z
-						+ 2 * image.getPixel(x, y + 1).z + image.getPixel(x + 1, y + 1).z));
-				double G = Math.sqrt(Gx * Gx + Gy * Gy);
-				if (G > threshold * (max - min))
-					re.setPixel(x, y, black);
-			}
-
-		return re;
-	}
-
 	public static BufferedImage Display2BufferedImage(Image image)
 	{
 		if (image.isChangable())
@@ -296,149 +250,6 @@ public class ComUtils
 		{
 			System.out.println("Display global_max hasn't been initialized");
 			return null;
-		}
-	}
-
-	public static Image stippling(Image image, Camera camera, boolean isColorStippling)
-	{		
-		Image re = new Image(image.getXres(), image.getYres());
-		int size = re.getXres() * re.getYres();
-
-		for (int x = 0; x < re.getXres(); x++)
-			for (int y = 0; y < re.getYres(); y++)
-			{
-				Pixel pixel = image.getPixel(x, y);
-				pixel.red = pixel.green = pixel.blue = 255 << 4;
-				re.setPixel(x, y, pixel);
-			}
-
-		if (isColorStippling)
-		{
-			for (int index = 0; index < size; index += 4)
-			{
-				colorStip(index, re, image, new String[] { "red", "green" });
-				colorStip(index, re, image, new String[] { "red", "blue" });
-				colorStip(index, re, image, new String[] { "green", "blue" });
-				if (index % re.getXres() == re.getXres() - 4)
-				{
-					index += (3 * re.getXres());
-				}
-			}
-		}
-		else
-		{
-			for (int index = 0; index < size; index += 4)
-			{
-				stip(index, re, image);
-				if (index % re.getXres() == re.getXres() - 4)
-				{
-					index += (3 * re.getXres());
-				}
-			}
-		}
-
-		return re;
-	}
-
-	public static class Pair implements Comparable<Pair>
-	{
-		int pos;
-		short value;
-
-		public Pair(int pos, short value)
-		{
-			this.pos = pos;
-			this.value = value;
-		}
-
-		public int compareTo(Pair arg0)
-		{
-			return value < arg0.value ? -1 : (value == arg0.value ? 0 : 1);
-		}
-	}
-
-	public static void colorStip(int index, Image re, Image image, String[] color)
-	{
-		try
-		{
-			Field color1 = new Pixel().getClass().getDeclaredField(color[0]);
-			Field color2 = new Pixel().getClass().getDeclaredField(color[1]);
-
-			int x = re.getXres();
-			int[] data = { index + x + 1, index + x + 2, index + 2 * x + 2, index + 2 * x + 1, index + 2 * x, index + x, index, index + 1, index + 2,
-					index + 3, index + x + 3, index + 2 * x + 3, index + 3 * x + 3, index + 3 * x + 2, index + 3 * x + 1, index + 3 * x };
-			ArrayList<Pair> arr = new ArrayList<Pair>();
-			short C1 = 0;
-			short C2 = 0;
-			for (int i = 0; i < 16; ++i)
-			{
-				int pos = data[i];
-				Pixel temp = image.getPixel(pos);
-				C1 += color1.getShort(temp) / 16;
-				C2 += color2.getShort(temp) / 16;
-				short value = (short) ((color1.getShort(temp) + color2.getShort(temp)) / 2);
-				Pair cur = new Pair(pos, value);
-				arr.add(cur);
-			}
-			Collections.sort(arr);
-			short mean = (short) ((C1 + C2) / 2);
-			mean = (short) (mean >> 4);
-			int lev = mean / 20 + 1;
-			Random r = new Random();
-			for (int i = lev; i <= 10; ++i)
-			{
-				int target = 0;
-				while (r.nextInt(3) != 0 && target < arr.size() - 1)
-					++target;
-				int pos = arr.get(target).pos;
-				arr.remove(target);
-				Pixel pixel = new Pixel(re.getPixel(pos));
-				color1.set(pixel, (short) 0);
-				color2.set(pixel, (short) 0);
-				re.setPixel(pos, pixel);
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	public static void stip(int index, Image re, Image image)
-	{
-		int x = re.getXres();
-		int[] data = { index + x + 1, index + x + 2, index + 2 * x + 2, index + 2 * x + 1, index + 2 * x, index + x, index, index + 1, index + 2,
-				index + 3, index + x + 3, index + 2 * x + 3, index + 3 * x + 3, index + 3 * x + 2, index + 3 * x + 1, index + 3 * x };
-		ArrayList<Pair> arr = new ArrayList<Pair>();
-		short red = 0;
-		short green = 0;
-		short blue = 0;
-		for (int i = 0; i < 16; ++i)
-		{
-			int pos = data[i];
-			Pixel temp = image.getPixel(pos);
-			red += temp.red / 16;
-			green += temp.green / 16;
-			blue += temp.blue / 16;
-			short value = (short) ((temp.red * 30 + temp.green * 59 + temp.blue * 11) / 100);
-			Pair cur = new Pair(pos, value);
-			arr.add(cur);
-		}
-		Collections.sort(arr);
-		short mean = (short) ((red * 30 + green * 59 + blue * 11) / 100);
-		mean = (short) (mean >> 4);
-		int lev = mean / 20 + 1;
-		Random r = new Random();
-		for (int i = lev; i <= 12; ++i)
-		{
-			int target = 0;
-			while (r.nextInt(3) == 0 && target < arr.size() - 1)
-				++target;
-			int pos = arr.get(target).pos;
-			arr.remove(target);
-			Pixel pixel = new Pixel(re.getPixel(pos));
-			pixel.red = pixel.green = pixel.blue = 0;
-			re.setPixel(pos, pixel);
 		}
 	}
 }

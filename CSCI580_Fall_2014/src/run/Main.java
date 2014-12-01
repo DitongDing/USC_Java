@@ -23,7 +23,7 @@ public class Main
 	public static String defaultInput = "data/Winnie-the-Pooh/Winnie-the-Pooh.obj";
 	// public static String defaultInput = "ppot.asc";
 	public static String defaultOutput = "output.ppm";
-	// public static Pixel defaultPixel = new Pixel((short)( 255 << 4), (short)( 255 << 4), (short) ( 255 << 4), (short) 1, Float.MAX_VALUE);
+	// public static Pixel defaultPixel = new Pixel((short) (255 << 4), (short) (255 << 4), (short) (255 << 4), (short) 1, Float.MAX_VALUE);
 	public static Pixel defaultPixel = new Pixel((short) 1000, (short) 1000, (short) 1000, (short) 1, Float.MAX_VALUE);
 	public static boolean status = true;
 	public static int width = 512; // frame buffer and display width

@@ -2,11 +2,13 @@ package gl;
 
 import gl.texture.TextureFunction;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
 import java.util.Stack;
 
 import gl.Pixel;
-import utils.ComUtils;
 import utils.MathUtils;
 
 public class Render
@@ -15,6 +17,7 @@ public class Render
 	public static boolean TEST_TOON = true;
 	public static boolean TEST_STIPPLING = false;
 	public static boolean TEST_STIPPLING_COLOR = false;
+	public static boolean TEST_GOOCH = false;
 
 	public static int MATLEVELS = 100; // how many matrix pushes allowed
 	public static int MAX_LIGHTS = 10; // how many lights allowed
@@ -100,10 +103,10 @@ public class Render
 			for (Vertex[] tri : triList)
 				DrawTriangle(display, tri, aaOffset[i]);
 			Image image = display;
-			if (TEST_TOON || TEST_STIPPLING)
-				image = ComUtils.edgeDetector(image, camera.getD());
+			if (TEST_TOON || TEST_STIPPLING || TEST_GOOCH)
+				image = edgeDetector(image, camera.getD());
 			if (TEST_STIPPLING)
-				image = ComUtils.stippling(image, camera, TEST_STIPPLING_COLOR);
+				image = stippling(image, TEST_STIPPLING_COLOR);
 			for (int x = 0; x < display.getXres(); x++)
 				for (int y = 0; y < display.getYres(); y++)
 				{
@@ -412,7 +415,6 @@ public class Render
 		return textureFunction == null ? null : textureFunction.getColor(u, v);
 	}
 
-	// TODO 思考怎样转换成toon shading的渲染方式
 	private Color calColor(Color KA, Color KD, Color KS, float[] Nm, float[] E) throws Exception
 	{
 		Color color = new Color(0, 0, 0);
@@ -435,26 +437,156 @@ public class Render
 		float[] Ks = KS.getVector();
 		float s = spec;
 
-		if (MathUtils.Multiply(N, E) < 0)
-			N = MathUtils.Multiply(-1, N);
-
-		float[] tempColor = { 0, 0, 0 };
-
-		if (!TEST_TOON)
+		if (TEST_GOOCH)
 		{
-			float[] Sle = { 0, 0, 0 };
-			for (int i = 0; i < numlights; i++)
-			{
-				float RE = MathUtils.Multiply(R[i], E);
-				if (RE <= 0)
-					continue;
-				RE = (float) Math.pow(RE, s);
-				Sle = MathUtils.Plus(Sle, MathUtils.Multiply(RE, le[i]));
-			}
-			for (int i = 0; i < tempColor.length; i++)
-				tempColor[i] += Ks[i] * Sle[i];
+			// flag
+			int fg_lightnum = 1; // light number, normally 1, need to set light source to upper right or left with the same side of camera
+									// need to take care of brightness
+			int fg_lightcolor = 0; // enable light color, if disabled all lights are white, resulting yellow to blue color
 
-			if (tempColor[0] < 1 || tempColor[1] < 1 || tempColor[2] < 1)
+			int fg_multblend = 0; // multiplication blending mode, outside the scope of original gooch shading
+			float blend_addxmult = 1.0f; // blending factor between normal and multiplication
+
+			int fg_Specular = 1; // switch of Specular light
+			int fg_Ambient = 1; // switch of Ambient light
+
+			// color factor of kBlue = {0,0,b} and kYellow = {y,y,0}
+			float y = 0.3f;
+			float b = 0.55f;
+
+			// color factor of kCool = kBlue + alpha * render->Kd and kWarm = kYellow + beta * render->Kd
+			float alpha = 0.35f;
+			float beta = 0.5f;
+
+			float[] LSpeculars = { 0, 0, 0 }, LDResult = { 0, 0, 0 };
+			float[] LDiffusesAdd = { 0, 0, 0 }, LDiffusesMult = { 0, 0, 0 };
+
+			float RE, NL;
+			Color kBlue = new Color(0, 0, b);
+			Color kYellow = new Color(y, y, 0);
+			Color kWarm = new Color(), kCool = new Color();
+			String[] fieldName = { "red", "green", "blue" };
+
+			// compute kCool and kWarm
+			for (int j = 0; j < 3; j++)
+			{
+				Field field = new Color().getClass().getDeclaredField(fieldName[j]);
+				field.set(kCool, field.getFloat(kBlue) + alpha * Kd[j]);
+				field.set(kWarm, field.getFloat(kYellow) + beta * Kd[j]);
+			}
+
+			// check number of lights
+			fg_lightnum = (fg_lightnum > numlights) ? numlights : fg_lightnum;
+
+			for (int i = 0; i < fg_lightnum; i++)
+			{
+				float[] Ldir = L[i];
+				float[] Lcolor = le[i];
+
+				// Speculars
+				RE = MathUtils.Multiply(R[i], E);
+
+				if (RE > 0)
+					LSpeculars = MathUtils.Plus(LSpeculars, MathUtils.Multiply((float) Math.pow(RE, s), Lcolor));
+
+				// Diffuses
+				NL = MathUtils.Multiply(N, Ldir);
+
+				if (NL * MathUtils.Multiply(N, E) > 0)
+				{
+					if (NL < 0)
+					{
+						NL = -NL;
+						N = MathUtils.Multiply(-1, N);
+					}
+					// LDiffuses = LDiffuses + Lcolor * NL;
+
+					float cokcool = (1 - MathUtils.Multiply(N, Ldir)) / 2;
+
+					if (fg_lightcolor == 1)
+					{
+						for (int j = 0; j < 3; j++)
+						{
+							Field field = new Color().getClass().getDeclaredField(fieldName[j]);
+							LDiffusesAdd[j] += (cokcool * field.getFloat(kCool) + (1 - cokcool) * field.getFloat(kWarm)) * Lcolor[j];
+						}
+
+						if (fg_multblend == 1)
+						{
+							if (LDiffusesMult[0] == 0)
+								LDiffusesMult[0] += (cokcool * kCool.red + (1 - cokcool) * kWarm.red) * Lcolor[0];
+							else
+								LDiffusesMult[0] *= (cokcool * kCool.red + (1 - cokcool) * kWarm.red) * Lcolor[0];
+							if (LDiffusesMult[0] == 0)
+								LDiffusesMult[1] += (cokcool * kCool.green + (1 - cokcool) * kWarm.green) * Lcolor[1];
+							else
+								LDiffusesMult[1] *= (cokcool * kCool.green + (1 - cokcool) * kWarm.green) * Lcolor[1];
+							if (LDiffusesMult[0] == 0)
+								LDiffusesMult[2] += (cokcool * kCool.blue + (1 - cokcool) * kWarm.blue) * Lcolor[2];
+							else
+								LDiffusesMult[2] *= (cokcool * kCool.blue + (1 - cokcool) * kWarm.blue) * Lcolor[2];
+						}
+					}
+					else
+					{
+						for (int j = 0; j < 3; j++)
+						{
+							Field field = new Color().getClass().getDeclaredField(fieldName[j]);
+							LDiffusesAdd[j] += (cokcool * field.getFloat(kCool) + (1 - cokcool) * field.getFloat(kWarm));
+						}
+
+						if (fg_multblend == 1)
+						{
+							if (LDiffusesMult[0] == 0)
+								LDiffusesMult[0] += (cokcool * kCool.red + (1 - cokcool) * kWarm.red);
+							else
+								LDiffusesMult[0] *= (cokcool * kCool.red + (1 - cokcool) * kWarm.red);
+							if (LDiffusesMult[0] == 0)
+								LDiffusesMult[1] += (cokcool * kCool.green + (1 - cokcool) * kWarm.green);
+							else
+								LDiffusesMult[1] *= (cokcool * kCool.green + (1 - cokcool) * kWarm.green);
+							if (LDiffusesMult[0] == 0)
+								LDiffusesMult[2] += (cokcool * kCool.blue + (1 - cokcool) * kWarm.blue);
+							else
+								LDiffusesMult[2] *= (cokcool * kCool.blue + (1 - cokcool) * kWarm.blue);
+						}
+					}
+				}
+			}
+
+			LDResult = (fg_multblend == 1) ? MathUtils.Plus(MathUtils.Multiply(blend_addxmult, LDiffusesAdd),
+					MathUtils.Multiply((1 - blend_addxmult), LDiffusesMult)) : LDiffusesAdd;
+
+			color.red = LDResult[0];
+			color.green = LDResult[1];
+			color.blue = LDResult[2];
+
+			if (fg_Specular == 1)
+			{
+				color.red += Ks[0] * LSpeculars[0];
+				color.green += Ks[1] * LSpeculars[1];
+				color.blue += Ks[2] * LSpeculars[2];
+			}
+
+			if (fg_Ambient == 1)
+			{
+				color.red += Ka[0] * la[0];
+				color.green += Ka[1] * la[1];
+				color.blue += Ka[2] * la[2];
+			}
+
+			color.red = color.red < 0 ? 0 : (color.red > 1 ? 1 : color.red);
+			color.green = color.green < 0 ? 0 : (color.green > 1 ? 1 : color.green);
+			color.blue = color.blue < 0 ? 0 : (color.blue > 1 ? 1 : color.blue);
+		}
+		else
+		{
+			if (MathUtils.Multiply(N, E) < 0)
+				N = MathUtils.Multiply(-1, N);
+
+			float[] tempColor = { 0, 0, 0 };
+
+			if (TEST_TOON)
 			{
 				float[] Dle = { 0, 0, 0 };
 				for (int i = 0; i < numlights; i++)
@@ -462,37 +594,233 @@ public class Render
 					float NL = MathUtils.Multiply(N, L[i]);
 					if (NL < 0)
 						continue;
+					NL = NL < 0.3 ? 0.3f : (NL < 0.7 ? 0.6f : 0.9f);
 					Dle = MathUtils.Plus(Dle, MathUtils.Multiply(NL, le[i]));
 				}
 				for (int i = 0; i < tempColor.length; i++)
 					tempColor[i] += Kd[i] * Dle[i];
 			}
-
-			if (tempColor[0] < 1 || tempColor[1] < 1 || tempColor[2] < 1)
-				for (int i = 0; i < tempColor.length; i++)
-					tempColor[i] += Ka[i] * la[i];
-		}
-		else
-		{
-			float[] Dle = { 0, 0, 0 };
-			for (int i = 0; i < numlights; i++)
+			else
 			{
-				float NL = MathUtils.Multiply(N, L[i]);
-				if (NL < 0)
-					continue;
-				NL = NL < 0.3 ? 0.3f : (NL < 0.7 ? 0.6f : 0.9f);
-				Dle = MathUtils.Plus(Dle, MathUtils.Multiply(NL, le[i]));
-			}
-			for (int i = 0; i < tempColor.length; i++)
-				tempColor[i] += Kd[i] * Dle[i];
-		}
+				float[] Sle = { 0, 0, 0 };
+				for (int i = 0; i < numlights; i++)
+				{
+					float RE = MathUtils.Multiply(R[i], E);
+					if (RE <= 0)
+						continue;
+					RE = (float) Math.pow(RE, s);
+					Sle = MathUtils.Plus(Sle, MathUtils.Multiply(RE, le[i]));
+				}
+				for (int i = 0; i < tempColor.length; i++)
+					tempColor[i] += Ks[i] * Sle[i];
 
-		color.red = tempColor[0] > 1 ? 1 : tempColor[0];
-		color.green = tempColor[1] > 1 ? 1 : tempColor[1];
-		color.blue = tempColor[2] > 1 ? 1 : tempColor[2];
+				if (tempColor[0] < 1 || tempColor[1] < 1 || tempColor[2] < 1)
+				{
+					float[] Dle = { 0, 0, 0 };
+					for (int i = 0; i < numlights; i++)
+					{
+						float NL = MathUtils.Multiply(N, L[i]);
+						if (NL < 0)
+							continue;
+						Dle = MathUtils.Plus(Dle, MathUtils.Multiply(NL, le[i]));
+					}
+					for (int i = 0; i < tempColor.length; i++)
+						tempColor[i] += Kd[i] * Dle[i];
+				}
+
+				if (tempColor[0] < 1 || tempColor[1] < 1 || tempColor[2] < 1)
+					for (int i = 0; i < tempColor.length; i++)
+						tempColor[i] += Ka[i] * la[i];
+			}
+
+			color.red = tempColor[0] > 1 ? 1 : tempColor[0];
+			color.green = tempColor[1] > 1 ? 1 : tempColor[1];
+			color.blue = tempColor[2] > 1 ? 1 : tempColor[2];
+		}
 
 		return color;
 	}
+
+	// Design for toon & stippling
+	public Image edgeDetector(Image image, float ZMax)
+	{
+		Image re = new Image(image.getXres(), image.getYres());
+
+		double threshold = 0.25;
+
+		for (int x = 0; x < re.getXres(); x++)
+			for (int y = 0; y < re.getYres(); y++)
+			{
+				re.setPixel(x, y, new Pixel(image.getPixel(x, y)));
+				re.getPixel(x, y).z = 1 / (1 / re.getPixel(x, y).z - 1 / ZMax);
+			}
+
+		float min = Float.MAX_VALUE;
+		float max = -1;
+
+		for (int x = 0; x < re.getXres(); x++)
+			for (int y = 0; y < re.getYres(); y++)
+			{
+				if (re.getPixel(x, y).z != Float.MAX_VALUE && re.getPixel(x, y).z > max)
+					max = re.getPixel(x, y).z;
+				else if (re.getPixel(x, y).z < min)
+					min = re.getPixel(x, y).z;
+			}
+
+		Pixel black = new Pixel((short) 0, (short) 0, (short) 0, (short) 1, 0);
+
+		for (int x = 1; x < re.getXres() - 1; x++)
+			for (int y = 1; y < re.getYres() - 1; y++)
+			{
+				double Gx = ((image.getPixel(x + 1, y - 1).z + 2 * image.getPixel(x + 1, y).z + image.getPixel(x + 1, y + 1).z) - (image.getPixel(x - 1, y - 1).z
+						+ 2 * image.getPixel(x - 1, y).z + image.getPixel(x - 1, y + 1).z));
+				double Gy = ((image.getPixel(x - 1, y - 1).z + 2 * image.getPixel(x, y - 1).z + image.getPixel(x + 1, y - 1).z) - (image.getPixel(x - 1, y + 1).z
+						+ 2 * image.getPixel(x, y + 1).z + image.getPixel(x + 1, y + 1).z));
+				double G = Math.sqrt(Gx * Gx + Gy * Gy);
+				if (G > threshold * (max - min))
+					re.setPixel(x, y, black);
+			}
+
+		return re;
+	}
+
+	// design for stippling -- start --
+	public Image stippling(Image image, boolean isColorStippling)
+	{
+		Image re = new Image(image.getXres(), image.getYres());
+		int size = re.getXres() * re.getYres();
+
+		for (int x = 0; x < re.getXres(); x++)
+			for (int y = 0; y < re.getYres(); y++)
+			{
+				Pixel pixel = image.getPixel(x, y);
+				pixel.red = pixel.green = pixel.blue = 255 << 4;
+				re.setPixel(x, y, pixel);
+			}
+
+		if (isColorStippling)
+			for (int index = 0; index < size; index += 4)
+			{
+				colorStip(index, re, image, new String[] { "red", "green" });
+				colorStip(index, re, image, new String[] { "red", "blue" });
+				colorStip(index, re, image, new String[] { "green", "blue" });
+				if (index % re.getXres() == re.getXres() - 4)
+					index += (3 * re.getXres());
+			}
+		else
+			for (int index = 0; index < size; index += 4)
+			{
+				stip(index, re, image);
+				if (index % re.getXres() == re.getXres() - 4)
+					index += (3 * re.getXres());
+			}
+
+		return re;
+	}
+
+	public class Pair implements Comparable<Pair>
+	{
+		int pos;
+		short value;
+
+		public Pair(int pos, short value)
+		{
+			this.pos = pos;
+			this.value = value;
+		}
+
+		public int compareTo(Pair arg0)
+		{
+			return value < arg0.value ? -1 : (value == arg0.value ? 0 : 1);
+		}
+	}
+
+	public void colorStip(int index, Image re, Image image, String[] color)
+	{
+		try
+		{
+			Field color1 = new Pixel().getClass().getDeclaredField(color[0]);
+			Field color2 = new Pixel().getClass().getDeclaredField(color[1]);
+
+			int x = re.getXres();
+			int[] data = { index + x + 1, index + x + 2, index + 2 * x + 2, index + 2 * x + 1, index + 2 * x, index + x, index, index + 1, index + 2,
+					index + 3, index + x + 3, index + 2 * x + 3, index + 3 * x + 3, index + 3 * x + 2, index + 3 * x + 1, index + 3 * x };
+			ArrayList<Pair> arr = new ArrayList<Pair>();
+			short C1 = 0;
+			short C2 = 0;
+			for (int i = 0; i < 16; ++i)
+			{
+				int pos = data[i];
+				Pixel temp = image.getPixel(pos);
+				C1 += color1.getShort(temp) / 16;
+				C2 += color2.getShort(temp) / 16;
+				short value = (short) ((color1.getShort(temp) + color2.getShort(temp)) / 2);
+				Pair cur = new Pair(pos, value);
+				arr.add(cur);
+			}
+			Collections.sort(arr);
+			short mean = (short) ((C1 + C2) / 2);
+			mean = (short) (mean >> 4);
+			int lev = mean / 20 + 1;
+			Random r = new Random();
+			for (int i = lev; i <= 10; ++i)
+			{
+				int target = 0;
+				while (r.nextInt(3) != 0 && target < arr.size() - 1)
+					++target;
+				int pos = arr.get(target).pos;
+				arr.remove(target);
+				Pixel pixel = new Pixel(re.getPixel(pos));
+				color1.set(pixel, (short) 0);
+				color2.set(pixel, (short) 0);
+				re.setPixel(pos, pixel);
+			}
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	public void stip(int index, Image re, Image image)
+	{
+		int x = re.getXres();
+		int[] data = { index + x + 1, index + x + 2, index + 2 * x + 2, index + 2 * x + 1, index + 2 * x, index + x, index, index + 1, index + 2, index + 3,
+				index + x + 3, index + 2 * x + 3, index + 3 * x + 3, index + 3 * x + 2, index + 3 * x + 1, index + 3 * x };
+		ArrayList<Pair> arr = new ArrayList<Pair>();
+		short red = 0;
+		short green = 0;
+		short blue = 0;
+		for (int i = 0; i < 16; ++i)
+		{
+			int pos = data[i];
+			Pixel temp = image.getPixel(pos);
+			red += temp.red / 16;
+			green += temp.green / 16;
+			blue += temp.blue / 16;
+			short value = (short) ((temp.red * 30 + temp.green * 59 + temp.blue * 11) / 100);
+			Pair cur = new Pair(pos, value);
+			arr.add(cur);
+		}
+		Collections.sort(arr);
+		short mean = (short) ((red * 30 + green * 59 + blue * 11) / 100);
+		mean = (short) (mean >> 4);
+		int lev = mean / 20 + 1;
+		Random r = new Random();
+		for (int i = lev; i <= 12; ++i)
+		{
+			int target = 0;
+			while (r.nextInt(3) == 0 && target < arr.size() - 1)
+				++target;
+			int pos = arr.get(target).pos;
+			arr.remove(target);
+			Pixel pixel = new Pixel(re.getPixel(pos));
+			pixel.red = pixel.green = pixel.blue = 0;
+			re.setPixel(pos, pixel);
+		}
+	}
+
+	// design for stippling -- end --
 
 	public static Matrix CreateRotationByXMatrix(float degree)
 	{
