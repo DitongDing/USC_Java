@@ -18,6 +18,18 @@ public class Image
 		fbuf = new Pixel[yres][xres];
 	}
 
+	public void setPixel(int index, Pixel pixel)
+	{
+		int x = index % xres, y = index / xres;
+		setPixel(x, y, pixel);
+	}
+
+	public Pixel getPixel(int index)
+	{
+		int x = index % xres, y = index / xres;
+		return getPixel(x, y);
+	}
+
 	public void setPixel(int x, int y, Pixel pixel)
 	{
 		x = x < 0 ? 0 : (x >= xres ? xres - 1 : x);

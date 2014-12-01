@@ -12,7 +12,9 @@ import utils.MathUtils;
 public class Render
 {
 	// TODO: remove test flag
-	public static boolean TEST_TOON = true;
+	public static boolean TEST_TOON = false;
+	public static boolean TEST_STIPPLING = true;
+	public static boolean TEST_STIPPLING_COLOR = true;
 
 	public static int MATLEVELS = 100; // how many matrix pushes allowed
 	public static int MAX_LIGHTS = 10; // how many lights allowed
@@ -98,8 +100,10 @@ public class Render
 			for (Vertex[] tri : triList)
 				DrawTriangle(display, tri, aaOffset[i]);
 			Image image = display;
-			if (TEST_TOON)
-				image = ComUtils.edgeDetector(display, camera.getD());
+			if (TEST_TOON || TEST_STIPPLING)
+				image = ComUtils.edgeDetector(image, camera.getD());
+			if (TEST_STIPPLING)
+				image = ComUtils.stippling(image, camera, TEST_STIPPLING_COLOR);
 			for (int x = 0; x < display.getXres(); x++)
 				for (int y = 0; y < display.getYres(); y++)
 				{
