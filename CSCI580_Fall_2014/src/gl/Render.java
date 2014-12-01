@@ -12,9 +12,9 @@ import utils.MathUtils;
 public class Render
 {
 	// TODO: remove test flag
-	public static boolean TEST_TOON = false;
-	public static boolean TEST_STIPPLING = true;
-	public static boolean TEST_STIPPLING_COLOR = true;
+	public static boolean TEST_TOON = true;
+	public static boolean TEST_STIPPLING = false;
+	public static boolean TEST_STIPPLING_COLOR = false;
 
 	public static int MATLEVELS = 100; // how many matrix pushes allowed
 	public static int MAX_LIGHTS = 10; // how many lights allowed
