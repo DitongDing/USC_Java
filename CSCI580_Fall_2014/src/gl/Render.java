@@ -4,7 +4,6 @@ import gl.texture.TextureFunction;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Random;
 import java.util.Stack;
 
@@ -14,9 +13,9 @@ import utils.MathUtils;
 public class Render
 {
 	// TODO: remove test flag
-	public static boolean TEST_TOON = true;
-	public static boolean TEST_STIPPLING = false;
-	public static boolean TEST_STIPPLING_COLOR = false;
+	public static boolean TEST_TOON = false;
+	public static boolean TEST_STIPPLING = true;
+	public static boolean TEST_STIPPLING_COLOR = true;
 	public static boolean TEST_GOOCH = false;
 
 	public static int MATLEVELS = 100; // how many matrix pushes allowed
@@ -698,126 +697,96 @@ public class Render
 				re.setPixel(x, y, pixel);
 			}
 
-		if (isColorStippling)
-			for (int index = 0; index < size; index += 4)
+		Random random = new Random();
+
+		int reserve = 0;
+		int reserveBL = 0;
+		int reserveG = 0;
+		int reserveR = 0;
+		if (!isColorStippling)
+		{// black
+			long mean = 0;
+			for (int index = 0; index < size; ++index)
 			{
-				colorStip(index, re, image, new String[] { "red", "green" });
-				colorStip(index, re, image, new String[] { "red", "blue" });
-				colorStip(index, re, image, new String[] { "green", "blue" });
-				if (index % re.getXres() == re.getXres() - 4)
-					index += (3 * re.getXres());
+				Pixel temp = image.getPixel(index);
+				short blue = temp.blue;
+				short green = temp.green;
+				short red = temp.red;
+				short grey = (short) ((red * 30 + green * 59 + blue * 11) / 100);
+				mean += grey;
 			}
+			mean = mean / size;
+			mean = mean >> 4;
+			reserve = (int) (mean / 10 + 5);
+			for (int index = 0; index < size; ++index)
+			{
+				Pixel temp = image.getPixel(index);
+				short blue = temp.blue;
+				short green = temp.green;
+				short red = temp.red;
+				short grey = (short) ((red * 30 + green * 59 + blue * 11) / 100);
+				grey = (short) (grey >> 4);
+				int level = grey / 10 + 8;
+				if (random.nextInt(reserve) >= level)
+					re.setPixel(index, new Pixel((short) 0, (short) 0, (short) 0, (short) 1, 0));
+			}
+		}
 		else
-			for (int index = 0; index < size; index += 4)
+		{// color
+			long meanBL = 0;
+			long meanG = 0;
+			long meanR = 0;
+			for (int index = 0; index < size; ++index)
 			{
-				stip(index, re, image);
-				if (index % re.getXres() == re.getXres() - 4)
-					index += (3 * re.getXres());
+				Pixel temp = image.getPixel(index);
+				short blue = temp.blue;
+				short green = temp.green;
+				short red = temp.red;
+				meanBL += blue;
+				meanG += green;
+				meanR += red;
 			}
+			meanBL = meanBL / size;
+			meanBL = meanBL >> 4;
+			reserveBL = (int) (meanBL / 10 + 5);
+			meanG = meanG / size;
+			meanG = meanG >> 4;
+			reserveG = (int) (meanG / 10 + 5);
+			meanR = meanR / size;
+			meanR = meanR >> 4;
+			reserveR = (int) (meanR / 10 + 5);
+			for (int index = 0; index < size; ++index)
+			{
+				Pixel temp = image.getPixel(index);
+				short blue = temp.blue;
+				short green = temp.green;
+				short red = temp.red;
+				short b;
+				short r;
+				short g;
+				b = blue;
+				g = green;
+				r = red;
+				b = (short) (b >> 4);
+				g = (short) (g >> 4);
+				r = (short) (r >> 4);
+				int levelBL = b / 10 + 8;
+				int levelG = g / 10 + 8;
+				int levelR = r / 10 + 8;
+				Pixel pixel = new Pixel((short) 0, (short) 0, (short) 0, (short) 1, 0);
+				if (random.nextInt(reserveBL) <= levelBL)
+					pixel.blue = 255 << 4;
+				if (random.nextInt(reserveG) <= levelG)
+				{
+					pixel.green = 255 << 4;
+				}
+				if (random.nextInt(reserveR) <= levelR)
+					pixel.red = 255 << 4;
+				re.setPixel(index, pixel);
+			}
+		}
 
 		return re;
-	}
-
-	public class Pair implements Comparable<Pair>
-	{
-		int pos;
-		short value;
-
-		public Pair(int pos, short value)
-		{
-			this.pos = pos;
-			this.value = value;
-		}
-
-		public int compareTo(Pair arg0)
-		{
-			return value < arg0.value ? -1 : (value == arg0.value ? 0 : 1);
-		}
-	}
-
-	public void colorStip(int index, Image re, Image image, String[] color)
-	{
-		try
-		{
-			Field color1 = new Pixel().getClass().getDeclaredField(color[0]);
-			Field color2 = new Pixel().getClass().getDeclaredField(color[1]);
-
-			int x = re.getXres();
-			int[] data = { index + x + 1, index + x + 2, index + 2 * x + 2, index + 2 * x + 1, index + 2 * x, index + x, index, index + 1, index + 2,
-					index + 3, index + x + 3, index + 2 * x + 3, index + 3 * x + 3, index + 3 * x + 2, index + 3 * x + 1, index + 3 * x };
-			ArrayList<Pair> arr = new ArrayList<Pair>();
-			short C1 = 0;
-			short C2 = 0;
-			for (int i = 0; i < 16; ++i)
-			{
-				int pos = data[i];
-				Pixel temp = image.getPixel(pos);
-				C1 += color1.getShort(temp) / 16;
-				C2 += color2.getShort(temp) / 16;
-				short value = (short) ((color1.getShort(temp) + color2.getShort(temp)) / 2);
-				Pair cur = new Pair(pos, value);
-				arr.add(cur);
-			}
-			Collections.sort(arr);
-			short mean = (short) ((C1 + C2) / 2);
-			mean = (short) (mean >> 4);
-			int lev = mean / 20 + 1;
-			Random r = new Random();
-			for (int i = lev; i <= 10; ++i)
-			{
-				int target = 0;
-				while (r.nextInt(3) != 0 && target < arr.size() - 1)
-					++target;
-				int pos = arr.get(target).pos;
-				arr.remove(target);
-				Pixel pixel = new Pixel(re.getPixel(pos));
-				color1.set(pixel, (short) 0);
-				color2.set(pixel, (short) 0);
-				re.setPixel(pos, pixel);
-			}
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	public void stip(int index, Image re, Image image)
-	{
-		int x = re.getXres();
-		int[] data = { index + x + 1, index + x + 2, index + 2 * x + 2, index + 2 * x + 1, index + 2 * x, index + x, index, index + 1, index + 2, index + 3,
-				index + x + 3, index + 2 * x + 3, index + 3 * x + 3, index + 3 * x + 2, index + 3 * x + 1, index + 3 * x };
-		ArrayList<Pair> arr = new ArrayList<Pair>();
-		short red = 0;
-		short green = 0;
-		short blue = 0;
-		for (int i = 0; i < 16; ++i)
-		{
-			int pos = data[i];
-			Pixel temp = image.getPixel(pos);
-			red += temp.red / 16;
-			green += temp.green / 16;
-			blue += temp.blue / 16;
-			short value = (short) ((temp.red * 30 + temp.green * 59 + temp.blue * 11) / 100);
-			Pair cur = new Pair(pos, value);
-			arr.add(cur);
-		}
-		Collections.sort(arr);
-		short mean = (short) ((red * 30 + green * 59 + blue * 11) / 100);
-		mean = (short) (mean >> 4);
-		int lev = mean / 20 + 1;
-		Random r = new Random();
-		for (int i = lev; i <= 12; ++i)
-		{
-			int target = 0;
-			while (r.nextInt(3) == 0 && target < arr.size() - 1)
-				++target;
-			int pos = arr.get(target).pos;
-			arr.remove(target);
-			Pixel pixel = new Pixel(re.getPixel(pos));
-			pixel.red = pixel.green = pixel.blue = 0;
-			re.setPixel(pos, pixel);
-		}
 	}
 
 	// design for stippling -- end --
