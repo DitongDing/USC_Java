@@ -56,7 +56,7 @@ public class Final_Main
 		}
 		else
 		{
-			inputFile = "data/Winnie-the-Pooh/Winnie-the-Pooh.obj";
+			inputFile = "Winnie-the-Pooh.obj";
 			position = new Coord(0f, 0f, -70f, 1f); // for winnie
 		}
 
