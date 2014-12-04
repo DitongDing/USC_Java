@@ -176,7 +176,7 @@ public class ComUtils
 					ny = normals[i].getY();
 					nz = normals[i].getZ();
 					u = textures[i].getU();
-					v = textures[i].getV();
+					v = 1 - textures[i].getV(); // obj import will change the direction
 					tri[i] = new Vertex(x, y, z, w, new Coord(nx, ny, nz, 0), u, v);
 				}
 				triList.add(tri);

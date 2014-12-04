@@ -1,27 +1,26 @@
 package test;
 
-import java.lang.reflect.*;
-import java.util.regex.*;
+import gl.Vertex;
+
+import java.io.PrintWriter;
+import java.util.ArrayList;
+
+import run.Final_Main;
+import utils.ComUtils;
 
 public class Test
 {
-	public static void main(String[] args) throws NoSuchFieldException, SecurityException, ClassNotFoundException, IllegalArgumentException, IllegalAccessException
+	public static void main(String[] args) throws Exception
 	{
-		Class1 test = new Class1(1, 2);
-		Field field = test.getClass().getDeclaredField("b");
-		
-		System.out.println(field.get(test));
-	}
-}
-
-class Class1
-{
-	public int a;
-	public int b;
-	
-	public Class1(int A, int B)
-	{
-		a = A;
-		b = B;
+		PrintWriter pw = new PrintWriter("M14h.asc");
+		ArrayList<Vertex[]> triList = ComUtils.readModelFile("data/fromRin/M14h.obj");
+		for (Vertex[] tri : triList)
+		{
+			pw.println("triangle");
+			for (Vertex vertex : tri)
+				pw.println(vertex.x + "\t" + vertex.y + "\t" + vertex.z + "\t" + vertex.U + "\t" + vertex.V + "\t" + vertex.norm.x + "\t" + vertex.norm.y
+						+ "\t" + vertex.norm.z);
+		}
+		pw.close();
 	}
 }

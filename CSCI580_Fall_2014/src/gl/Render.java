@@ -14,8 +14,8 @@ public class Render
 {
 	// TODO: remove test flag
 	public static boolean TEST_TOON = false;
-	public static boolean TEST_STIPPLING = true;
-	public static boolean TEST_STIPPLING_COLOR = true;
+	public static boolean TEST_STIPPLING = false;
+	public static boolean TEST_STIPPLING_COLOR = false;
 	public static boolean TEST_GOOCH = false;
 
 	public static int MATLEVELS = 100; // how many matrix pushes allowed
