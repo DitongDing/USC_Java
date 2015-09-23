@@ -1,3 +1,0 @@
-mvn clean
-mvn package -DskipTests
-cp ./target/homework1-1.0.jar ../jar/homework1.jar
