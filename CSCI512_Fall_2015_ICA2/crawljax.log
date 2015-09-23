@@ -1,0 +1,56 @@
+17:09:34.216 [main] WARN  com.crawljax.core.plugin.Plugins (68) - No plugins loaded. There will be no output
+17:09:44.381 [main] INFO  com.crawljax.core.UnfiredCandidateActions (130) - There are 1 states with unfired actions
+17:09:44.382 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 1 states with unfired actions
+17:09:46.522 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state2 added to the StateMachine.
+17:09:46.522 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:09:46.547 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 1 states with unfired actions
+17:09:47.808 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state3 added to the StateMachine.
+17:09:47.808 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:09:47.832 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 1 states with unfired actions
+17:09:49.089 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state4 added to the StateMachine.
+17:09:49.089 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:09:49.130 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 1 states with unfired actions
+17:09:50.456 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state5 added to the StateMachine.
+17:09:50.456 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:09:50.485 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 1 states with unfired actions
+17:09:51.721 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state6 added to the StateMachine.
+17:09:51.721 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:09:51.738 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (130) - There are 2 states with unfired actions
+17:09:52.394 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state7 added to the StateMachine.
+17:09:52.394 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 2
+17:09:52.398 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 1 states with unfired actions
+17:09:53.668 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state8 added to the StateMachine.
+17:09:53.668 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:09:53.698 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 1 states with unfired actions
+17:09:54.944 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state9 added to the StateMachine.
+17:09:54.945 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:09:54.965 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 1 states with unfired actions
+17:09:56.215 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state10 added to the StateMachine.
+17:09:56.216 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:09:56.232 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 1 states with unfired actions
+17:09:57.472 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state11 added to the StateMachine.
+17:09:57.473 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:09:57.496 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 1 states with unfired actions
+17:09:58.718 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state12 added to the StateMachine.
+17:09:58.718 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:09:58.732 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 1 states with unfired actions
+17:09:59.955 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state13 added to the StateMachine.
+17:09:59.956 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:09:59.971 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 1 states with unfired actions
+17:10:01.226 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state14 added to the StateMachine.
+17:10:01.226 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:10:01.239 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (130) - There are 2 states with unfired actions
+17:10:02.145 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state15 added to the StateMachine.
+17:10:02.145 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 2
+17:10:02.151 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 2 states with unfired actions
+17:10:03.374 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state16 added to the StateMachine.
+17:10:03.374 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 1
+17:10:03.389 [pool-1-thread-2] INFO  com.crawljax.core.UnfiredCandidateActions (155) - There are 2 states with unfired actions
+17:10:04.584 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (187) - Crawl depth is now 1
+17:10:05.464 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (103) - CLONE State detected: state17 and index are the same.
+17:10:06.158 [pool-1-thread-2] INFO  com.crawljax.core.state.StateMachine (111) - State state18 added to the StateMachine.
+17:10:06.158 [pool-1-thread-2] INFO  com.crawljax.core.Crawler (370) - New DOM is a new state! crawl depth is now 2
+17:10:06.165 [pool-1-thread-2] INFO  c.c.browser.WebDriverBackedEmbeddedBrowser (325) - Closing the browser...
+17:10:06.165 [main] INFO  com.crawljax.core.CrawlController (130) - Received shutdown notice. Reason is Exausted
+17:10:06.172 [pool-1-thread-2] INFO  c.c.browser.WebDriverBackedEmbeddedBrowser (331) - Interrupted while waiting for the browser to close. It might not close correctly
+17:10:06.178 [main] INFO  com.crawljax.core.CrawlController (125) - Shutdown process complete

@@ -20,6 +20,13 @@
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 		</dependency>
+		<!-- Will be deleted -->
+		<dependency>
+			<groupId>com.crawljax</groupId>
+			<artifactId>crawljax-examples</artifactId>
+			<version>3.6</version>
+		</dependency>
+		<!-- Will be deleted -->
 	</dependencies>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
