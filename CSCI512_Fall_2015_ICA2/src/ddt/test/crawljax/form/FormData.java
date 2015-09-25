@@ -2,7 +2,6 @@ package ddt.test.crawljax.form;
 
 import com.crawljax.core.configuration.Form;
 
-// TODO: think about how to control form filling in different pages, for reducing time for search field in all pages.
 public class FormData extends Form {
 	public FormData() {
 		super();
