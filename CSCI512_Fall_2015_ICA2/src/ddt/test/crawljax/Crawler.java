@@ -1,9 +1,7 @@
 package ddt.test.crawljax;
 
-import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
 
 import com.crawljax.browser.EmbeddedBrowser.BrowserType;
@@ -17,6 +15,9 @@ import ddt.test.crawljax.plugin.PreStateCrawlingPlugin;
 
 public class Crawler {
 	// TODO: modify builder properties if needed. 200 20 1
+	// TODO: unlogin check on adminMenu.jsp
+	// TODO: control input for empl update and insert. (as they are using same value, insert cannot happen because of
+	// duplicate.)
 	private static final int MAX_STATES = 200;
 	private static final int MAX_DEPTH = 10;
 	private static final long MAX_RUNTIME = 10;
@@ -30,19 +31,14 @@ public class Crawler {
 	private CrawljaxRunner runner;
 	private PrintWriter pw;
 
-	public Crawler(String URL, String loginURL) throws URISyntaxException {
+	public Crawler(String URL, String loginURL) throws Exception {
 		// Get init builder
 		builder = CrawljaxConfiguration.builderFor(URL);
 
 		// Add plugins
 		builder.addPlugin(new LoginPlugin(new URI(loginURL)));
-		// TODO: Will be removed later
-		try {
-			pw = new PrintWriter("./output");
-			builder.addPlugin(new PreStateCrawlingPlugin(pw));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		pw = new PrintWriter("./output");
+		builder.addPlugin(new PreStateCrawlingPlugin(pw));
 
 		// Add rules
 		Rules.addRules(builder);

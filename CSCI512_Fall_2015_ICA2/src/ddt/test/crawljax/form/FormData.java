@@ -17,7 +17,7 @@ public class FormData extends Form {
 		// Default.Search, EmpsRecord.Insert, EmpsRecord.Update
 		field("dep_id").setValues("All", "Administration", "");
 		// EmpsGrid.Search, EmpsRecord.Insert, EmpsRecord.Update
-		field("emp_login").setValues("admin", "");
+		field("emp_login").setValues("admin", "xyz", "");
 		// EmpsRecord.Insert, EmpsRecord.Update
 		field("title").setValues("CEO", "");
 		// EmpsRecord.Insert, EmpsRecord.Update
@@ -33,7 +33,7 @@ public class FormData extends Form {
 		// EmpsRecord.Insert, EmpsRecord.Update
 		field("cell_phone").setValues("x", "123456", "");
 		// EmpsRecord.Insert, EmpsRecord.Update
-		field("manmonth").setValues(true, false);
+		field("manmonth").setValues(true);
 		// EmpsRecord.Insert, EmpsRecord.Update
 		field("picture").setValues("xxx", "");
 	}

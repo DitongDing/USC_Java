@@ -3,7 +3,7 @@ package ddt.test;
 import ddt.test.crawljax.Crawler;
 
 public class Run {
-	// Usage: Run <URL>
+	// Usage: Run <URL> <login URL>
 	public static void main(String[] args) throws Exception {
 		if (args == null || args.length != 2) {
 			System.out.println("The usage is: Run <URL> <login URL>");
