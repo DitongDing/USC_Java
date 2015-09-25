@@ -2,6 +2,7 @@ package ddt.test.crawljax.form;
 
 import com.crawljax.core.configuration.Form;
 
+@Deprecated
 public class FormData extends Form {
 	public FormData() {
 		super();
@@ -16,24 +17,25 @@ public class FormData extends Form {
 		// Default.Search, EmpsRecord.Insert, EmpsRecord.Update
 		field("dep_id").setValues("All", "Administration", "");
 		// EmpsGrid.Search, EmpsRecord.Insert, EmpsRecord.Update
-		field("emp_login").setValues("admin", "xyz", "");
+		field("emp_login").setValues("", "admin", "xyz", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12",
+				"13", "14", "15", "16", "17", "18", "19", "20");
 		// EmpsRecord.Insert, EmpsRecord.Update
-		field("title").setValues("CEO", "");
+		field("title").setValues("", "CEO");
 		// EmpsRecord.Insert, EmpsRecord.Update
-		field("password").setValues("x", "123456", "");
+		field("password").setValues("", "x");
 		// EmpsRecord.Insert, EmpsRecord.Update
-		field("emp_level").setValues("None", "Admin", "123456", "");
+		field("emp_level").setValues("", "Admin");
 		// EmpsRecord.Insert, EmpsRecord.Update
-		field("address").setValues("x", "");
+		field("address").setValues("", "x");
 		// EmpsRecord.Insert, EmpsRecord.Update
-		field("work_phone").setValues("x", "123456", "");
+		field("work_phone").setValues("", "x", "123456");
 		// EmpsRecord.Insert, EmpsRecord.Update
-		field("home_phone").setValues("x", "123456", "");
+		field("home_phone").setValues("", "x", "123456");
 		// EmpsRecord.Insert, EmpsRecord.Update
-		field("cell_phone").setValues("x", "123456", "");
+		field("cell_phone").setValues("", "x", "123456");
 		// EmpsRecord.Insert, EmpsRecord.Update
 		field("manmonth").setValues(true);
 		// EmpsRecord.Insert, EmpsRecord.Update
-		field("picture").setValues("xxx", "");
+		field("picture").setValues("", "xxx");
 	}
 }

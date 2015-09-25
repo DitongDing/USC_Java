@@ -5,6 +5,7 @@ import com.crawljax.condition.Condition;
 
 import ddt.utils.ComUtils;
 
+@Deprecated
 public class FillFormBeforeClick implements Condition {
 	private String[][] fieldNames = { {} };
 	private String[][] fieldValues = { {} };
