@@ -6,6 +6,10 @@ import com.crawljax.core.configuration.Form;
 public class FormData extends Form {
 	public FormData() {
 		super();
+		// // Login.login
+		// field("Login").setValues("admin");
+		// // Login.login
+		// field("Password").setValues("admin");
 		// Default.Search, DepsRecord.Update, EmpsGrid.Search, EmpsRecord.Insert, EmpsRecord.Update
 		field("name").setValues("Ali", "xyz", "DDT", "");
 		// Default.Search, EmpsRecord.Insert, EmpsRecord.Update

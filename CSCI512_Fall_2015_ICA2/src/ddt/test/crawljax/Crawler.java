@@ -1,5 +1,7 @@
 package ddt.test.crawljax;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
@@ -11,6 +13,7 @@ import com.crawljax.core.configuration.CrawljaxConfiguration;
 import com.crawljax.core.configuration.CrawljaxConfiguration.CrawljaxConfigurationBuilder;
 
 import ddt.test.crawljax.plugin.LoginPlugin;
+import ddt.test.crawljax.plugin.PreStateCrawlingPlugin;
 
 public class Crawler {
 	// TODO: modify builder properties if needed. 200 20 1
@@ -25,6 +28,7 @@ public class Crawler {
 	// name of plugin classes.
 	private CrawljaxConfigurationBuilder builder;
 	private CrawljaxRunner runner;
+	private PrintWriter pw;
 
 	public Crawler(String URL, String loginURL) throws URISyntaxException {
 		// Get init builder
@@ -32,6 +36,13 @@ public class Crawler {
 
 		// Add plugins
 		builder.addPlugin(new LoginPlugin(new URI(loginURL)));
+		// TODO: Will be removed later
+		try {
+			pw = new PrintWriter("./output");
+			builder.addPlugin(new PreStateCrawlingPlugin(pw));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
 
 		// Add rules
 		Rules.addRules(builder);
@@ -45,6 +56,7 @@ public class Crawler {
 
 	public void run() {
 		runner.call();
+		pw.close();
 	}
 
 	private void generalSetting() {

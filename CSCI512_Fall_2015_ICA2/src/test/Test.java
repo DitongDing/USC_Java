@@ -37,34 +37,37 @@ public class Test {
 	public static String LOGIN_URL = "http://localhost:8080/empldir/Login.jsp";
 
 	public static void main(String[] args) throws Exception {
-		final PrintWriter pw = new PrintWriter("output/output.txt");
+		String s = "Sorted=1";
+		System.out.println(s.substring(s.lastIndexOf('=') + 1).equals(""));
 
-		CrawljaxConfigurationBuilder builder = CrawljaxConfiguration.builderFor(URL);
-		CrawlRulesBuilder rules = builder.crawlRules();
-		rules.insertRandomDataInInputForms(false);
-		builder.setMaximumDepth(7);
-
-		// Do not click logout
-		rules.dontClick("input").underXPath("//INPUT[@type='submit' and @value='Logout']");
-		// Click all input with type submit|button
-		rules.click("input").underXPath("//INPUT[@type='submit' or @type='button']");
-		// Click all links with href
-		rules.click("a").underXPath("//A[@href]");
-		// Do not click the links that row position > 3 and row position != last.
-		rules.dontClick("a").underXPath("//TBODY/TR[position()>3 and position()!=last()]");
-
-		builder.addPlugin(new PreStateCrawlingPlugin() {
-			public void preStateCrawling(CrawlerContext context, ImmutableList<CandidateElement> candidateElements,
-					StateVertex state) {
-				pw.println(state.getUrl() + "\t" + candidateElements.size());
-			}
-		});
-
-		builder.addPlugin(new LoginPlugin(new URI(LOGIN_URL)));
-
-		CrawljaxRunner runner = new CrawljaxRunner(builder.build());
-		runner.call();
-
-		pw.close();
+		// final PrintWriter pw = new PrintWriter("output/output.txt");
+		//
+		// CrawljaxConfigurationBuilder builder = CrawljaxConfiguration.builderFor(URL);
+		// CrawlRulesBuilder rules = builder.crawlRules();
+		// rules.insertRandomDataInInputForms(false);
+		// builder.setMaximumDepth(7);
+		//
+		// // Do not click logout
+		// rules.dontClick("input").underXPath("//INPUT[@type='submit' and @value='Logout']");
+		// // Click all input with type submit|button
+		// rules.click("input").underXPath("//INPUT[@type='submit' or @type='button']");
+		// // Click all links with href
+		// rules.click("a").underXPath("//A[@href]");
+		// // Do not click the links that row position > 3 and row position != last.
+		// rules.dontClick("a").underXPath("//TBODY/TR[position()>3 and position()!=last()]");
+		//
+		// builder.addPlugin(new PreStateCrawlingPlugin() {
+		// public void preStateCrawling(CrawlerContext context, ImmutableList<CandidateElement> candidateElements,
+		// StateVertex state) {
+		// pw.println(state.getUrl() + "\t" + candidateElements.size());
+		// }
+		// });
+		//
+		// builder.addPlugin(new LoginPlugin(new URI(LOGIN_URL)));
+		//
+		// CrawljaxRunner runner = new CrawljaxRunner(builder.build());
+		// runner.call();
+		//
+		// pw.close();
 	}
 }

@@ -11,8 +11,8 @@ import com.crawljax.core.state.Eventable;
 import com.crawljax.core.state.Identification;
 
 public class LoginPlugin implements OnBrowserCreatedPlugin {
-	private static String[][] CREDENTIALS = { /* { "", "" }, { "X", "X" }, */{ "admin", "admin" } };
-	private static String[] FINAL_CREDENTIAL = { "admin", "admin" };
+	private static String[][] CREDENTIALS = { { "", "" }, { "X", "X" }, { "admin", "admin" } };
+	private static String[] FINAL_CREDENTIALS = { "admin", "admin" };
 	private static int USERNAME = 0;
 	private static String[] UN_FIELD_NAME = { "Login" };
 	private static int PASSWORD = 1;
@@ -33,7 +33,7 @@ public class LoginPlugin implements OnBrowserCreatedPlugin {
 			for (String[] credential : CREDENTIALS)
 				login(newBrowser, credential);
 			logout(newBrowser);
-			login(newBrowser, FINAL_CREDENTIAL);
+			login(newBrowser, FINAL_CREDENTIALS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
