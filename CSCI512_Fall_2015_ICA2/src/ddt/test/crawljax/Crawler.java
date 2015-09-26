@@ -16,8 +16,6 @@ import ddt.test.crawljax.plugin.PreStateCrawlingPlugin;
 public class Crawler {
 	// TODO: modify builder properties if needed. 200 20 1
 	// TODO: unlogin check on adminMenu.jsp
-	// TODO: control input for empl update and insert. (as they are using same value, insert cannot happen because of
-	// duplicate.)
 	private static final int MAX_STATES = 200;
 	private static final int MAX_DEPTH = 10;
 	private static final long MAX_RUNTIME = 10;
