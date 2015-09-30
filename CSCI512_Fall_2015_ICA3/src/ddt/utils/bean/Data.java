@@ -1,6 +1,7 @@
 package ddt.utils.bean;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeSet;
 
 public class Data extends TreeSet<DataTuple> {
@@ -9,7 +10,17 @@ public class Data extends TreeSet<DataTuple> {
 	public Data(String[]... dataTuples) {
 		super();
 		for (String[] dataTuple : dataTuples)
-			this.add(new DataTuple(dataTuple[0], dataTuple[1]));
+			addDataTuple(dataTuple);
+	}
+	
+	public Data(List<String[]> dataTuples) {
+		super();
+		for (String[] dataTuple : dataTuples)
+			addDataTuple(dataTuple);
+	}
+	
+	public void addDataTuple(String[] dataTuple) {
+		this.add(new DataTuple(dataTuple[0], dataTuple[1]));
 	}
 
 	@Override

@@ -1,0 +1,307 @@
+<xml>
+<component name="org.apache.jsp.Header_jsp">
+	<interface method="POST|GET" target="Header.jsp">
+		<parameter name="FormAction" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[]" lines="[]" />
+	</interface>
+</component>
+<component name="org.apache.jsp.EmpsGrid_jsp">
+	<interface method="POST|GET" target="EmpsGrid.jsp">
+	</interface>
+	<interface method="POST|GET" target="EmpsGrid.jsp">
+		<parameter name="emp_login" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[]" lines="[]" />
+		<parameter name="name" type="STRING" values="[]" lines="[]" />
+		<parameter name="Formemps_Sorting" type="INTEGER" values="[]" lines="[]" />
+		<parameter name="Formemps_Sorted" type="STRING" values="[]" lines="[]" />
+		<parameter name="Formemps_Page" type="INTEGER" values="[]" lines="[]" />
+		<parameter name="manmonth" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[]" lines="[]" />
+	</interface>
+</component>
+<component name="org.apache.jsp.EmpDetail_jsp">
+	<interface method="POST|GET" target="EmpDetail.jsp">
+		<parameter name="Trn_email" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="Trn_name" type="STRING" values="[]" lines="[]" />
+		<parameter name="Trn_dep_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , Record]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="EmpDetail.jsp">
+		<parameter name="Trn_email" type="STRING" values="[]" lines="[]" />
+		<parameter name="email" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="dep_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="name" type="STRING" values="[]" lines="[]" />
+		<parameter name="PK_emp_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="Trn_name" type="STRING" values="[]" lines="[]" />
+		<parameter name="Trn_dep_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , Record]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="EmpDetail.jsp">
+		<parameter name="Trn_email" type="STRING" values="[]" lines="[]" />
+		<parameter name="email" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="dep_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="name" type="STRING" values="[]" lines="[]" />
+		<parameter name="Trn_name" type="STRING" values="[]" lines="[]" />
+		<parameter name="Trn_dep_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , Record]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="EmpDetail.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , Record]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="EmpDetail.jsp">
+		<parameter name="email" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="dep_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="name" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , Record]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="EmpDetail.jsp">
+		<parameter name="Trn_email" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="PK_emp_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="Trn_name" type="STRING" values="[]" lines="[]" />
+		<parameter name="Trn_dep_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , Record]" lines="[]" />
+	</interface>
+</component>
+<component name="org.apache.jsp.DepsRecord_jsp">
+	<interface method="POST|GET" target="DepsRecord.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="dep_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="name" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , deps]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="DepsRecord.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="dep_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="name" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="PK_dep_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , deps]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="DepsRecord.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="PK_dep_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , deps]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="DepsRecord.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="dep_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="PK_dep_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , deps]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="DepsRecord.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="name" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , deps]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="DepsRecord.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="dep_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , deps]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="DepsRecord.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="name" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="PK_dep_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , deps]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="DepsRecord.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, , deps]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="DepsRecord.jsp">
+	</interface>
+</component>
+<component name="org.apache.jsp.EmpsRecord_jsp">
+	<interface method="POST|GET" target="EmpsRecord.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="emp_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="PK_emp_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, emps, ]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="EmpsRecord.jsp">
+		<parameter name="cell_phone" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_password" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="dep_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="manmonth" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, emps, ]" lines="[]" />
+		<parameter name="picture" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_level" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="title" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_login" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="address" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="email" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="name" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="work_phone" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="home_phone" type="DOUBLE" values="[]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="EmpsRecord.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, emps, ]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="EmpsRecord.jsp">
+		<parameter name="cell_phone" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_password" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="dep_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="manmonth" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, emps, ]" lines="[]" />
+		<parameter name="picture" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_level" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="title" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="email" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_login" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="address" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="name" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="PK_emp_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="work_phone" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="home_phone" type="DOUBLE" values="[]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="EmpsRecord.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="PK_emp_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, emps, ]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="EmpsRecord.jsp">
+	</interface>
+	<interface method="POST|GET" target="EmpsRecord.jsp">
+		<parameter name="cell_phone" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_password" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="dep_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="manmonth" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, emps, ]" lines="[]" />
+		<parameter name="emp_level" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="picture" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="title" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_login" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="address" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="email" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="name" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="work_phone" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="home_phone" type="DOUBLE" values="[]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="EmpsRecord.jsp">
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="emp_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, emps, ]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="EmpsRecord.jsp">
+		<parameter name="cell_phone" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_password" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="dep_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="manmonth" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, emps, ]" lines="[]" />
+		<parameter name="emp_level" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="picture" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="title" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="emp_login" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="address" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="email" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[update, sendRedirect, cancel, insert, delete, ]" lines="[]" />
+		<parameter name="name" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="PK_emp_id" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="work_phone" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="home_phone" type="DOUBLE" values="[]" lines="[]" />
+	</interface>
+</component>
+<component name="org.apache.jsp.Login_jsp">
+	<interface method="POST|GET" target="Login.jsp">
+		<parameter name="Login" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="querystring" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[sendRedirect, login, logout, ]" lines="[]" />
+		<parameter name="Password" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="ret_page" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, Login, ]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="Login.jsp">
+		<parameter name="FormAction" type="STRING" values="[sendRedirect, login, logout, ]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, Login, ]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="Login.jsp">
+		<parameter name="querystring" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[sendRedirect, login, logout, ]" lines="[]" />
+		<parameter name="ret_page" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, Login, ]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="Login.jsp">
+		<parameter name="Login" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[sendRedirect, login, logout, ]" lines="[]" />
+		<parameter name="Password" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, Login, ]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="Login.jsp">
+		<parameter name="Login" type="STRING" values="[]" lines="[]" />
+		<parameter name="querystring" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[sendRedirect, login, logout, ]" lines="[]" />
+		<parameter name="ret_page" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, Login, ]" lines="[]" />
+	</interface>
+</component>
+<component name="org.apache.jsp.AdminMenu_jsp">
+	<interface method="POST|GET" target="AdminMenu.jsp">
+	</interface>
+	<interface method="POST|GET" target="AdminMenu.jsp">
+		<parameter name="querystring" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[sendRedirect, login, logout, ]" lines="[]" />
+		<parameter name="ret_page" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, Login, ]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="AdminMenu.jsp">
+		<parameter name="Login" type="STRING" values="[]" lines="[]" />
+		<parameter name="querystring" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[sendRedirect, login, logout, ]" lines="[]" />
+		<parameter name="ret_page" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, Login, ]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="AdminMenu.jsp">
+		<parameter name="FormAction" type="STRING" values="[sendRedirect, login, logout, ]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, Login, ]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="AdminMenu.jsp">
+		<parameter name="Login" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[sendRedirect, login, logout, ]" lines="[]" />
+		<parameter name="Password" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, Login, ]" lines="[]" />
+	</interface>
+	<interface method="POST|GET" target="AdminMenu.jsp">
+		<parameter name="Login" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="querystring" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[sendRedirect, login, logout, ]" lines="[]" />
+		<parameter name="Password" type="DOUBLE" values="[]" lines="[]" />
+		<parameter name="ret_page" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[sendRedirect, Login, ]" lines="[]" />
+	</interface>
+</component>
+<component name="org.apache.jsp.DepsGrid_jsp">
+	<interface method="POST|GET" target="DepsGrid.jsp">
+	</interface>
+	<interface method="POST|GET" target="DepsGrid.jsp">
+		<parameter name="Formdeps_Page" type="INTEGER" values="[]" lines="[]" />
+		<parameter name="Formdeps_Sorting" type="INTEGER" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[]" lines="[]" />
+		<parameter name="Formdeps_Sorted" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[]" lines="[]" />
+	</interface>
+</component>
+<component name="org.apache.jsp.Default_jsp">
+	<interface method="POST|GET" target="Default.jsp">
+		<parameter name="FormGrid_Sorting" type="INTEGER" values="[]" lines="[]" />
+		<parameter name="FormGrid_Sorted" type="STRING" values="[]" lines="[]" />
+		<parameter name="email" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormAction" type="STRING" values="[]" lines="[]" />
+		<parameter name="dep_id" type="STRING" values="[]" lines="[]" />
+		<parameter name="name" type="STRING" values="[]" lines="[]" />
+		<parameter name="FormName" type="STRING" values="[]" lines="[]" />
+	</interface>
+</component>
+</xml>

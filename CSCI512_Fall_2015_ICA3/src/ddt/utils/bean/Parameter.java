@@ -1,8 +1,10 @@
 package ddt.utils.bean;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.w3c.dom.Element;
@@ -15,6 +17,7 @@ public class Parameter implements Comparable<Parameter> {
 	private String name;
 	private String type;
 	private List<String> values;
+	private Set<String> valuesSet;
 	// The meaning of lines remains unknown.
 	@SuppressWarnings("unused")
 	private List<String> lines;
@@ -52,20 +55,66 @@ public class Parameter implements Comparable<Parameter> {
 	}
 
 	private void setType(String type) {
-		this.type = type;
+		this.type = type.toLowerCase();
 	}
 
 	public List<String> getValues() {
 		return values;
 	}
 
-	// TODO: complete set values by rules.
 	private void setValues(String values) {
 		this.values = new ArrayList<String>();
+		this.valuesSet = new HashSet<String>();
 
 		StringTokenizer st = new StringTokenizer(values, "[], ");
 		while (st.hasMoreTokens())
-			this.values.add(st.nextToken());
+			addValue(st.nextToken());
+
+		addTypeValue();
+		addNameValue();
+	}
+
+	private void addValue(String value) {
+		if (!valuesSet.contains(value)) {
+			this.values.add(value);
+			this.valuesSet.add(value);
+		}
+	}
+
+	// TODO: add value by type.
+	// Contains default correct/type error/null
+	// Three types: STRING, INTEGER, DOUBLE
+	private void addTypeValue() {
+		if ("string".equals(type)) {
+			// default correct
+			addValue("abc");
+			// type error
+
+		} else if ("integer".equals(type)) {
+			// default correct
+			addValue("0");
+			// type error
+			addValue("x");
+			addValue("0.1");
+		} else if ("double".equals(type)) {
+			// default correct
+			addValue("0.0");
+			// type error
+			addValue("x");
+		}
+		// null
+		addValue("");
+	}
+
+	// TODO: add value by name
+	// minus
+	private void addNameValue() {
+		// if (name.equals("FormAction")) {
+		//
+		// } else if (name.contains("Sorting") || name.contains("Sorted")) {
+		// for (int i = 0; i < 5; i++)
+		// addValue(Integer.toString(i));
+		// }
 	}
 
 	@Override
