@@ -11,6 +11,16 @@ public class Webapp {
 		setComponents(new ArrayList<Component>());
 	}
 
+	@Override
+	public String toString() {
+		String result = "";
+
+		for (Component component : components)
+			result += component.toString() + "\n\n";
+
+		return result;
+	}
+
 	public List<Component> getComponents() {
 		return components;
 	}

@@ -46,8 +46,11 @@ public class Component {
 
 		for (int i = 0; i < interfaces.getLength(); i++) {
 			Node node = interfaces.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE)
-				this.interfaces.add(new Interface(node));
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Interface interf = new Interface(node);
+				if (interf.getParameters().size() != 0)
+					this.interfaces.add(interf);
+			}
 		}
 	}
 
@@ -60,9 +63,9 @@ public class Component {
 			target = null;
 		else
 			target = interfaces.get(0).getTarget();
-		
-		for(Interface i : interfaces)
-			if(!i.getTarget().equals(target))
+
+		for (Interface i : interfaces)
+			if (!i.getTarget().equals(target))
 				throw new RuntimeException("Error");
 	}
 }

@@ -96,7 +96,7 @@ public class Interface {
 		return dataSet;
 	}
 
-	// TODO: finish setDataTupleCombination().
+	// TODO: finish setDataTupleCombination(). Finish Cartesian product first
 	private void setDataSet() {
 		this.dataSet = new HashSet<Data>();
 

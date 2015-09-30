@@ -1,6 +1,6 @@
 package ddt.utils.bean;
 
-public class DataTuple {
+public class DataTuple implements Comparable<DataTuple> {
 	private String name;
 	private String value;
 
@@ -17,6 +17,21 @@ public class DataTuple {
 	@Override
 	public String toString() {
 		return name + "=" + value;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		boolean result = false;
+		if (obj != null && obj instanceof DataTuple) {
+			final DataTuple dt = (DataTuple) obj;
+			result = this.name.equals(dt.name) && this.value.equals(dt.value);
+		}
+		return result;
+	}
+
+	@Override
+	public int compareTo(DataTuple arg0) {
+		return name.compareTo(arg0.name);
 	}
 
 	public String getName() {

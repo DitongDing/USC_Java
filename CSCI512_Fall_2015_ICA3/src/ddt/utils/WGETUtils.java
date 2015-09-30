@@ -2,23 +2,20 @@ package ddt.utils;
 
 import java.io.PrintWriter;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import ddt.utils.bean.Component;
 import ddt.utils.bean.Data;
-import ddt.utils.bean.DataTuple;
 import ddt.utils.bean.Interface;
 import ddt.utils.bean.Webapp;
 
 public class WGETUtils {
 	private static final String ADMIN_COOKIES = "cookies_admin";
 	private static final String GUEST_COOKIES = "cookies_guest";
-	private static final String[][] GUEST_DATA = { { "Login", "guest" }, { "Password", "guest" },
-			{ "FormAction", "login" }, { "FormName", "Login" } };
-	private static final String[][] ADMIN_DATA = { { "Login", "admin" }, { "Password", "admin" },
-			{ "FormAction", "login" }, { "FormName", "Login" } };
+	private static final String[][] GUEST_DATA = { { "Login", "guest" }, { "Password", "guest" }, { "FormAction", "login" }, { "FormName", "Login" } };
+	private static final String[][] ADMIN_DATA = { { "Login", "admin" }, { "Password", "admin" }, { "FormAction", "login" }, { "FormName", "Login" } };
+	// TODO: Add max count
+	// private static final int MAX_COUNT = 5000;
 
 	private String input;
 	private String output;
@@ -71,7 +68,7 @@ public class WGETUtils {
 	}
 
 	// Command types: no cookies, s/l cookies (with session). URL = URLBase/target.
-	private String generateCommand(String target, String method, List<DataTuple> data, String cookies) {
+	private String generateCommand(String target, String method, Data data, String cookies) {
 		if (target == null || method == null || (!method.equals("POST") && !method.equals("GET")) || data == null)
 			return "";
 
@@ -80,24 +77,11 @@ public class WGETUtils {
 		if (cookies != null)
 			result += " --load-cookies " + cookies + " --save-cookies " + cookies + " --keep-session-cookies";
 
-		String dataString = getDataString(data);
+		String dataString = data.toString();
 		if (method.equals("POST"))
 			result += " --post-data '" + dataString + "' \"" + URL + "\"";
 		else if (method.equals("GET"))
 			result += " \"" + URL + "?" + dataString + "\"";
-
-		return result;
-	}
-
-	private String getDataString(List<DataTuple> data) {
-		String result = "";
-
-		Iterator<DataTuple> iterator = data.iterator();
-		if (iterator.hasNext()) {
-			result += iterator.next().toString();
-			while (iterator.hasNext())
-				result += "&" + iterator.next().toString();
-		}
 
 		return result;
 	}
