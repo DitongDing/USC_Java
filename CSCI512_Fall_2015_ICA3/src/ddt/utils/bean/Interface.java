@@ -1,8 +1,11 @@
 package ddt.utils.bean;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.w3c.dom.Element;
@@ -14,13 +17,13 @@ public class Interface {
 	private String target;
 	private List<Parameter> parameters;
 
-	private List<List<DataTuple>> dataTupleCombination;
+	private Set<Data> dataSet;
 
 	public Interface(Node node) {
 		setMethods(((Element) node).getAttribute("method"));
 		setTarget(((Element) node).getAttribute("target"));
 		setParameters(node.getChildNodes());
-		setDataTupleCombination();
+		setDataSet();
 	}
 
 	public String toString() {
@@ -67,20 +70,38 @@ public class Interface {
 
 	private void setParameters(NodeList parameters) {
 		this.parameters = new ArrayList<Parameter>();
+		boolean formAction = false;
+		boolean formName = false;
 
 		for (int i = 0; i < parameters.getLength(); i++) {
 			Node node = parameters.item(i);
-			if (node.getNodeType() == Node.ELEMENT_NODE)
-				this.parameters.add(new Parameter(node));
+			if (node.getNodeType() == Node.ELEMENT_NODE) {
+				Parameter parameter = new Parameter(node);
+				this.parameters.add(parameter);
+				if (!formAction)
+					formAction = parameter.getName().equals("FormAction");
+				if (!formName)
+					formName = parameter.getName().equals("FormName");
+			}
 		}
+
+		// assert parameters contains FormAction and FormName, if it contains parameters.
+		if (this.parameters.size() != 0 && !(formAction && formName))
+			throw new RuntimeException("Interface not contains formAction and fz");
+
+		Collections.sort(this.parameters);
 	}
 
-	public List<List<DataTuple>> getDataTupleCombination() {
-		return dataTupleCombination;
+	public Set<Data> getDataSet() {
+		return dataSet;
 	}
 
 	// TODO: finish setDataTupleCombination().
-	private void setDataTupleCombination() {
-		this.dataTupleCombination = new ArrayList<List<DataTuple>>();
+	private void setDataSet() {
+		this.dataSet = new HashSet<Data>();
+
+		// FormAction and FormName error
+
+		// Sorting and Sorted tuple should only exists some combination
 	}
 }

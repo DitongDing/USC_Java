@@ -10,6 +10,11 @@ public class DataTuple {
 	}
 
 	@Override
+	public int hashCode() {
+		return (name.hashCode() + value.hashCode()) / 73;
+	}
+
+	@Override
 	public String toString() {
 		return name + "=" + value;
 	}

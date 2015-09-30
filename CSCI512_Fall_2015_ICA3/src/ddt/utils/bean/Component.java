@@ -8,14 +8,15 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-// TODO: Add rules for login: if an interface contains Login, put it as the first wget.
 public class Component {
 	private String name;
 	private List<Interface> interfaces;
+	private String target;
 
 	public Component(Node node) {
 		setName(((Element) node).getAttribute("name"));
 		setInterfaces(node.getChildNodes());
+		setTarget();
 	}
 
 	public String toString() {
@@ -48,5 +49,20 @@ public class Component {
 			if (node.getNodeType() == Node.ELEMENT_NODE)
 				this.interfaces.add(new Interface(node));
 		}
+	}
+
+	public String getTarget() {
+		return target;
+	}
+
+	private void setTarget() {
+		if (interfaces.size() == 0)
+			target = null;
+		else
+			target = interfaces.get(0).getTarget();
+		
+		for(Interface i : interfaces)
+			if(!i.getTarget().equals(target))
+				throw new RuntimeException("Error");
 	}
 }

@@ -11,7 +11,7 @@ import org.w3c.dom.Node;
 // TODO: generate possible datatuple. null, invalid value, correct value.
 // TODO: think about default value?
 // TODO: think about how to combine potential values for an interface.
-public class Parameter {
+public class Parameter implements Comparable<Parameter> {
 	private String name;
 	private String type;
 	private List<String> values;
@@ -66,5 +66,10 @@ public class Parameter {
 		StringTokenizer st = new StringTokenizer(values, "[], ");
 		while (st.hasMoreTokens())
 			this.values.add(st.nextToken());
+	}
+
+	@Override
+	public int compareTo(Parameter arg0) {
+		return name.compareTo(arg0.name);
 	}
 }

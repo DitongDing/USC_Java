@@ -27,8 +27,7 @@ public class XMLUtils {
 				// Assume there are only one login component per webapp.
 				if (component.getName().toLowerCase().contains("login"))
 					webapp.setLoginComponent(component);
-				else
-					webapp.addComponent(component);
+				webapp.addComponent(component);
 			}
 		}
 

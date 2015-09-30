@@ -13,6 +13,6 @@ public class Run {
 		final String input = args[0];
 		final String output = args[1];
 		final String URLBase = args[2];
-		WGETUtils.parse(input, output, URLBase);
+		new WGETUtils(input, output, URLBase).parse();
 	}
 }
