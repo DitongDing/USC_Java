@@ -14,7 +14,6 @@ import ddt.test.crawljax.plugin.LoginPlugin;
 import ddt.test.crawljax.plugin.PreStateCrawlingPlugin;
 
 public class Crawler {
-	// TODO: modify builder properties if needed. 200 20 1
 	private static final int MAX_STATES = 200;
 	private static final int MAX_DEPTH = 10;
 	private static final long MAX_RUNTIME = 10;
