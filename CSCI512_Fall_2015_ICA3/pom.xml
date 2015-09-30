@@ -4,14 +4,6 @@
 	<groupId>ddt</groupId>
 	<artifactId>homework3</artifactId>
 	<version>1.0</version>
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-digester3</artifactId>
-			<version>3.2</version>
-			<classifier>with-deps</classifier>
-		</dependency>
-	</dependencies>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>

@@ -14,10 +14,13 @@ public class Interface {
 	private String target;
 	private List<Parameter> parameters;
 
+	private List<List<DataTuple>> dataTupleCombination;
+
 	public Interface(Node node) {
 		setMethods(((Element) node).getAttribute("method"));
 		setTarget(((Element) node).getAttribute("target"));
 		setParameters(node.getChildNodes());
+		setDataTupleCombination();
 	}
 
 	public String toString() {
@@ -70,5 +73,14 @@ public class Interface {
 			if (node.getNodeType() == Node.ELEMENT_NODE)
 				this.parameters.add(new Parameter(node));
 		}
+	}
+
+	public List<List<DataTuple>> getDataTupleCombination() {
+		return dataTupleCombination;
+	}
+
+	// TODO: finish setDataTupleCombination().
+	private void setDataTupleCombination() {
+		this.dataTupleCombination = new ArrayList<List<DataTuple>>();
 	}
 }

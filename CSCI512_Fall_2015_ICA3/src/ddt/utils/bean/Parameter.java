@@ -8,6 +8,9 @@ import java.util.StringTokenizer;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+// TODO: generate possible datatuple. null, invalid value, correct value.
+// TODO: think about default value?
+// TODO: think about how to combine potential values for an interface.
 public class Parameter {
 	private String name;
 	private String type;
