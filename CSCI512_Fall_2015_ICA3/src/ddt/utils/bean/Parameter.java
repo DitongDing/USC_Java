@@ -1,6 +1,12 @@
 package ddt.utils.bean;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 public class Parameter {
 	private String name;
@@ -10,11 +16,31 @@ public class Parameter {
 	@SuppressWarnings("unused")
 	private List<String> lines;
 
+	public Parameter(Node node) {
+		setName(((Element) node).getAttribute("name"));
+		setType(((Element) node).getAttribute("type"));
+		setValues(((Element) node).getAttribute("values"));
+	}
+
+	@Override
+	public String toString() {
+		String result = name + ":" + type + "=[";
+		Iterator<String> iterator = values.iterator();
+		if (iterator.hasNext()) {
+			result += iterator.next();
+			while (iterator.hasNext())
+				result += "," + iterator.next();
+		}
+		result += "]";
+
+		return result;
+	}
+
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	private void setName(String name) {
 		this.name = name;
 	}
 
@@ -22,7 +48,7 @@ public class Parameter {
 		return type;
 	}
 
-	public void setType(String type) {
+	private void setType(String type) {
 		this.type = type;
 	}
 
@@ -30,7 +56,12 @@ public class Parameter {
 		return values;
 	}
 
-	public void setValues(List<String> values) {
-		this.values = values;
+	// TODO: complete set values by rules.
+	private void setValues(String values) {
+		this.values = new ArrayList<String>();
+
+		StringTokenizer st = new StringTokenizer(values, "[], ");
+		while (st.hasMoreTokens())
+			this.values.add(st.nextToken());
 	}
 }
