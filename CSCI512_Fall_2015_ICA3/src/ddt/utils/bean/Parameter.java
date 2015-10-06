@@ -11,8 +11,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 // TODO: generate possible datatuple. null, invalid value, correct value.
-// TODO: think about default value?
 // TODO: think about how to combine potential values for an interface.
+// TOOD: add 'error values' field
 public class Parameter implements Comparable<Parameter> {
 	private String name;
 	private String type;
