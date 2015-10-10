@@ -9,7 +9,7 @@ import ddt.test.bean.AccessLog;
 import ddt.test.bean.AccessLogs;
 import ddt.test.bean.WgetLog;
 
-public class Oracle {
+public class TestUtils {
 	public static void generate(String input, String wgetOutput, String expectedResultOutput) throws Exception {
 		AccessLogs accessLogs = new AccessLogs(input);
 		HashMap<String, String> sessionIDMap = new HashMap<String, String>();

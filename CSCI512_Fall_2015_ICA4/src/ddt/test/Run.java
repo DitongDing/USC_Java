@@ -1,6 +1,6 @@
 package ddt.test;
 
-import ddt.test.utils.Oracle;
+import ddt.test.utils.TestUtils;
 
 public class Run {
 	// Usage: Run <generate> <input> <wget_output> <expected_result_output>
@@ -18,13 +18,13 @@ public class Run {
 			final String wgetOutput = args[2];
 			final String expectedResultOutput = args[3];
 
-			Oracle.generate(input, wgetOutput, expectedResultOutput);
+			TestUtils.generate(input, wgetOutput, expectedResultOutput);
 		} else if ("compare".equals(args[0])) {
 			final String expected = args[1];
 			final String actual = args[2];
 			final String output = args[3];
 
-			Oracle.compare(expected, actual, output);
+			TestUtils.compare(expected, actual, output);
 		}
 	}
 }
