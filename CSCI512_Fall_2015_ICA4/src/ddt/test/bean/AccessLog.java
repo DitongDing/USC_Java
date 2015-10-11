@@ -5,7 +5,7 @@ import java.util.StringTokenizer;
 public class AccessLog {
 	private String sessionID;
 	private String method;
-	private String URL;
+	private String action;
 	private String postData;
 	private String responseCode;
 	private String responseSize;
@@ -16,7 +16,8 @@ public class AccessLog {
 
 		sessionID = trim(st.nextToken());
 		method = trim(st.nextToken());
-		URL = trim(st.nextToken());
+		action = trim(st.nextToken()).substring(1);
+		action = action.substring(action.indexOf('/'));
 		postData = trim(st.nextToken());
 		responseCode = trim(st.nextToken());
 		responseSize = trim(st.nextToken());
@@ -24,8 +25,31 @@ public class AccessLog {
 		assert(responseCode.equals("404") || responseCode.equals("302") || responseCode.equals("200"));
 	}
 
-	public String getExpectedResult() {
-		return responseCode + "\t" + responseSize;
+	// Only file name
+	private String getOutputFileName(int count) {
+		String result = String.format("%05d", count) + "_";
+		result += action.substring(1);
+		int index = result.indexOf('?');
+		if (index != -1)
+			result = result.substring(0, index);
+		return result.replace('/', '_');
+	}
+
+	public String getWget(String URLBase, String cookies, int count) {
+		assert(URLBase.charAt(URLBase.length() - 1) != '/');
+
+		if (URLBase == null || cookies == null)
+			return "";
+
+		String result = "";
+		result += "wget --load-cookies " + cookies + " --save-cookies " + cookies + " --keep-session-cookies -O "
+				+ getOutputFileName(count);
+
+		if (getMethod().equals("POST"))
+			result += " --post-data '" + getPostData() + "'";
+		result += " \"" + URLBase + getAction() + "\"";
+
+		return result;
 	}
 
 	private String trim(String s) {
@@ -45,8 +69,8 @@ public class AccessLog {
 		return method;
 	}
 
-	public String getURL() {
-		return URL;
+	public String getAction() {
+		return action;
 	}
 
 	public String getPostData() {
