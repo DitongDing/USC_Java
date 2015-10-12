@@ -1,24 +1,36 @@
 package ddt.test.utils;
 
+import java.io.PrintWriter;
+import java.util.HashMap;
+
+import ddt.test.bean.AccessLog;
+import ddt.test.bean.AccessLogs;
 
 public class ComUtils {
-	public static final String seperator = "==========";
-	public static final String logfile = "log";
-	public static final String server = "http://localhost:8080";
+	public static void generate(String input, String wgetOrg, String orgAppname, String wgetTest, String testAppname,
+			String URLBase) throws Exception {
+		AccessLogs accessLogs = new AccessLogs(input);
+		HashMap<String, String> sessionIDMap = new HashMap<String, String>();
+		PrintWriter pwWgetOrg = new PrintWriter(wgetOrg);
+		PrintWriter pwWgetTest = new PrintWriter(wgetTest);
+		int count = 0;
 
-	// public static String generateWget(AccessLog accessLog, String cookies) {
-	// if (accessLog == null || cookies == null)
-	// return "";
-	//
-	// String result = "echo \"" + seperator + "\" >> " + logfile + "\n";
-	//
-	// result += "wget -a " + logfile + " --load-cookies " + cookies + " --save-cookies " + cookies
-	// + " --keep-session-cookies";
-	//
-	// if (accessLog.getMethod().equals("POST"))
-	// result += " --post-data '" + accessLog.getPostData() + "'";
-	// result += " \"" + server + accessLog.getURL() + "\"";
-	//
-	// return result;
-	// }
+		for (AccessLog accessLog : accessLogs) {
+			String cookies = sessionIDMap.get(accessLog.getSessionID());
+			if (cookies == null) {
+				cookies = Integer.toString(sessionIDMap.size());
+				sessionIDMap.put(accessLog.getSessionID(), cookies);
+			}
+
+			String URL = URLBase + "/" + orgAppname;
+			String command = accessLog.getWget(URL, cookies, count);
+			pwWgetOrg.println(command);
+			pwWgetTest.println(command.replaceAll(orgAppname, testAppname));
+
+			count++;
+		}
+
+		pwWgetOrg.close();
+		pwWgetTest.close();
+	}
 }
