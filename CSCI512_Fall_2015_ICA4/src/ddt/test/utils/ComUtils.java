@@ -33,4 +33,28 @@ public class ComUtils {
 		pwWgetOrg.close();
 		pwWgetTest.close();
 	}
+
+	public static void generate(String input, String orgAppname, String output) throws Exception {
+		AccessLogs accessLogs = new AccessLogs(input);
+		HashMap<String, String> sessionIDMap = new HashMap<String, String>();
+		PrintWriter pw = new PrintWriter(output);
+
+		pw.println("Scenario: ");
+
+		for (AccessLog accessLog : accessLogs) {
+			String cookies = sessionIDMap.get(accessLog.getSessionID());
+			if (cookies == null) {
+				cookies = Integer.toString(sessionIDMap.size());
+				sessionIDMap.put(accessLog.getSessionID(), cookies);
+			}
+
+			String path = accessLog.getPath();
+			pw.println("\tWhen load " + path + " on original app");
+		}
+
+		pw.println("\tWhen do the same on test app");
+		pw.println("\tThen the files should be identical");
+
+		pw.close();
+	}
 }

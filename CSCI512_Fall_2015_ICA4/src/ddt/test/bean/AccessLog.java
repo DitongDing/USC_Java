@@ -35,6 +35,14 @@ public class AccessLog {
 		return result.replace('/', '_');
 	}
 
+	public String getPath() {
+		String result = "\"" + getAction() + "\"";
+		if (getMethod().equals("POST"))
+			result += " with post data '" + getPostData() + "'";
+
+		return result;
+	}
+
 	public String getWget(String URLBase, String cookies, int count) {
 		assert(URLBase.charAt(URLBase.length() - 1) != '/');
 
