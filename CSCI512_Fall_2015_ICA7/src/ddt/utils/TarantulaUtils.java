@@ -2,7 +2,11 @@ package ddt.utils;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,11 +24,14 @@ public class TarantulaUtils {
 	private String resultFile;
 
 	private Project project;
+	private Map<String, List<Line>> result;
 
-	public TarantulaUtils(String coverageDir, String resultFile) {
+	public static final Integer K = 20;
+
+	public TarantulaUtils(String coverageDir, String resultFile, String baseDir) {
 		this.coverageDir = coverageDir;
 		this.resultFile = resultFile;
-		this.project = new Project();
+		this.project = new Project(baseDir);
 	}
 
 	public void analysis() {
@@ -52,18 +59,19 @@ public class TarantulaUtils {
 			project.addCount(passed);
 
 			Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
-			NodeList classFileNodes = (NodeList) xPath.evaluate("//class[@line-rate!=0]", document.getDocumentElement(),
-					XPathConstants.NODESET);
+			NodeList classFileNodes = (NodeList) xPath.evaluate(".//class[@line-rate!=0]",
+					document.getDocumentElement(), XPathConstants.NODESET);
 			for (int i = 0; i < classFileNodes.getLength(); i++) {
 				Element classFileNode = (Element) classFileNodes.item(i);
-				NodeList lineNodes = (NodeList) xPath.evaluate("//line[@hits!=0]", classFileNode,
+				NodeList lineNodes = (NodeList) xPath.evaluate(".//line[@hits!=0]", classFileNode,
 						XPathConstants.NODESET);
 
-				String classFileName = classFileNode.getAttribute("name");
+				String classFileName = "/" + classFileNode.getAttribute("filename");
+				String className = classFileNode.getAttribute("name");
 				for (int j = 0; j < lineNodes.getLength(); j++) {
 					Element lineNode = (Element) lineNodes.item(j);
 					Integer lineNumber = Integer.valueOf(lineNode.getAttribute("number"));
-					project.addLine(classFileName, lineNumber, passed);
+					project.addLine(classFileName, className, lineNumber, passed);
 				}
 			}
 		}
@@ -71,19 +79,39 @@ public class TarantulaUtils {
 
 	private void calculate() {
 		project.close();
+		// The result is for each file
+		result = project.getResult();
 	}
 
 	private void write() throws Exception {
 		PrintWriter pw = new PrintWriter(resultFile);
 
-		for (Entry<String, List<Line>> entry : project.getSortedLines().entrySet()) {
-			pw.println("========================================");
-			pw.println("Class name: " + entry.getKey());
-			pw.println("Lines: ");
-			for (Line line : entry.getValue())
-				pw.println("\t" + line.toString());
-			pw.println();
-		}
+		// for (Entry<String, List<Line>> entry : result.entrySet()) {
+		// pw.println("========================================");
+		// pw.println("File: " + entry.getKey());
+		// pw.println("Lines: ");
+		// for (Line line : entry.getValue())
+		// pw.println("\t" + line.toString());
+		// pw.println();
+		// }
+
+		ArrayList<Line> lines = new ArrayList<Line>();
+		for (List<Line> linesPerFile : result.values())
+			lines.addAll(linesPerFile);
+
+		Collections.sort(lines, new Comparator<Line>() {
+			@Override
+			public int compare(Line o1, Line o2) {
+				return -o1.compareTo(o2);
+			}
+		});
+
+		Integer count = 0;
+		for (Line line : lines)
+			if (count++ < K)
+				pw.println(String.format("%-40s| %s", line.getClassFileName(), line.toString()));
+			else
+				break;
 
 		pw.close();
 	}

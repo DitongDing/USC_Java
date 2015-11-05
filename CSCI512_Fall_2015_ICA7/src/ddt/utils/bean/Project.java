@@ -1,5 +1,6 @@
 package ddt.utils.bean;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,13 +10,14 @@ public class Project {
 	private Integer totalPassedCount;
 	private Map<String, ClassFile> classFileMap;
 	private Boolean isClosed;
-	private Map<String, List<Line>> sortedLines;
+	private String baseDir;
 
-	public Project() {
+	public Project(String baseDir) {
 		totalFailedCount = 0;
 		totalPassedCount = 0;
 		classFileMap = new HashMap<String, ClassFile>();
 		isClosed = false;
+		this.baseDir = baseDir;
 	}
 
 	public void addCount(Boolean passed) {
@@ -33,10 +35,10 @@ public class Project {
 		return totalPassedCount;
 	}
 
-	public void addLine(String classFileName, Integer lineNumber, Boolean passed) {
+	public void addLine(String classFileName, String className, Integer lineNumber, Boolean passed) {
 		ClassFile classFile = classFileMap.get(classFileName);
 		if (classFile == null) {
-			classFile = new ClassFile(classFileName, this);
+			classFile = new ClassFile(classFileName, className, this);
 			classFileMap.put(classFileName, classFile);
 		}
 		classFile.addLine(lineNumber, passed);
@@ -46,17 +48,25 @@ public class Project {
 		isClosed = true;
 		for (ClassFile classFile : classFileMap.values())
 			classFile.close();
-
-		sortedLines = new HashMap<String, List<Line>>();
-		for (ClassFile classFile : classFileMap.values())
-			sortedLines.put(classFile.getClassFileName(), classFile.getSortedLines());
 	}
 
-	public Map<String, List<Line>> getSortedLines() {
-		return sortedLines;
+	public Map<String, List<Line>> getResult() {
+		Map<String, List<Line>> result = new HashMap<String, List<Line>>();
+
+		for (ClassFile classFile : classFileMap.values()) {
+			List<Line> lines = classFile.getResult();
+			if (!lines.isEmpty())
+				result.put(classFile.getClassFileName(), lines);
+		}
+
+		return result;
 	}
 
 	public Boolean isClosed() {
 		return isClosed;
+	}
+
+	public File getFile(String fileName) {
+		return new File(baseDir + fileName);
 	}
 }
