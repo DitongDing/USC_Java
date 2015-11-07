@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-import ddt.utils.TarantulaUtils;
-
 public class ClassFile {
 	private String classFileName;
 	@SuppressWarnings("unused")
@@ -51,15 +49,23 @@ public class ClassFile {
 		return project.isClosed();
 	}
 
+	public List<String> getTotalFailedTestCases() {
+		return project.getTotalFailedTestCases();
+	}
+
 	public Integer getTotalFailedCount() {
 		return project.getTotalFailedCount();
+	}
+
+	public List<String> getTotalPassedTestCases() {
+		return project.getTotalPassedTestCases();
 	}
 
 	public Integer getTotalPassedCount() {
 		return project.getTotalPassedCount();
 	}
 
-	public void addLine(Integer lineNumber, Boolean passed) {
+	public void addLine(Integer lineNumber, String testCaseName, Boolean passed) {
 		String lineContent = lineContents.get(lineNumber);
 		String trimedLineContent = lineContent.trim();
 		if (!(trimedLineContent.equals("") || trimedLineContent.equals("{") || trimedLineContent.equals("}")
@@ -70,7 +76,7 @@ public class ClassFile {
 				lineMap.put(lineNumber, line);
 			}
 
-			line.addCount(passed);
+			line.addCount(testCaseName, passed);
 		}
 	}
 
@@ -79,10 +85,11 @@ public class ClassFile {
 			line.close();
 	}
 
-	public List<Line> getResult() {
-		List<Line> result = getTopKLines(TarantulaUtils.K);
-		// List<Line> result = getSortedLines();
-		return result;
+	public List<Line> getResult(Integer K) {
+		if (K == null)
+			return getSortedLines();
+		else
+			return getTopKLines(K);
 	}
 
 	private List<Line> getTopKLines(Integer K) {
@@ -103,7 +110,6 @@ public class ClassFile {
 		return result;
 	}
 
-	@SuppressWarnings("unused")
 	private List<Line> getSortedLines() {
 		assert(project.isClosed());
 

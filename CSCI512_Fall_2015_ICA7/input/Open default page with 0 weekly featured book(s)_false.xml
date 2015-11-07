@@ -19613,7 +19613,7 @@
 						<line number="1233" hits="0" branch="false"/>
 						<line number="1236" hits="1" branch="false"/>
 						<line number="1237" hits="1" branch="false"/>
-						<line number="1238" hits="1" branch="false"/>
+						<line number="1238" hits="1" branch="false"></line>
 					</lines>
 				</class>
 				<class name="org.apache.jsp.EditorialCatGrid_jsp" filename="org/apache/jsp/EditorialCatGrid_jsp.java" line-rate="0.0" branch-rate="0.0" complexity="5.366666666666666">
