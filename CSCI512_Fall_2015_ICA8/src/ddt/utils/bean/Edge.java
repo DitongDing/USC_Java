@@ -1,5 +1,7 @@
 package ddt.utils.bean;
 
+import ddt.utils.bean.node.Node;
+
 public class Edge {
 	// Assume <startNode, endNode> is the ID for Edge.
 	protected Node startNode;

@@ -1,10 +1,11 @@
-package ddt.utils.bean;
+package ddt.utils.bean.node;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import ddt.utils.bean.Edge;
+
 public class Node {
-	// Assume ID should be unique in one graph. Can use line number instead
 	protected String ID;
 	protected Set<Edge> inEdges;
 	protected Set<Edge> outEdges;
@@ -39,9 +40,7 @@ public class Node {
 	}
 
 	public void addInEdge(Edge edge) {
-		assert(edge != null);
-		assert(this.equals(edge.getEndNode()));
-		assert(!inEdges.contains(edge));
+		assert (edge != null && this.equals(edge.getEndNode()) && !inEdges.contains(edge));
 		inEdges.add(edge);
 	}
 
@@ -50,9 +49,7 @@ public class Node {
 	}
 
 	public void addOutEdge(Edge edge) {
-		assert(edge != null);
-		assert(this.equals(edge.getStartNode()));
-		assert(!outEdges.contains(edge));
+		assert (edge != null && this.equals(edge.getStartNode()) && !outEdges.contains(edge));
 		outEdges.add(edge);
 	}
 }

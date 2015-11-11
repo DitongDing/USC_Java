@@ -1,34 +1,47 @@
 package ddt.utils.bean;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import ddt.utils.bean.property.InvocationOrderProperty;
+import org.apache.bcel.classfile.ClassParser;
+import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.classfile.Method;
+
+import ddt.utils.bean.node.MethodNode;
+import ddt.utils.bean.node.Node;
 
 public class CFG {
-	private Map<String, Node> nodeMap;
+	// As for Java, all code should be executed by a method, so the basic
+	// element in CFG is MethodNode.
+	private Map<String, MethodNode> methodMap;
 
-	public CFG(String classFilePath) {
-		Node entry = new Node("entry");
-		Node exit = new Node("exit");
+	public CFG(String classFilePath) throws Exception {
+		methodMap = new HashMap<String, MethodNode>();
 
-		// TODO: <1 HIGH> finish CFG constructor
+		// Parse class file
+		JavaClass cls;
+		cls = (new ClassParser(classFilePath)).parse();
+		// Traverse methods and add them to map
+		for (Method method : cls.getMethods())
+			addMethodNode(new MethodNode(method, this));
 	}
 
-	private void addNode(Node node) {
-		// TODO: <1 HIGH> finish add node function in CFG
+	public MethodNode getMethodNode(String ID) {
+		MethodNode result = methodMap.get(ID);
+		if (result == null) {
+			result = new MethodNode(ID);
+			addMethodNode(result);
+		}
+		return methodMap.get(ID);
 	}
 
-	private void addEdge(Node node) {
-		// TODO: <1 HIGH> finish add node function in CFG
+	private void addMethodNode(MethodNode methodNode) {
+		assert (methodNode != null && methodNode.getID() != null);
+		methodMap.put(methodNode.getID(), methodNode);
 	}
 
 	public void toDottyFile(String outputFileName) {
 		// TODO: <3 LOW> finish CFG to dotty file function.
-	}
-
-	public Boolean checkProperty(InvocationOrderProperty property) {
-		// TODO: <2 MID> finish check invocation order property function.
-		return false;
 	}
 
 	public Boolean checkReachability(Node preNode, Node postNode) {
