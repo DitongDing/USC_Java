@@ -24,16 +24,9 @@ import org.apache.bcel.generic.Select;
 
 public class CFG {
 	// Static Dotty file strings.
-	protected static final String[] dottyFileHeader = new String[] {
-		"digraph control_flow_graph {",
-		"",
-		"	node [shape = rectangle]; entry exit;",
-		"	node [shape = circle];",
-		""
-	};
-	protected static final String[] dottyFileFooter = new String[] {
-		"}"
-	};
+	protected static final String[] dottyFileHeader = new String[] { "digraph control_flow_graph {", "", "	node [shape = rectangle]; entry exit;",
+			"	node [shape = circle];", "" };
+	protected static final String[] dottyFileFooter = new String[] { "}" };
 	protected static final String dottyEntryNode = "entry";
 	protected static final String dottyExitNode = "exit";
 	// Dotty file edge templates.
@@ -46,79 +39,85 @@ public class CFG {
 	/**
 	 * Loads an instruction list and creates a new CFG.
 	 * 
-	 * @param instructions Instruction list from the method to create the CFG from.
+	 * @param instructions
+	 *            Instruction list from the method to create the CFG from.
 	 */
-	public CFG( InstructionList instructions ) {}
+	public CFG(InstructionList instructions) {
+		System.out.println();
+	}
 
 	/**
 	 * Generates a Dotty file representing the CFG.
 	 * 
-	 * @param out OutputStream to write the dotty file to.
+	 * @param out
+	 *            OutputStream to write the dotty file to.
 	 */
-	public void generateDotty( OutputStream _out ) {}
-
+	public void generateDotty(OutputStream _out) {
+		
+	}
 
 	/**
 	 * Main method. Generate a Dotty file with the CFG representing a given class file.
 	 * 
-	 * @param args Expects two arguments: <input-class-file> <output-dotty-file>
+	 * @param args
+	 *            Expects two arguments: <input-class-file> <output-dotty-file>
 	 */
 	public static void main(String[] args) {
 		PrintStream error = System.err;
 		// PrintStream debug = new PrintStream( new OutputStream() {} );
-		PrintStream debug = new PrintStream( System.out );
+		PrintStream debug = new PrintStream(System.out);
 
 		// Check arguments.
-		if ( args.length != 2 ) {
-			error.println( "Wrong number of arguments." );
-			error.println( "Usage: CFG <input-class-file> <output-dotty-file>" );
-			System.exit( 1 );
+		if (args.length != 2) {
+			error.println("Wrong number of arguments.");
+			error.println("Usage: CFG <input-class-file> <output-dotty-file>");
+			System.exit(1);
 		}
 		String inputClassFilename = args[0];
 		String outputDottyFilename = args[1];
 
 		// Parse class file.
-		debug.println( "Parsing " + inputClassFilename + "." );
+		debug.println("Parsing " + inputClassFilename + ".");
 		JavaClass cls = null;
 		try {
-			cls = (new ClassParser( inputClassFilename )).parse();
+			cls = (new ClassParser(inputClassFilename)).parse();
 		} catch (IOException e) {
-			e.printStackTrace( debug );
-			error.println( "Error while parsing " + inputClassFilename + "." );
-			System.exit( 1 );
+			e.printStackTrace(debug);
+			error.println("Error while parsing " + inputClassFilename + ".");
+			System.exit(1);
 		}
 
 		// Search for main method.
-		debug.println( "Searching for main method:" );
+		debug.println("Searching for main method:");
 		Method mainMethod = null;
-		for ( Method m : cls.getMethods() ) {
-			debug.println( "   " + m.getName() );
-			if ( "main".equals( m.getName() ) ) {
+		for (Method m : cls.getMethods()) {
+			debug.println("   " + m.getName());
+			if ("main".equals(m.getName())) {
 				mainMethod = m;
 				break;
 			}
 		}
-		if ( mainMethod == null ) {
-			error.println( "No main method found in " + inputClassFilename + "." );
-			System.exit( 1 );
+		if (mainMethod == null) {
+			error.println("No main method found in " + inputClassFilename + ".");
+			System.exit(1);
 		}
 
 		// Create CFG.
-		debug.println( "Creating CFG object." );
-		CFG cfg = new CFG( new InstructionList( mainMethod.getCode().getCode() ) );
+		debug.println("Creating CFG object.");
+		CFG cfg = new CFG(new InstructionList(mainMethod.getCode().getCode()));
 
 		// Output Dotty file.
-		debug.println( "Generating Dotty file." );
+		debug.println("Generating Dotty file.");
 		try {
-			OutputStream output = new FileOutputStream( outputDottyFilename );
-			cfg.generateDotty( output );
+			OutputStream output = new FileOutputStream(outputDottyFilename);
+			cfg.generateDotty(output);
 			output.close();
 		} catch (IOException e) {
-			e.printStackTrace( debug );
-			error.println( "Error while writing to " + outputDottyFilename + "." );
-			System.exit( 1 );
+			e.printStackTrace(debug);
+			error.println("Error while writing to " + outputDottyFilename + ".");
+			System.exit(1);
 		}
 
-		debug.println( "Done." );
+		debug.println("Done.");
 	}
 }
