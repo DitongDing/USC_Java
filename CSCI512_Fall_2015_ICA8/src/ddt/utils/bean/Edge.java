@@ -23,8 +23,8 @@ public class Edge implements Comparable<Edge> {
 	public String toDottyString() {
 		String result = String.format("\t%s -> %s", startNode.toDottyString(), endNode.toDottyString());
 		if (!description.equals(""))
-			result = String.format("%s [label = \"%s\"];", result, description);
-		return result;
+			result = String.format("%s [label = \"%s\"]", result, description);
+		return result + ";";
 	}
 
 	@Override

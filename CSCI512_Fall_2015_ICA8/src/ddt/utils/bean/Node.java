@@ -27,7 +27,7 @@ public class Node implements Comparable<Node> {
 	}
 
 	public Node(Method method, InstructionHandle instructionHandle) {
-		this(method, "" + instructionHandle.getPosition(), instructionHandle.getInstruction().toString());
+		this(method, "" + instructionHandle.getPosition(), ComUtils.getNodeDescription(instructionHandle, method.getCPG()));
 		this.instructionHandle = instructionHandle;
 	}
 
@@ -37,31 +37,33 @@ public class Node implements Comparable<Node> {
 			if (instruction instanceof InvokeInstruction) {
 				InvokeInstruction invokeInstruction = (InvokeInstruction) instruction;
 				String methodName = ComUtils.getMethodName(invokeInstruction, method.getCPG());
-				Method invokeMethod = method.getMethod(methodName);
-				if (invokeMethod != null) {
-					linkTo(invokeMethod.getEntry(), String.format("Function call to %s", methodName));
-					invokeMethod.getExit().linkTo(nextNode,
-							String.format("Function %s finish, go back to %s", invokeMethod.getMethodName(), method.getMethodName()));
-				} else {
-					linkTo(nextNode, String.format("Function %s finish", methodName));
-				}
+				// Method invokeMethod = method.getMethod(methodName);
+				// if (invokeMethod != null) {
+				// linkTo(invokeMethod.getEntry(), String.format("Function call to %s", methodName));
+				// invokeMethod.getExit().linkTo(nextNode,
+				// String.format("Function %s finish, go back to %s", invokeMethod.getMethodName(), method.getMethodName()));
+				// } else {
+				// linkTo(nextNode, String.format("Function %s finish", methodName));
+				// }
+				linkTo(nextNode, String.format("Function %s finish", ComUtils.getMethodShortName(methodName)));
 			} else if (instruction instanceof IfInstruction) {
 				IfInstruction ifInstruction = (IfInstruction) instruction;
 				String targetOffset = ComUtils.getTargetOffset(ifInstruction);
-				linkTo(targetOffset, String.format("If %s then goto %s", ComUtils.getIfMeanning(ifInstruction), targetOffset));
+				linkTo(targetOffset, String.format("If %s", ComUtils.getIfMeanning(ifInstruction)));
+				linkTo(nextNode, String.format("Else"));
 			} else if (instruction instanceof GotoInstruction) {
 				GotoInstruction gotoInstruction = (GotoInstruction) instruction;
 				String targetOffset = ComUtils.getTargetOffset(gotoInstruction);
-				linkTo(targetOffset, String.format("Goto %s", targetOffset));
+				linkTo(targetOffset, String.format(""));
 			} else if (instruction instanceof Select) {
 				Select select = (Select) instruction;
 				String defaultTargetOffset = "" + select.getTarget().getPosition();
-				linkTo(defaultTargetOffset, String.format("Default goto %s", defaultTargetOffset));
+				linkTo(defaultTargetOffset, String.format("Default"));
 				InstructionHandle[] targets = select.getTargets();
 				int[] cases = select.getMatchs();
 				for (int i = 0; i < targets.length; i++) {
 					String targetOffset = "" + targets[i].getPosition();
-					linkTo(targetOffset, String.format("If case %s goto %s", cases[i], targetOffset));
+					linkTo(targetOffset, String.format("If case %s", cases[i], targetOffset));
 				}
 			} else if (instruction instanceof RETURN) {
 				linkTo(method.getExit(), "");

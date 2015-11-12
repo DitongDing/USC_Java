@@ -2,6 +2,7 @@ package ddt.utils.bean;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -49,8 +50,11 @@ public class CFG {
 
 	public Method getMethod(String methodName) {
 		Method result = methodMap.get(methodName);
-		if (result == null)
+		if (result == null) {
 			assert (methodName.startsWith("java"));
+			result = new Method(this, methodName);
+			addMethod(result);
+		}
 		return result;
 	}
 
@@ -58,24 +62,39 @@ public class CFG {
 		return cpg;
 	}
 
-	// TODO: <3 LOW> finish CFG to dotty file function.
 	// Only draw main function.
 	public void toDottyFile(String outputFileName) throws Exception {
 
 		PrintWriter pw = new PrintWriter(outputFileName);
 
 		pw.println(DOTTY_HEADER);
+		pw.println();
 
 		Set<Node> visited = new HashSet<Node>();
 		LinkedList<Node> queue = new LinkedList<Node>();
+		List<Edge> edges = new ArrayList<Edge>();
 		queue.add(mainMethod.getEntry());
 		while (!queue.isEmpty()) {
 			Node currentNode = queue.pollFirst();
 			if (!visited.contains(currentNode)) {
-				
+				for (Edge edge : currentNode.getOutEdges()) {
+					edges.add(edge);
+					queue.add(edge.getEndNode());
+				}
+				visited.add(currentNode);
 			}
 		}
 
+		Collections.sort(edges);
+		for (Edge edge : edges)
+			pw.println(edge.toDottyString());
+		List<Node> nodes = new ArrayList<Node>(visited);
+		Collections.sort(nodes);
+		for (Node node : nodes)
+			if (!node.getDescription().equals(""))
+				pw.println(String.format("%s [label = \"%s\"]", node.toDottyString(), node.getDescription()));
+
+		pw.println();
 		pw.println(DOTTY_FOOTER);
 
 		pw.close();

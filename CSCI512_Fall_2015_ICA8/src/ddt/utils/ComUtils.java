@@ -22,8 +22,10 @@ public class ComUtils {
 	}
 
 	public static String getIfMeanning(IfInstruction ifInstruction) {
-		String top_1 = "stack[top-1]";
-		String top_0 = "stack[top]";
+		// String top_1 = "stack[top-1]";
+		// String top_0 = "stack[top]";
+		String top_1 = "";
+		String top_0 = "";
 		String zero = "0";
 		String NULL = "null";
 		String left = "";
@@ -87,5 +89,26 @@ public class ComUtils {
 			right = NULL;
 		}
 		return String.format("%s %s %s", left, op, right);
+	}
+
+	public static String getMethodShortName(String methodName) {
+		return methodName.substring(methodName.lastIndexOf('.') + 1, methodName.indexOf('('));
+	}
+
+	public static String getNodeDescription(InstructionHandle instructionHandle, ConstantPoolGen CPG) {
+		Instruction instruction = instructionHandle.getInstruction();
+		String result = "";
+		if (instruction instanceof InvokeInstruction) {
+			InvokeInstruction invokeInstruction = (InvokeInstruction) instruction;
+			String methodName = ComUtils.getMethodName(invokeInstruction, CPG);
+			result = "Call " + getMethodShortName(methodName);
+		} else if (instruction instanceof GotoInstruction) {
+			GotoInstruction gotoInstruction = (GotoInstruction) instruction;
+			String targetOffset = ComUtils.getTargetOffset(gotoInstruction);
+			result = "Goto " + targetOffset;
+		} else {
+			result = "";
+		}
+		return result;
 	}
 }

@@ -50,7 +50,7 @@ public class Method {
 		Node currentNode = entry;
 		Node nextNode = getNode("" + instructionHandles[0].getPosition());
 		currentNode.initialize(nextNode);
-		for (int i = 1; i < instructionHandles.length - 1; i++) {
+		for (int i = 1; i < instructionHandles.length; i++) {
 			currentNode = nextNode;
 			nextNode = getNode("" + instructionHandles[i].getPosition());
 			currentNode.initialize(nextNode);
