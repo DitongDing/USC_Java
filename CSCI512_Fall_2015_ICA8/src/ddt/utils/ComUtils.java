@@ -1,0 +1,91 @@
+package ddt.utils;
+
+import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.generic.*;
+
+public class ComUtils {
+	public static String getMethodName(JavaClass cls, org.apache.bcel.classfile.Method method) {
+		String methodName = String.format("%s.%s%s", cls.getClassName(), method.getName(), method.getSignature());
+		return methodName;
+	}
+
+	public static String getMethodName(InvokeInstruction instruction, ConstantPoolGen CPG) {
+		return String.format("%s.%s%s", instruction.getReferenceType(CPG), instruction.getMethodName(CPG), instruction.getSignature(CPG));
+	}
+
+	public static String getTargetOffset(IfInstruction ifInstruction) {
+		return "" + ifInstruction.getTarget().getPosition();
+	}
+
+	public static String getTargetOffset(GotoInstruction gotoInstruction) {
+		return "" + gotoInstruction.getTarget().getPosition();
+	}
+
+	public static String getIfMeanning(IfInstruction ifInstruction) {
+		String top_1 = "stack[top-1]";
+		String top_0 = "stack[top]";
+		String zero = "0";
+		String NULL = "null";
+		String left = "";
+		String right = "";
+		String op = "";
+		if (ifInstruction instanceof IF_ACMPEQ || ifInstruction instanceof IF_ICMPEQ) {
+			left = top_1;
+			op = "==";
+			right = top_0;
+		} else if (ifInstruction instanceof IF_ACMPNE || ifInstruction instanceof IF_ICMPNE) {
+			left = top_1;
+			op = "!=";
+			right = top_0;
+		} else if (ifInstruction instanceof IF_ICMPGE) {
+			left = top_1;
+			op = ">=";
+			right = top_0;
+		} else if (ifInstruction instanceof IF_ICMPGT) {
+			left = top_1;
+			op = ">";
+			right = top_0;
+		} else if (ifInstruction instanceof IF_ICMPLE) {
+			left = top_1;
+			op = "<=";
+			right = top_0;
+		} else if (ifInstruction instanceof IF_ICMPLT) {
+			left = top_1;
+			op = "<";
+			right = top_0;
+		} else if (ifInstruction instanceof IFEQ) {
+			left = top_0;
+			op = "==";
+			right = zero;
+		} else if (ifInstruction instanceof IFGE) {
+			left = top_0;
+			op = ">=";
+			right = zero;
+		} else if (ifInstruction instanceof IFGT) {
+			left = top_0;
+			op = ">";
+			right = zero;
+		} else if (ifInstruction instanceof IFLE) {
+			left = top_0;
+			op = "<=";
+			right = zero;
+		} else if (ifInstruction instanceof IFLT) {
+			left = top_0;
+			op = "<";
+			right = zero;
+		} else if (ifInstruction instanceof IFNE) {
+			left = top_0;
+			op = "!=";
+			right = zero;
+		} else if (ifInstruction instanceof IFNONNULL) {
+			left = top_0;
+			op = "!=";
+			right = NULL;
+		} else if (ifInstruction instanceof IFNULL) {
+			left = top_0;
+			op = "==";
+			right = NULL;
+		}
+		return String.format("%s %s %s", left, op, right);
+	}
+}

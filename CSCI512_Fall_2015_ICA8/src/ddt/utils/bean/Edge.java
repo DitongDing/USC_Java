@@ -1,8 +1,8 @@
 package ddt.utils.bean;
 
-import ddt.utils.bean.node.Node;
+import ddt.utils.bean.Node;
 
-public class Edge {
+public class Edge implements Comparable<Edge> {
 	// Assume <startNode, endNode> is the ID for Edge.
 	protected Node startNode;
 	protected Node endNode;
@@ -15,9 +15,16 @@ public class Edge {
 	}
 
 	@Override
-	// May be changed later. Assume we will use it in output to dotty.
+	// May be changed later.
 	public String toString() {
-		return String.format("%s -> %s [label = \"%s\"];", startNode.getID(), endNode.getID(), description);
+		return String.format("%s -> %s [label = \"%s\"];", startNode.getOffset(), endNode.getOffset(), description);
+	}
+
+	public String toDottyString() {
+		String result = String.format("\t%s -> %s", startNode.toDottyString(), endNode.toDottyString());
+		if (!description.equals(""))
+			result = String.format("%s [label = \"%s\"];", result, description);
+		return result;
 	}
 
 	@Override
@@ -38,5 +45,13 @@ public class Edge {
 
 	public String getDescription() {
 		return description;
+	}
+
+	@Override
+	public int compareTo(Edge edge) {
+		int result = startNode.compareTo(edge.startNode);
+		if (result == 0)
+			result = endNode.compareTo(edge.endNode);
+		return result;
 	}
 }
