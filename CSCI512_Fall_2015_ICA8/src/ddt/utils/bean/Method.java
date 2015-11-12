@@ -1,7 +1,9 @@
 package ddt.utils.bean;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.generic.ConstantPoolGen;
@@ -58,6 +60,25 @@ public class Method {
 		currentNode = nextNode;
 		nextNode = exit;
 		currentNode.initialize(nextNode);
+
+		// Build beReached set for each node.
+		boolean changed;
+		do {
+			changed = false;
+
+			for (Node node : nodeMap.values()) {
+				Set<Node> beReached = new HashSet<Node>();
+				beReached.add(node);
+				for (Edge edge : node.inEdges) {
+					Node pred = edge.getStartNode();
+					beReached.addAll(pred.getBeReached());
+				}
+				if (beReached.size() > node.getBeReached().size()) {
+					node.setBeReached(beReached);
+					changed = true;
+				}
+			}
+		} while (changed);
 	}
 
 	public Method getMethod(String methodName) {
@@ -100,5 +121,9 @@ public class Method {
 
 	public Node getExit() {
 		return exit;
+	}
+
+	public Map<String, Node> getNodeMap() {
+		return nodeMap;
 	}
 }

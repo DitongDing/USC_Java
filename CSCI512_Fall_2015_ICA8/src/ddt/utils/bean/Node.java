@@ -18,12 +18,16 @@ public class Node implements Comparable<Node> {
 
 	protected InstructionHandle instructionHandle;
 
+	protected Set<Node> beReached;
+
 	public Node(Method method, String offset, String description) {
 		this.method = method;
 		this.offset = offset;
 		this.description = description;
 		this.inEdges = new HashSet<Edge>();
 		this.outEdges = new HashSet<Edge>();
+		this.beReached = new HashSet<Node>();
+		beReached.add(this);
 	}
 
 	public Node(Method method, InstructionHandle instructionHandle) {
@@ -136,6 +140,18 @@ public class Node implements Comparable<Node> {
 			return Integer.MAX_VALUE;
 		else
 			return Integer.valueOf(offset);
+	}
+
+	public void setBeReached(Set<Node> beReached) {
+		this.beReached = beReached;
+	}
+
+	public Set<Node> getBeReached() {
+		return beReached;
+	}
+
+	public boolean canBeReachedBy(Node node) {
+		return beReached.contains(node);
 	}
 
 	@Override

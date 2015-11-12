@@ -23,6 +23,8 @@ public class CFG {
 	protected Method mainMethod;
 	protected ConstantPoolGen cpg;
 
+	protected Map<Node, Set<Node>> beReachedMap;
+
 	public CFG(String classFilePath) throws Exception {
 		methodMap = new HashMap<String, Method>();
 
@@ -63,7 +65,7 @@ public class CFG {
 	}
 
 	// Only draw main function.
-	public void toDottyFile(String outputFileName) throws Exception {
+	public void mainToDottyFile(String outputFileName) throws Exception {
 
 		PrintWriter pw = new PrintWriter(outputFileName);
 
@@ -91,8 +93,7 @@ public class CFG {
 		List<Node> nodes = new ArrayList<Node>(visited);
 		Collections.sort(nodes);
 		for (Node node : nodes)
-			if (!node.getDescription().equals(""))
-				pw.println(String.format("%s [label = \"%s\"]", node.toDottyString(), node.getDescription()));
+			pw.println(String.format("%s [label = \"%s %s\"]", node.toDottyString(), node.getOffset(), node.getDescription()));
 
 		pw.println();
 		pw.println(DOTTY_FOOTER);
@@ -100,8 +101,30 @@ public class CFG {
 		pw.close();
 	}
 
+	public List<Node> getMainNodesByDescription(String description) {
+		List<Node> result = new ArrayList<Node>();
+
+		for (Node node : mainMethod.getNodeMap().values())
+			if (node.getDescription().equals(description))
+				result.add(node);
+
+		return result;
+	}
+
 	public boolean checkReachability(Node preNode, Node postNode) {
-		// TODO: <1 HIGH> finish check reachability
-		return false;
+		boolean result = false;
+		if (preNode.equals(postNode)) {
+			Node node = preNode;
+			for (Edge edge : node.inEdges) {
+				if (edge.getStartNode().equals(node))
+					result = true;
+				else
+					result = checkReachability(node, edge.getStartNode());
+				if (result)
+					break;
+			}
+		} else
+			result = postNode.canBeReachedBy(preNode);
+		return result;
 	}
 }
