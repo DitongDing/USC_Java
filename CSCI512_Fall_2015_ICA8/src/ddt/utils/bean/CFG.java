@@ -93,7 +93,7 @@ public class CFG {
 		List<Node> nodes = new ArrayList<Node>(visited);
 		Collections.sort(nodes);
 		for (Node node : nodes)
-			pw.println(String.format("%s [label = \"%s %s\"]", node.toDottyString(), node.getOffset(), node.getDescription()));
+			pw.println(String.format("%s [label = \"%s\"]", node.toDottyString(), node.toString()));
 
 		pw.println();
 		pw.println(DOTTY_FOOTER);

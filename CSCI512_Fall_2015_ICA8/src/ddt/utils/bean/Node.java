@@ -92,7 +92,7 @@ public class Node implements Comparable<Node> {
 
 	@Override
 	public String toString() {
-		return String.format("%s (%s)", offset, description);
+		return String.format("%s %s", offset, description);
 	}
 
 	public String toDottyString() {
