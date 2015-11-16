@@ -43,6 +43,16 @@ public class CFG {
 		List<Method> methods = new ArrayList<Method>(methodMap.values());
 		for (Method method : methods)
 			method.initialize();
+
+		// ArrayList<Node> nodes = new ArrayList<Node>(mainMethod.getNodeMap().values());
+		// Collections.sort(nodes);
+		// for (Node node : nodes) {
+		// System.out.println(node.getOffset() + ":");
+		// ArrayList<Node> beReacheds = new ArrayList<Node>(node.getBeReached());
+		// Collections.sort(beReacheds);
+		// for (Node beReached : beReacheds)
+		// System.out.println("\t" + beReached.getOffset());
+		// }
 	}
 
 	private void addMethod(Method method) {
@@ -116,12 +126,20 @@ public class CFG {
 		if (preNode.equals(postNode)) {
 			Node node = preNode;
 			for (Edge edge : node.inEdges) {
+				if (result)
+					break;
 				if (edge.getStartNode().equals(node))
 					result = true;
 				else
 					result = checkReachability(node, edge.getStartNode());
+			}
+			for (Edge edge : node.outEdges) {
 				if (result)
 					break;
+				if (edge.getEndNode().equals(node))
+					result = true;
+				else
+					result = checkReachability(edge.getEndNode(), node);
 			}
 		} else
 			result = postNode.canBeReachedBy(preNode);
