@@ -14,6 +14,7 @@ import org.apache.bcel.classfile.ClassParser;
 import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.generic.ConstantPoolGen;
 
+// Currently CFG only works on one .class file, but it can be changed to multiple files.
 public class CFG {
 	private static final String DOTTY_HEADER = "digraph control_flow_graph {\n\tnode [shape = rectangle]; entry exit;\n\tnode [shape = circle];";
 	private static final String DOTTY_FOOTER = "}";
@@ -25,7 +26,7 @@ public class CFG {
 
 	protected Map<Node, Set<Node>> beReachedMap;
 
-	public CFG(String classFilePath) throws Exception {
+	public CFG(String classFilePath, String[] accepts, String[] rejects) throws Exception {
 		methodMap = new HashMap<String, Method>();
 
 		// Parse class file
@@ -34,25 +35,47 @@ public class CFG {
 		cpg = new ConstantPoolGen(cls.getConstantPool());
 		// Traverse methods and add them to map
 		for (org.apache.bcel.classfile.Method method : cls.getMethods()) {
-			Method m = new Method(cls, this, method);
-			if (method.getName().equals("main"))
-				mainMethod = m;
-			addMethod(m);
+			String name = method.getName();
+			if (checkIfAccept(name, accepts, rejects)) {
+				Method m = new Method(cls, this, method);
+				if (name.equals("main"))
+					mainMethod = m;
+				addMethod(m);
+			}
 		}
 		// Initialize methods
 		List<Method> methods = new ArrayList<Method>(methodMap.values());
 		for (Method method : methods)
 			method.initialize();
+	}
 
-		// ArrayList<Node> nodes = new ArrayList<Node>(mainMethod.getNodeMap().values());
-		// Collections.sort(nodes);
-		// for (Node node : nodes) {
-		// System.out.println(node.getOffset() + ":");
-		// ArrayList<Node> beReacheds = new ArrayList<Node>(node.getBeReached());
-		// Collections.sort(beReacheds);
-		// for (Node beReached : beReacheds)
-		// System.out.println("\t" + beReached.getOffset());
-		// }
+	public CFG(String classFilePath) throws Exception {
+		this(classFilePath, new String[0], new String[0]);
+	}
+
+	// accept.length = 0 means accept all; reject.length = 0 reject none. Reject array has higher priority
+	private boolean checkIfAccept(String name, String[] accepts, String[] rejects) {
+		boolean isAccepted = true;
+
+		// Only check rejects when it has rules.
+		if (rejects.length != 0)
+			for (String reject : rejects)
+				if (name.contains(reject)) {
+					isAccepted = false;
+					break;
+				}
+
+		// Only check accepts when it pass rejects check and it has rules.
+		if (isAccepted && accepts.length != 0) {
+			isAccepted = false;
+			for (String accept : accepts)
+				if (name.contains(accept)) {
+					isAccepted = true;
+					break;
+				}
+		}
+
+		return isAccepted;
 	}
 
 	private void addMethod(Method method) {
@@ -63,11 +86,20 @@ public class CFG {
 	public Method getMethod(String methodName) {
 		Method result = methodMap.get(methodName);
 		if (result == null) {
-			assert (methodName.startsWith("java"));
+			// assert (methodName.startsWith("java"));
 			result = new Method(this, methodName);
 			addMethod(result);
 		}
 		return result;
+	}
+
+	// NOT SAFE!
+	@Deprecated
+	public Method getMethodByShortName(String methodShortName) {
+		for (Method method : methodMap.values())
+			if (method.getMethodName().contains(methodShortName))
+				return method;
+		return null;
 	}
 
 	public ConstantPoolGen getCPG() {

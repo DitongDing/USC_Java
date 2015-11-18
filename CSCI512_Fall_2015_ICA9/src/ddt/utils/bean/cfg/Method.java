@@ -11,7 +11,7 @@ import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.InstructionList;
 
-import ddt.utils.ComUtils;
+import ddt.utils.CFGUtils;
 import ddt.utils.Constant;
 
 public class Method {
@@ -38,7 +38,7 @@ public class Method {
 	}
 
 	public Method(JavaClass cls, CFG cfg, org.apache.bcel.classfile.Method method) {
-		this(cfg, ComUtils.getMethodName(cls, method));
+		this(cfg, CFGUtils.getMethodName(cls, method));
 		this.method = method;
 		lineNumberTable = method.getLineNumberTable();
 	}
@@ -129,8 +129,8 @@ public class Method {
 	public Map<String, Node> getNodeMap() {
 		return nodeMap;
 	}
-	
+
 	public int getLineNumber(int offset) {
-		return lineNumberTable.getSourceLine(offset);
+		return lineNumberTable == null ? -1 : lineNumberTable.getSourceLine(offset);
 	}
 }
