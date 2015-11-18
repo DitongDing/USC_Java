@@ -85,7 +85,7 @@ public class Method {
 	}
 
 	public Method getMethod(String methodName) {
-		return cfg.getMethod(methodName);
+		return cfg.getMethodByFullName(methodName);
 	}
 
 	public Node getNode(String offset) {

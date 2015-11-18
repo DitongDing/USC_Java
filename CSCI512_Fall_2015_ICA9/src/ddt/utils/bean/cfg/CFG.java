@@ -2,6 +2,7 @@ package ddt.utils.bean.cfg;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +22,6 @@ public class CFG {
 
 	// methodName -> method
 	protected Map<String, Method> methodMap;
-	protected Method mainMethod;
 	protected ConstantPoolGen cpg;
 
 	protected Map<Node, Set<Node>> beReachedMap;
@@ -38,8 +38,6 @@ public class CFG {
 			String name = method.getName();
 			if (checkIfAccept(name, accepts, rejects)) {
 				Method m = new Method(cls, this, method);
-				if (name.equals("main"))
-					mainMethod = m;
 				addMethod(m);
 			}
 		}
@@ -53,7 +51,8 @@ public class CFG {
 		this(classFilePath, new String[0], new String[0]);
 	}
 
-	// accept.length = 0 means accept all; reject.length = 0 reject none. Reject array has higher priority
+	// accept.length = 0 means accept all; reject.length = 0 reject none. Reject
+	// array has higher priority
 	private boolean checkIfAccept(String name, String[] accepts, String[] rejects) {
 		boolean isAccepted = true;
 
@@ -83,11 +82,11 @@ public class CFG {
 		methodMap.put(method.getMethodName(), method);
 	}
 
-	public Method getMethod(String methodName) {
-		Method result = methodMap.get(methodName);
+	public Method getMethodByFullName(String methodFullName) {
+		Method result = methodMap.get(methodFullName);
 		if (result == null) {
 			// assert (methodName.startsWith("java"));
-			result = new Method(this, methodName);
+			result = new Method(this, methodFullName);
 			addMethod(result);
 		}
 		return result;
@@ -95,9 +94,9 @@ public class CFG {
 
 	// NOT SAFE!
 	@Deprecated
-	public Method getMethodByShortName(String methodShortName) {
+	public Method getMethodByPartName(String methodPartName) {
 		for (Method method : methodMap.values())
-			if (method.getMethodName().contains(methodShortName))
+			if (method.getMethodName().contains(methodPartName))
 				return method;
 		return null;
 	}
@@ -106,9 +105,8 @@ public class CFG {
 		return cpg;
 	}
 
-	// Only draw main function.
-	public void mainToDottyFile(String outputFileName) throws Exception {
-
+	public void toDottyFile(String methodName, String outputFileName) throws Exception {
+		Method method = this.getMethodByPartName(methodName);
 		PrintWriter pw = new PrintWriter(outputFileName);
 
 		pw.println(DOTTY_HEADER);
@@ -117,7 +115,7 @@ public class CFG {
 		Set<Node> visited = new HashSet<Node>();
 		LinkedList<Node> queue = new LinkedList<Node>();
 		List<Edge> edges = new ArrayList<Edge>();
-		queue.add(mainMethod.getEntry());
+		queue.add(method.getEntry());
 		while (!queue.isEmpty()) {
 			Node currentNode = queue.pollFirst();
 			if (!visited.contains(currentNode)) {
@@ -143,10 +141,11 @@ public class CFG {
 		pw.close();
 	}
 
-	public List<Node> getMainNodesByDescription(String description) {
+	public List<Node> getNodesByDescription(String methodName, String description) {
+		Collection<Node> nodes = this.getMethodByPartName(methodName).getNodeMap().values();
 		List<Node> result = new ArrayList<Node>();
 
-		for (Node node : mainMethod.getNodeMap().values())
+		for (Node node : nodes)
 			if (node.getDescription().equals(description))
 				result.add(node);
 
