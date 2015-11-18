@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.classfile.LineNumberTable;
 import org.apache.bcel.generic.ConstantPoolGen;
 import org.apache.bcel.generic.InstructionHandle;
 import org.apache.bcel.generic.InstructionList;
@@ -23,6 +24,7 @@ public class Method {
 	protected Map<String, Node> nodeMap;
 
 	protected org.apache.bcel.classfile.Method method;
+	protected LineNumberTable lineNumberTable;
 
 	public Method(CFG cfg, String methodName) {
 		super();
@@ -38,6 +40,7 @@ public class Method {
 	public Method(JavaClass cls, CFG cfg, org.apache.bcel.classfile.Method method) {
 		this(cfg, ComUtils.getMethodName(cls, method));
 		this.method = method;
+		lineNumberTable = method.getLineNumberTable();
 	}
 
 	public void initialize() {
@@ -125,5 +128,9 @@ public class Method {
 
 	public Map<String, Node> getNodeMap() {
 		return nodeMap;
+	}
+	
+	public int getLineNumber(int offset) {
+		return lineNumberTable.getSourceLine(offset);
 	}
 }
