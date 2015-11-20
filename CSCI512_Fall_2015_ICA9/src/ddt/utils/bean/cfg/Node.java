@@ -38,7 +38,8 @@ public class Node implements Comparable<Node> {
 	}
 
 	public Node(Method method, InstructionHandle instructionHandle) {
-		this(method, "" + instructionHandle.getPosition(), CFGUtils.getNodeDescription(instructionHandle, method.getCPG()));
+		this(method, "" + instructionHandle.getPosition(),
+				CFGUtils.getNodeDescription(instructionHandle, method.getCPG()));
 		this.instructionHandle = instructionHandle;
 		lineNumber = method.getLineNumber(Integer.valueOf(offset));
 	}
@@ -53,7 +54,8 @@ public class Node implements Comparable<Node> {
 				// if (invokeMethod != null) {
 				// linkTo(invokeMethod.getEntry(), String.format("Function call to %s", methodName));
 				// invokeMethod.getExit().linkTo(nextNode,
-				// String.format("Function %s finish, go back to %s", invokeMethod.getMethodName(), method.getMethodName()));
+				// String.format("Function %s finish, go back to %s", invokeMethod.getMethodName(),
+				// method.getMethodName()));
 				// } else {
 				// linkTo(nextNode, String.format("Function %s finish", methodName));
 				// }
@@ -116,7 +118,7 @@ public class Node implements Comparable<Node> {
 		final Node otherNode = (Node) other;
 		return method.equals(otherNode.method) && offset.equals(otherNode.offset);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return offset.hashCode();
@@ -174,12 +176,23 @@ public class Node implements Comparable<Node> {
 		return getIntOffset() - node.getIntOffset();
 	}
 
-	private String toCPString() {
-		return instructionHandle.getInstruction().toString(method.getCPG().getConstantPool());
+	// return ConstantPoolString if instructionHandle is not null, otherwise return offset
+	// Ignore target of IfInstruction and GotoInstruction
+	// !MAY BE DANGEROUS
+	private String toInstructionString() {
+		String result = offset;
+		if (instructionHandle != null) {
+			Instruction instruction = instructionHandle.getInstruction();
+			if (instruction instanceof IfInstruction || instruction instanceof GotoInstruction)
+				result = instruction.getName();
+			else
+				result = instruction.toString(method.getCPG().getConstantPool());
+		}
+		return result;
 	}
 
 	public boolean equalsByInstruction(Node other) {
-		return toCPString().equals(other.toCPString());
+		return toInstructionString().equals(other.toInstructionString());
 	}
 
 	public Edge getOutEdgeByDescription(String description) {

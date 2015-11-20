@@ -122,18 +122,9 @@ public class ComUtils {
 		return result;
 	}
 
-	public static void writeLinesByNodes(String sourcePath, Set<Node> nodes, String output) {
+	public static void writeLinesByNodes(Set<Node> nodes, String output) {
 		try {
 			PrintWriter pw = new PrintWriter(output);
-			BufferedReader br = new BufferedReader(new FileReader(sourcePath));
-
-			List<String> lineContents = new ArrayList<String>();
-			lineContents.add("===line 0===");
-			String line = br.readLine();
-			while (line != null) {
-				lineContents.add(line);
-				line = br.readLine();
-			}
 
 			Set<Integer> lineNumberSet = new HashSet<Integer>();
 			for (Node node : nodes) {
@@ -144,10 +135,9 @@ public class ComUtils {
 			List<Integer> lineNumbers = new ArrayList<Integer>(lineNumberSet);
 			Collections.sort(lineNumbers);
 			for (Integer lineNumber : lineNumbers)
-				pw.println(String.format("%d: %s", lineNumber, lineContents.get(lineNumber)));
+				pw.println(String.format("%d", lineNumber));
 
 			pw.close();
-			br.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

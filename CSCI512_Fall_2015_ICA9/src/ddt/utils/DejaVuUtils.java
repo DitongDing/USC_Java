@@ -8,21 +8,20 @@ import java.util.Set;
 import ddt.utils.bean.cfg.Edge;
 import ddt.utils.bean.cfg.Method;
 import ddt.utils.bean.cfg.Node;
-import ddt.utils.bean.dejavu.ClassFile;
 import ddt.utils.bean.dejavu.TestCase;
 
 // Method <-> control flow graph
 public class DejaVuUtils {
 	// Analysis one class.method every time.
 	@SuppressWarnings("deprecation")
-	public static void run(String coverageDir, String testSuiteFile0, ClassFile classFile0, ClassFile classFile1, String methodPartName,
-			String dangerousLinesOutput, String testSuiteFil1) {
+	public static void run(String coverageDir, String testSuiteFile0, String classFilePath0, String classFilePath1,
+			String methodPartName, String dangerousLinesOutput, String testSuiteFil1) {
 		try {
 			// Step 1: Build CFG for org and revised.
 			final String[] accepts = { methodPartName };
 			final String[] rejects = { "cobertura" };
-			Method method0 = CFGUtils.buildCFG(classFile0.getClassFilePath(), accepts, rejects).getMethodByPartName(methodPartName);
-			Method method1 = CFGUtils.buildCFG(classFile1.getClassFilePath(), accepts, rejects).getMethodByPartName(methodPartName);
+			Method method0 = CFGUtils.buildCFG(classFilePath0, accepts, rejects).getMethodByPartName(methodPartName);
+			Method method1 = CFGUtils.buildCFG(classFilePath1, accepts, rejects).getMethodByPartName(methodPartName);
 
 			// Step 2: Build TCNodeTable based on method0 and test suite
 			Set<TestCase> testSuite = ComUtils.getTestSuite(method0, coverageDir, testSuiteFile0);
@@ -30,7 +29,7 @@ public class DejaVuUtils {
 
 			// Step 3: Compare cfg0, cfg1 to get dangerous node set.
 			Set<Node> dangerousNodes = getDangerousNodes(method0, method1);
-			ComUtils.writeLinesByNodes(classFile0.getSourceFilePath(), dangerousNodes, dangerousLinesOutput);
+			ComUtils.writeLinesByNodes(dangerousNodes, dangerousLinesOutput);
 
 			// Step 4: Get reduced test suite
 			Set<TestCase> reducedTestSuite = reduceTestSuite(TCNodeTable, dangerousNodes);
@@ -41,7 +40,7 @@ public class DejaVuUtils {
 	}
 
 	// Step 2 unit. Do not need CFG as test case contains executed node.
-	private static Map<Node, Set<TestCase>> getTCNodeTable(Set<TestCase> testSuite) {
+	public static Map<Node, Set<TestCase>> getTCNodeTable(Set<TestCase> testSuite) {
 		Map<Node, Set<TestCase>> result = new HashMap<Node, Set<TestCase>>();
 
 		for (TestCase testCase : testSuite)
@@ -58,7 +57,7 @@ public class DejaVuUtils {
 	}
 
 	// Step 3 unit
-	private static Set<Node> getDangerousNodes(Method method0, Method method1) {
+	public static Set<Node> getDangerousNodes(Method method0, Method method1) {
 		Set<Node> result = new HashSet<Node>();
 		Set<Node> visited = new HashSet<Node>();
 
@@ -95,7 +94,7 @@ public class DejaVuUtils {
 	}
 
 	// Step 4 unit
-	private static Set<TestCase> reduceTestSuite(Map<Node, Set<TestCase>> TCNodeTable, Set<Node> dangerousNodes) {
+	public static Set<TestCase> reduceTestSuite(Map<Node, Set<TestCase>> TCNodeTable, Set<Node> dangerousNodes) {
 		Set<TestCase> result = new HashSet<TestCase>();
 
 		for (Node dangerousNode : dangerousNodes)
