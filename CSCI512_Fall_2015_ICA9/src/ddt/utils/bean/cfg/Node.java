@@ -116,6 +116,11 @@ public class Node implements Comparable<Node> {
 		final Node otherNode = (Node) other;
 		return method.equals(otherNode.method) && offset.equals(otherNode.offset);
 	}
+	
+	@Override
+	public int hashCode() {
+		return offset.hashCode();
+	}
 
 	public String getOffset() {
 		return offset;

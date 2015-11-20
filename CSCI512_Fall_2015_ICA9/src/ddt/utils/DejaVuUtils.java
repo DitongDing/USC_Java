@@ -1,39 +1,41 @@
 package ddt.utils;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ddt.utils.bean.cfg.CFG;
 import ddt.utils.bean.cfg.Edge;
 import ddt.utils.bean.cfg.Method;
 import ddt.utils.bean.cfg.Node;
 import ddt.utils.bean.dejavu.ClassFile;
 import ddt.utils.bean.dejavu.TestCase;
 
+// Method <-> control flow graph
 public class DejaVuUtils {
-	public static Set<TestCase> run(String coverageDir, ClassFile[] classFiles0, ClassFile[] classFiles1) {
+	// Analysis one class.method every time.
+	@SuppressWarnings("deprecation")
+	public static Set<TestCase> run(String coverageDir, ClassFile classFile0, ClassFile classFile1, String methodPartName) {
 		Set<TestCase> result = new HashSet<TestCase>();
 
 		try {
-
-			// Step 1: Build CFGs for org and revised.
+			// Step 1: Build CFG for org and revised.
+			final String[] accepts = { methodPartName };
 			final String[] rejects = { "cobertura" };
-			List<CFG> cfg0s = new ArrayList<CFG>();
-			List<CFG> cfg1s = new ArrayList<CFG>();
-			for (int i = 0; i < classFiles0.length; i++) {
-				assert (classFiles0[i].equals(classFiles1[i]));
-				cfg0s.add(new CFG(classFiles0[i].getClassFilePath(), classFiles0[i].getMethodNames(), rejects));
-				cfg1s.add(new CFG(classFiles1[i].getClassFilePath(), classFiles1[i].getMethodNames(), rejects));
-			}
+			Method method0 = CFGUtils.buildCFG(classFile0.getClassFilePath(), accepts, rejects).getMethodByPartName(methodPartName);
+			Method method1 = CFGUtils.buildCFG(classFile1.getClassFilePath(), accepts, rejects).getMethodByPartName(methodPartName);
 
-			// Step 2: Build TCNodeTable based on cfg0s and coverageDir
-//			for (int i = 0; i < classFiles0.length; i++)
-//				for
+			// Step 2: Build TCNodeTable based on method0 and test suite
+			Set<TestCase> testSuite = ComUtils.getTestSuite(method0, coverageDir);
+			Map<Node, Set<TestCase>> TCNodeTable = getTCNodeTable(testSuite);
+
+			// Step 3: Compare cfg0, cfg1 to get dangerous node set.
+			Set<Node> dangerousNodes = getDangerousNodes(method0, method1);
+
+			// Step 4: Get reduced test suite
+			Set<TestCase> reducedTestSuite = reduceTestSuite(TCNodeTable, dangerousNodes);
+
+			result = reducedTestSuite;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -41,16 +43,11 @@ public class DejaVuUtils {
 		return result;
 	}
 
-	// Step 2 unit
-	private static Map<Node, Set<TestCase>> getTCNodeTable(CFG cfg0, String methodName, String coverageDir) {
+	// Step 2 unit. Do not need CFG as test case contains executed node.
+	private static Map<Node, Set<TestCase>> getTCNodeTable(Set<TestCase> testSuite) {
 		Map<Node, Set<TestCase>> result = new HashMap<Node, Set<TestCase>>();
 
-		@SuppressWarnings("deprecation")
-		Method method = cfg0.getMethodByPartName(methodName);
-		File dir = new File(coverageDir);
-		assert (dir.exists());
-		for (File file : dir.listFiles()) {
-			TestCase testCase = new TestCase(file, methodName, method);
+		for (TestCase testCase : testSuite)
 			for (Node executedNode : testCase.getExecutedNodes()) {
 				Set<TestCase> relatedTestCases = result.get(executedNode);
 				if (relatedTestCases == null) {
@@ -59,18 +56,17 @@ public class DejaVuUtils {
 				}
 				relatedTestCases.add(testCase);
 			}
-		}
 
 		return result;
 	}
 
 	// Step 3 unit
-	private static Set<Node> getDangerousNodes(CFG cfg0, CFG cfg1, String methodName) {
+	private static Set<Node> getDangerousNodes(Method method0, Method method1) {
 		Set<Node> result = new HashSet<Node>();
 		Set<Node> visited = new HashSet<Node>();
 
-		Node node0 = cfg0.getMethodByFullName(methodName).getEntry();
-		Node node1 = cfg1.getMethodByFullName(methodName).getEntry();
+		Node node0 = method0.getEntry();
+		Node node1 = method1.getEntry();
 
 		compare(result, visited, node0, node1);
 
@@ -102,7 +98,7 @@ public class DejaVuUtils {
 	}
 
 	// Step 4 unit
-	private static Set<TestCase> reduceTestSuites(Map<Node, Set<TestCase>> TCNodeTable, Set<Node> dangerousNodes) {
+	private static Set<TestCase> reduceTestSuite(Map<Node, Set<TestCase>> TCNodeTable, Set<Node> dangerousNodes) {
 		Set<TestCase> result = new HashSet<TestCase>();
 
 		for (Node dangerousNode : dangerousNodes)

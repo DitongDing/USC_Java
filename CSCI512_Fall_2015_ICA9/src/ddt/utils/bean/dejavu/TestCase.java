@@ -10,15 +10,13 @@ import ddt.utils.bean.cfg.Node;
 
 public class TestCase {
 	protected String testCaseName;
-	protected String methodName;
 	protected Set<Node> executedNodes;
 
-	public TestCase(File coverageReport, String methodName, Method method) {
+	public TestCase(File coverageReport, Method method) {
 		this.testCaseName = ComUtils.getTestCaseName(coverageReport);
-		this.methodName = methodName;
 		this.executedNodes = new HashSet<Node>();
 
-		Set<Integer> executedLineNumbers = ComUtils.getExecutedLineNumbers(coverageReport, methodName);
+		Set<Integer> executedLineNumbers = ComUtils.getExecutedLineNumbers(coverageReport, method);
 
 		for (Node node : method.getNodeMap().values()) {
 			Integer lineNumber = node.getLineNumber();
