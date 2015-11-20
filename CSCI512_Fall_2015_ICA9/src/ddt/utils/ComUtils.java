@@ -6,8 +6,10 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -74,15 +76,50 @@ public class ComUtils {
 		return result;
 	}
 
-	public static Set<TestCase> getTestSuite(Method method, String coverageDir) {
+	public static Set<TestCase> getTestSuite(Method method, String coverageDir, String testSuiteFile) {
 		Set<TestCase> testSuite = new HashSet<TestCase>();
+
+		Map<String, String> testCaseMap = ComUtils.readCucumberTestSuites(testSuiteFile);
 
 		File dir = new File(coverageDir);
 		assert (dir.exists());
-		for (File file : dir.listFiles())
-			testSuite.add(new TestCase(file, method));
+		for (File file : dir.listFiles()) {
+			String testCaseName = ComUtils.getTestCaseName(file);
+			String testCaseContent = testCaseMap.get(testCaseName);
+			testSuite.add(new TestCase(file, method, testCaseName, testCaseContent));
+		}
 
 		return testSuite;
+	}
+
+	public static Map<String, String> readCucumberTestSuites(String testSuiteFile) {
+		Map<String, String> result = new HashMap<String, String>();
+
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(testSuiteFile));
+
+			String line = br.readLine();
+
+			while (line != null) {
+				while (!line.startsWith("Scenario"))
+					line = br.readLine();
+				String testCaseName = line.substring("Scenario: ".length());
+				String testCaseContent = "";
+				while (true) {
+					line = br.readLine();
+					if (line == null || line.equals(""))
+						break;
+					testCaseContent += line + "\n";
+				}
+				result.put(testCaseName, testCaseContent);
+			}
+
+			br.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 
 	public static void writeLinesByNodes(String sourcePath, Set<Node> nodes, String output) {
@@ -111,6 +148,19 @@ public class ComUtils {
 
 			pw.close();
 			br.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void writeTestSuite(Set<TestCase> testSuite, String output) {
+		try {
+			PrintWriter pw = new PrintWriter(output);
+
+			for (TestCase testCase : testSuite)
+				pw.println(testCase.getCucumberTestCase());
+
+			pw.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

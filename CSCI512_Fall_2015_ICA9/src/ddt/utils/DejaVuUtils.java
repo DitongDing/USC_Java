@@ -15,9 +15,8 @@ import ddt.utils.bean.dejavu.TestCase;
 public class DejaVuUtils {
 	// Analysis one class.method every time.
 	@SuppressWarnings("deprecation")
-	public static Set<TestCase> run(String coverageDir, ClassFile classFile0, ClassFile classFile1, String methodPartName) {
-		Set<TestCase> result = new HashSet<TestCase>();
-
+	public static void run(String coverageDir, String testSuiteFile0, ClassFile classFile0, ClassFile classFile1, String methodPartName,
+			String dangerousLinesOutput, String testSuiteFil1) {
 		try {
 			// Step 1: Build CFG for org and revised.
 			final String[] accepts = { methodPartName };
@@ -26,21 +25,19 @@ public class DejaVuUtils {
 			Method method1 = CFGUtils.buildCFG(classFile1.getClassFilePath(), accepts, rejects).getMethodByPartName(methodPartName);
 
 			// Step 2: Build TCNodeTable based on method0 and test suite
-			Set<TestCase> testSuite = ComUtils.getTestSuite(method0, coverageDir);
+			Set<TestCase> testSuite = ComUtils.getTestSuite(method0, coverageDir, testSuiteFile0);
 			Map<Node, Set<TestCase>> TCNodeTable = getTCNodeTable(testSuite);
 
 			// Step 3: Compare cfg0, cfg1 to get dangerous node set.
 			Set<Node> dangerousNodes = getDangerousNodes(method0, method1);
+			ComUtils.writeLinesByNodes(classFile0.getSourceFilePath(), dangerousNodes, dangerousLinesOutput);
 
 			// Step 4: Get reduced test suite
 			Set<TestCase> reducedTestSuite = reduceTestSuite(TCNodeTable, dangerousNodes);
-
-			result = reducedTestSuite;
+			ComUtils.writeTestSuite(reducedTestSuite, testSuiteFil1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-		return result;
 	}
 
 	// Step 2 unit. Do not need CFG as test case contains executed node.

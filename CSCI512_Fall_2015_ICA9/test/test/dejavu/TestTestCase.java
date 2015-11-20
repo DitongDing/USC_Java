@@ -18,7 +18,7 @@ public class TestTestCase {
 		final String sourcePath = "./input/Default_jsp.java";
 		final String output = "./output/executedLines.txt";
 
-		Set<Node> nodes = new TestCase(file, method).getExecutedNodes();
+		Set<Node> nodes = new TestCase(file, method, "", "").getExecutedNodes();
 
 		ComUtils.writeLinesByNodes(sourcePath, nodes, output);
 	}
