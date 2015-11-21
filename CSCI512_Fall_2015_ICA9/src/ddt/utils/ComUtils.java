@@ -29,7 +29,8 @@ public class ComUtils {
 	public static String getTestCaseName(File file) {
 		String fileName = file.getName();
 		Boolean passed = fileName.endsWith("_true.xml");
-		return passed ? fileName.substring(0, fileName.length() - "_true.xml".length()) : fileName.substring(0, fileName.length() - "_false.xml".length());
+		return passed ? fileName.substring(0, fileName.length() - "_true.xml".length())
+				: fileName.substring(0, fileName.length() - "_false.xml".length());
 	}
 
 	public static Set<Integer> getExecutedLineNumbers(File coverageReport, Method method) {
@@ -42,14 +43,16 @@ public class ComUtils {
 		try {
 			String methodClassName = CFGUtils.getMethodClassName(methodFullName);
 			String methodShortName = CFGUtils.getMethodShortName(methodFullName);
-			String xPathString = String.format(".//class[@name='%s']//method[@name='%s']//line[@hits!=0]", methodClassName, methodShortName);
+			String xPathString = String.format(".//class[@name='%s']//method[@name='%s']//line[@hits!=0]",
+					methodClassName, methodShortName);
 
 			XPath xPath = XPathFactory.newInstance().newXPath();
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			dbf.setValidating(false);
 			dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
 			Document document = dbf.newDocumentBuilder().parse(coverageReport);
-			NodeList lineNodes = (NodeList) xPath.evaluate(xPathString, document.getDocumentElement(), XPathConstants.NODESET);
+			NodeList lineNodes = (NodeList) xPath.evaluate(xPathString, document.getDocumentElement(),
+					XPathConstants.NODESET);
 			for (int i = 0; i < lineNodes.getLength(); i++) {
 				Element lineNode = (Element) lineNodes.item(i);
 				result.add(Integer.valueOf(lineNode.getAttribute("number")));
@@ -143,7 +146,7 @@ public class ComUtils {
 		}
 	}
 
-	public static void writeTestSuite(Set<TestCase> testSuite, String output) {
+	public static void writeTestSuite(String sourceFile0, String sourceFile1, Set<TestCase> testSuite, String output) {
 		try {
 			PrintWriter pw = new PrintWriter(output);
 

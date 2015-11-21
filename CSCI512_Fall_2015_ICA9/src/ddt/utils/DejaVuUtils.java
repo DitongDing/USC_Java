@@ -14,8 +14,9 @@ import ddt.utils.bean.dejavu.TestCase;
 public class DejaVuUtils {
 	// Analysis one class.method every time.
 	@SuppressWarnings("deprecation")
-	public static void run(String coverageDir, String testSuiteFile0, String classFilePath0, String classFilePath1,
-			String methodPartName, String dangerousLinesOutput, String testSuiteFil1) {
+	public static void run(String coverageDir, String testSuiteFile0, String classFilePath0, String sourceFilePath0,
+			String classFilePath1, String sourceFilePath1, String methodPartName, String dangerousLinesOutput,
+			String testSuiteFil1) {
 		try {
 			// Step 1: Build CFG for org and revised.
 			final String[] accepts = { methodPartName };
@@ -33,7 +34,7 @@ public class DejaVuUtils {
 
 			// Step 4: Get reduced test suite
 			Set<TestCase> reducedTestSuite = reduceTestSuite(TCNodeTable, dangerousNodes);
-			ComUtils.writeTestSuite(reducedTestSuite, testSuiteFil1);
+			ComUtils.writeTestSuite(sourceFilePath0, sourceFilePath1, reducedTestSuite, testSuiteFil1);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

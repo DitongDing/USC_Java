@@ -14,7 +14,7 @@ public class TestCase {
 	protected String testCaseContent;
 	protected Set<Node> executedNodes;
 
-	public TestCase(File coverageReport, Method method,String testCaseName, String testCaseContent) {
+	public TestCase(File coverageReport, Method method, String testCaseName, String testCaseContent) {
 		this.testCaseName = testCaseName;
 		this.testCaseContent = testCaseContent;
 		this.executedNodes = new HashSet<Node>();
@@ -31,8 +31,21 @@ public class TestCase {
 	public Set<Node> getExecutedNodes() {
 		return executedNodes;
 	}
-	
+
 	public String getCucumberTestCase() {
 		return String.format("Scenario: %s\n%s", testCaseName, testCaseContent);
+	}
+
+	@Override
+	public int hashCode() {
+		return testCaseName.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == null || !(other instanceof TestCase))
+			return false;
+		final TestCase otherTestCase = (TestCase) other;
+		return testCaseName.equals(otherTestCase.testCaseName);
 	}
 }
