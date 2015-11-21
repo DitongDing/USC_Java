@@ -22,6 +22,6 @@ public class TestDangerousNode {
 		Method method1 = CFGUtils.buildCFG(classFilePath1, accepts, rejects).getMethodByPartName(methoPartdName);
 
 		Set<Node> dangerousNodes = DejaVuUtils.getDangerousNodes(method0, method1);
-		ComUtils.writeLinesByNodes(dangerousNodes, dangerousLinesOutput);
+		// ComUtils.writeLinesByNodes(dangerousNodes, dangerousLinesOutput);
 	}
 }

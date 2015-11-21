@@ -125,10 +125,26 @@ public class ComUtils {
 		return result;
 	}
 
-	public static void writeLinesByNodes(Set<Node> nodes, String output) {
+	public static void writeTestSuite(String sourceFile0, String sourceFile1, Set<TestCase> testSuite, String output) {
 		try {
 			PrintWriter pw = new PrintWriter(output);
 
+			pw.println("Feature: Reduced test suite\n");
+
+			for (TestCase testCase : testSuite)
+				pw.println(testCase.getCucumberTestCase());
+
+			pw.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void writeReport(Set<Node> nodes, Set<TestCase> testSuite0, Set<TestCase> testSuite1, String output) {
+		try {
+			PrintWriter pw = new PrintWriter(output);
+
+			pw.println("Dangerous lines in source file 0:");
 			Set<Integer> lineNumberSet = new HashSet<Integer>();
 			for (Node node : nodes) {
 				Integer lineNumber = node.getLineNumber();
@@ -140,18 +156,19 @@ public class ComUtils {
 			for (Integer lineNumber : lineNumbers)
 				pw.println(String.format("%d", lineNumber));
 
-			pw.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+			pw.println(
+					"================================================================================\nOriginal Test Suites:");
+			int count = 0;
+			for (TestCase testCase : testSuite0)
+				pw.println(String.format("%-3d\t%s", ++count, testCase.getTestCaseName()));
 
-	public static void writeTestSuite(String sourceFile0, String sourceFile1, Set<TestCase> testSuite, String output) {
-		try {
-			PrintWriter pw = new PrintWriter(output);
+			count = 0;
+			pw.println(
+					"================================================================================\nReduced Test Suites:");
+			for (TestCase testCase : testSuite1)
+				pw.println(String.format("%-3d\t%s", ++count, testCase.getTestCaseName()));
 
-			for (TestCase testCase : testSuite)
-				pw.println(testCase.getCucumberTestCase());
+			pw.println("================================================================================");
 
 			pw.close();
 		} catch (Exception e) {

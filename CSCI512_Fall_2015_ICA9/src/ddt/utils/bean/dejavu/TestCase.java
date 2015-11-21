@@ -28,6 +28,10 @@ public class TestCase {
 		}
 	}
 
+	public String getTestCaseName() {
+		return testCaseName;
+	}
+
 	public Set<Node> getExecutedNodes() {
 		return executedNodes;
 	}

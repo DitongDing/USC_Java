@@ -4,7 +4,7 @@ import ddt.utils.DejaVuUtils;
 
 public class TestDejaVu {
 	public static void main(String[] args) {
-		final String coverageDir = "./input/CoverageReport";
+		final String coverageDir = "./input/CR2";
 		final String testSuiteFile0 = "./input/testSuite0.feature";
 		final String classFilePath0 = "./input/0_Login_jsp.class";
 		final String sourceFilePath0 = "./input/0_Login_jsp.java";
