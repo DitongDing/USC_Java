@@ -98,8 +98,11 @@ public class DejaVuUtils {
 	public static Set<TestCase> reduceTestSuite(Map<Node, Set<TestCase>> TCNodeTable, Set<Node> dangerousNodes) {
 		Set<TestCase> result = new HashSet<TestCase>();
 
-		for (Node dangerousNode : dangerousNodes)
-			result.addAll(TCNodeTable.get(dangerousNode));
+		for (Node dangerousNode : dangerousNodes) {
+			Set<TestCase> testSuite = TCNodeTable.get(dangerousNode);
+			if (testSuite != null)
+				result.addAll(testSuite);
+		}
 
 		return result;
 	}
