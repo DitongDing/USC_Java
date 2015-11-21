@@ -2,6 +2,7 @@ package ddt.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -169,6 +171,47 @@ public class ComUtils {
 				pw.println(String.format("%-3d\t%s", ++count, testCase.getTestCaseName()));
 
 			pw.println("================================================================================");
+
+			pw.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void writeMappingFile(Map<Node, Set<TestCase>> TCNodeMap, String mappingFile) {
+		Set<String> TCClassLineSet = new HashSet<String>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(mappingFile));
+
+			String line = br.readLine();
+			while (line != null) {
+				TCClassLineSet.add(line);
+				line = br.readLine();
+			}
+
+			br.close();
+		} catch (FileNotFoundException e) {
+			// Do nothing, means it hasn't been initialized.
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		for (Entry<Node, Set<TestCase>> entry : TCNodeMap.entrySet()) {
+			String className = entry.getKey().getClassName();
+			Integer lineNumber = entry.getKey().getLineNumber();
+			for (TestCase testCase : entry.getValue()) {
+				String testCaseName = testCase.getTestCaseName();
+				TCClassLineSet.add(String.format("%s|%s|%s", testCaseName, className, lineNumber));
+			}
+		}
+
+		try {
+			PrintWriter pw = new PrintWriter(mappingFile);
+
+			List<String> result = new ArrayList<String>(TCClassLineSet);
+			Collections.sort(result);
+			for (String TCClassLine : result)
+				pw.println(TCClassLine);
 
 			pw.close();
 		} catch (Exception e) {

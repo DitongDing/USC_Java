@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE coverage SYSTEM "http://cobertura.sourceforge.net/xml/coverage-04.dtd">
 
-<coverage line-rate="0.0675885911840968" branch-rate="0.0243106542666014" lines-covered="782" lines-valid="11570" branches-covered="149" branches-valid="6129" complexity="5.808056872037914" version="2.0.3" timestamp="1448070601677">
+<coverage line-rate="0.0675885911840968" branch-rate="0.0243106542666014" lines-covered="782" lines-valid="11570" branches-covered="149" branches-valid="6129" complexity="5.808056872037914" version="2.0.3" timestamp="1448090782634">
 	<sources>
 		<source>/home/student/Documents/[2015.11.18][ICA9]/bookstore/bookstore/build/WEB-INF/src</source>
 	</sources>

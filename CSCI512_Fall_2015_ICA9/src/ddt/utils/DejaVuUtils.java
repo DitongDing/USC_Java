@@ -15,7 +15,8 @@ public class DejaVuUtils {
 	// Analysis one class.method every time.
 	@SuppressWarnings("deprecation")
 	public static void run(String coverageDir, String testSuiteFile0, String classFilePath0, String sourceFilePath0,
-			String classFilePath1, String sourceFilePath1, String methodPartName, String report, String testSuiteFil1) {
+			String classFilePath1, String sourceFilePath1, String methodPartName, String mappingFile, String report,
+			String testSuiteFil1) {
 		try {
 			// Step 1: Build CFG for org and revised.
 			final String[] accepts = { methodPartName };
@@ -34,6 +35,7 @@ public class DejaVuUtils {
 			Set<TestCase> reducedTestSuite = reduceTestSuite(TCNodeTable, dangerousNodes);
 			ComUtils.writeTestSuite(sourceFilePath0, sourceFilePath1, reducedTestSuite, testSuiteFil1);
 
+			ComUtils.writeMappingFile(TCNodeTable, mappingFile);
 			ComUtils.writeReport(dangerousNodes, testSuite, reducedTestSuite, report);
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -202,4 +202,8 @@ public class Node implements Comparable<Node> {
 	public Integer getLineNumber() {
 		return lineNumber;
 	}
+
+	public String getClassName() {
+		return CFGUtils.getMethodClassName(method.getMethodName());
+	}
 }
