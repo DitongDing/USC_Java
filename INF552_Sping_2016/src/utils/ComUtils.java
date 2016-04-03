@@ -1,12 +1,17 @@
 package utils;
 
 import java.io.File;
-import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import java.awt.Point;
 
 import Luxand.*;
 import Luxand.FSDK.*;
 import Luxand.FSDKCam.*;
+import bean.Face;
 
+@SuppressWarnings("unused")
 public class ComUtils {
 	static {
 		// Check key
@@ -21,42 +26,48 @@ public class ComUtils {
 		}
 	}
 
-	public static void extractFacialLocation_ByFolder(String inputFolder, String outputFile) throws Exception {
-		File folder = new File(inputFolder);
-		PrintWriter pw = new PrintWriter(outputFile);
+	public static List<Face> extractFacialLocation(File input) throws Exception {
+		List<Face> result = new ArrayList<Face>();
 
-		if (folder.isDirectory()) {
-			File[] files = folder.listFiles();
+		if (input != null) {
+			File[] files = null;
+
+			if (input.isDirectory())
+				files = input.listFiles();
+			else
+				files = new File[] { input };
+
 			for (File file : files)
 				if (file.getName().endsWith(".jpg")) {
-					FSDK.TPoint[] points = extractFacialLocation_ByFile(file.getAbsolutePath());
-					if (points != null) {
-						pw.println(file.getName());
-						for (FSDK.TPoint point : points)
-							pw.print(String.format("%d,%d,", point.x, point.y));
-						pw.println();
-					}
+					Face face = extractFacialLocation_ByFile(file);
+					if (face != null)
+						result.add(face);
 				}
 		}
 
-		pw.close();
+		return result;
 	}
 
-	public static FSDK.TPoint[] extractFacialLocation_ByFile(String inputFile) {
-		FSDK.TPoint[] result = null;
+	private static Face extractFacialLocation_ByFile(File input) {
+		Face result = null;
+		String filePath = input.getAbsolutePath();
 
 		HImage imageHandle = new HImage();
-		if (FSDK.LoadImageFromFileW(imageHandle, inputFile) == FSDK.FSDKE_OK) {
+		if (FSDK.LoadImageFromFileW(imageHandle, filePath) == FSDK.FSDKE_OK) {
 			FSDK.TFacePosition.ByReference facePosition = new FSDK.TFacePosition.ByReference();
 			if (FSDK.DetectFace(imageHandle, facePosition) == FSDK.FSDKE_OK) {
 				FSDK_Features.ByReference facialFeatures = new FSDK_Features.ByReference();
 				FSDK.DetectFacialFeaturesInRegion(imageHandle, (FSDK.TFacePosition) facePosition, facialFeatures);
-				result = facialFeatures.features;
+				result = new Face(input.getName(), filePath, facialFeatures.features);
 			} else
-				System.out.println(String.format("No face detected in %s", inputFile));
+				System.out.println(String.format("No face detected in %s", filePath));
 		} else
-			System.out.println(String.format("Load image %s fail", inputFile));
+			System.out.println(String.format("Load image %s fail", filePath));
 
 		return result;
+	}
+
+	public static double getDistance(Point a, Point b) {
+		return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 	}
 }
