@@ -46,7 +46,7 @@ public class TwoClassSVMTest {
 
 		br.close();
 
-		Classifier SVM = new TwoClassSVMClassifier(1.0, 1.0 / featureCount, new HashSet<Double>(Arrays.asList(new Double[] { -1.0, 1.0 })));
+		Classifier SVM = new TwoClassSVMClassifier(1.0, null, new HashSet<Double>(Arrays.asList(new Double[] { -1.0, 1.0 })));
 
 		SVM.train(trainSet);
 		SVM.save("model");

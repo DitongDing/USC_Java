@@ -8,18 +8,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import inf552.utils.ml.Model;
+import inf552.utils.ml.Classifier;
 import inf552.utils.ml.bean.Data;
 import inf552.utils.ml.bean.ValidationResult;
-import inf552.utils.ml.svm.TwoClassSVMClassifier;
-import inf552.utils.preprocessor.SpaceAFeature;
-import inf552.utils.preprocessor.SpaceALocation;
-import inf552.utils.preprocessor.SpaceBFeature;
-import inf552.utils.preprocessor.SpaceBLocation;
+import inf552.utils.ml.bean.knn.KNNClassifier;
 
-public class ModelTest {
+public class KNNTest {
 	public static void main(String[] args) throws Exception {
-		String input = "output/jaffe_HA&NE_SpaceALocation";
+		String input = "output/jaffe_HA&NE_SpaceBLocation";
 		Integer featureCount = 0;
 
 		List<Data> trainSet = new ArrayList<Data>();
@@ -50,16 +46,15 @@ public class ModelTest {
 
 		br.close();
 
-		Model model = new Model(new SpaceBFeature(), false,
-				new TwoClassSVMClassifier(1.0, null, new HashSet<Double>(Arrays.asList(new Double[] { -1.0, 1.0 }))));
+		Classifier classifier = new KNNClassifier(1, 2, new HashSet<Double>(Arrays.asList(new Double[] { -1.0, 1.0 })));
 
-		model.train(trainSet);
-		model.save("model");
-		model = new Model();
-		model.load("model");
+		classifier.train(trainSet);
+		classifier.save("model");
+		classifier = new KNNClassifier();
+		classifier.load("model");
 
-		System.out.println(new ValidationResult(model.predict(trainSet), trainSet));
+		System.out.println(new ValidationResult(classifier.predict(trainSet), trainSet));
 
-		System.out.println(new ValidationResult(model.predict(testSet), testSet));
+		System.out.println(new ValidationResult(classifier.predict(testSet), testSet));
 	}
 }

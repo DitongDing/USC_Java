@@ -13,6 +13,7 @@ import inf552.utils.ml.CrossValidation;
 import inf552.utils.ml.Model;
 import inf552.utils.ml.bean.Data;
 import inf552.utils.ml.bean.ValidationResult;
+import inf552.utils.ml.bean.knn.KNNClassifier;
 import inf552.utils.ml.svm.TwoClassSVMClassifier;
 import inf552.utils.preprocessor.SpaceALocation;
 
@@ -51,10 +52,11 @@ public class CVTest {
 
 		Set<Double> classes = new HashSet<Double>(Arrays.asList(new Double[] { -1.0, 1.0 }));
 		List<Model> models = new ArrayList<Model>();
-		models.add(new Model(new SpaceALocation(), false, new TwoClassSVMClassifier(1.0, 1.0 / featureCount, classes)));
-		models.add(new Model(new SpaceALocation(), true, new TwoClassSVMClassifier(1.0, 1.0 / featureCount, classes)));
+		models.add(new Model(new SpaceALocation(), false, new TwoClassSVMClassifier(1.0, null, classes)));
+		models.add(new Model(new SpaceALocation(), true, new TwoClassSVMClassifier(1.0, null, classes)));
 		models.add(new Model(new SpaceALocation(), false, new TwoClassSVMClassifier(1.0, 0.0, classes)));
 		models.add(new Model(new SpaceALocation(), false, new TwoClassSVMClassifier(1.0, 1.0, classes)));
+		models.add(new Model(new SpaceALocation(), false, new KNNClassifier(1, 2, classes)));
 
 		CrossValidation CV = new CrossValidation(10, models, trainSet);
 

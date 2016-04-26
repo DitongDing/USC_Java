@@ -3,6 +3,7 @@ package inf552.utils.ml.bean;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.StringTokenizer;
 
 public class Data {
 	private Double[] feature;
@@ -40,5 +41,25 @@ public class Data {
 			result.add((Data) data.clone());
 
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		String result = String.format("%.0f", label);
+		int index = 1;
+		for (Double value : feature)
+			result += String.format(" %d:%f", index++, value);
+		return result;
+	}
+
+	public static Data valueOf(String s) {
+		StringTokenizer st = new StringTokenizer(s, " :");
+		Double label = Double.valueOf(st.nextToken());
+		List<Double> feature = new ArrayList<Double>();
+		while (st.hasMoreTokens()) {
+			st.nextToken();
+			feature.add(Double.valueOf(st.nextToken()));
+		}
+		return new Data(feature.toArray(new Double[0]), label);
 	}
 }

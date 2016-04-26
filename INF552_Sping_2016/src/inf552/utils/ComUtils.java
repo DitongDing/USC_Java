@@ -28,4 +28,8 @@ public class ComUtils {
 		}
 		return result;
 	}
+
+	public static Double getFSDKDistance(Double[] data, int FSDKIndex0, int FSDKIndex1) {
+		return getDistance(getXYByIndex(data, FSDKIndex0), getXYByIndex(data, FSDKIndex1), 2);
+	}
 }

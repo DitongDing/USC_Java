@@ -69,6 +69,7 @@ public class TwoClassSVMClassifier extends Classifier {
 			svm.svm_save_model(ComUtils.getFilePath(dir.getPath(), MODEL_FILE), svmModel);
 			saveParam(ComUtils.getFilePath(dir.getPath(), PARAM_FILE));
 		} catch (IOException e) {
+			e.printStackTrace();
 			throw new RuntimeException("SVM model save error");
 		}
 	}
