@@ -22,13 +22,12 @@ public class Recognizer {
 		this.classifier = classifier;
 	}
 
-	public Recognizer(String path) {
-		load(path);
+	public Recognizer() {
 	}
-	
+
 	public List<Data> recognize(List<String> filePaths) {
 		List<Data> result = null;
-		
+
 		// TODO: Finish recognizer
 		return result;
 	}

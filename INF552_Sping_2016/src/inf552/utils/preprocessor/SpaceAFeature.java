@@ -19,11 +19,11 @@ public class SpaceAFeature extends PreProcessor {
 			Double label = data.getLabel();
 
 			double mouthHeight = ComUtils.getDistance(ComUtils.getXYByIndex(orgFeature, FSDK.FSDKP_MOUTH_TOP_INNER),
-					ComUtils.getXYByIndex(orgFeature, FSDK.FSDKP_MOUTH_BOTTOM_INNER));
+					ComUtils.getXYByIndex(orgFeature, FSDK.FSDKP_MOUTH_BOTTOM_INNER), 2);
 			double leftEyeHeight = ComUtils.getDistance(ComUtils.getXYByIndex(orgFeature, FSDK.FSDKP_LEFT_EYE_UPPER_LINE2),
-					ComUtils.getXYByIndex(orgFeature, FSDK.FSDKP_LEFT_EYE_LOWER_LINE2));
+					ComUtils.getXYByIndex(orgFeature, FSDK.FSDKP_LEFT_EYE_LOWER_LINE2), 2);
 			double rightEyeHeight = ComUtils.getDistance(ComUtils.getXYByIndex(orgFeature, FSDK.FSDKP_RIGHT_EYE_UPPER_LINE2),
-					ComUtils.getXYByIndex(orgFeature, FSDK.FSDKP_RIGHT_EYE_LOWER_LINE2));
+					ComUtils.getXYByIndex(orgFeature, FSDK.FSDKP_RIGHT_EYE_LOWER_LINE2), 2);
 			feature = new Double[] { mouthHeight, leftEyeHeight, rightEyeHeight };
 
 			result.add(new Data(feature, label));

@@ -1,5 +1,6 @@
 package inf552.utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import inf552.utils.ml.Classifier;
@@ -29,9 +30,14 @@ public class Trainer {
 		for (PreProcessor preProcessor : preProcessors) {
 			// PreProcess
 			List<Data> processedData = preProcessor.preProcess(originalData);
-			// CrossValidation
-			CrossValidation crossValidation = new CrossValidation(n_fold, classifiers, processedData);
+
+			// CrossValidation. Clone to avoid change the trained classifier.
+			List<Classifier> clonedClassifiers = new ArrayList<Classifier>(classifiers.size());
+			for (Classifier classifier : classifiers)
+				clonedClassifiers.add(classifier.cloneBeforeTraining());
+			CrossValidation crossValidation = new CrossValidation(n_fold, clonedClassifiers, processedData);
 			Classifier bestClassifier = crossValidation.getBestClassifier();
+
 			// Train with bestClassifier
 			bestClassifier.train(processedData);
 			// Get validation result
@@ -41,8 +47,10 @@ public class Trainer {
 				bestValidationResult = validationResult;
 				result = new Recognizer(preProcessor, bestClassifier);
 			}
-			
-			System.out.println(String.format("==========Trainer: ==========Current PreProcessor: %s, Current Best Classifier: %s, Best Validation Result: %s=========", preProcessor.getClass().getName(), bestClassifier.toString(), bestValidationResult.toString()));
+
+			System.out.println(
+					String.format("==========Trainer: ==========Current PreProcessor: %s, Current Best Classifier: %s, Best Validation Result: %s=========",
+							preProcessor.getClass().getName(), bestClassifier.toString(), bestValidationResult.toString()));
 		}
 
 		return result;

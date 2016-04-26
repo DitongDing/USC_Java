@@ -23,4 +23,9 @@ public class MultiClassSVMClassifier extends Classifier {
 	@Override
 	public void load(String path) {
 	}
+
+	@Override
+	public Classifier cloneBeforeTraining() {
+		return null;
+	}
 }

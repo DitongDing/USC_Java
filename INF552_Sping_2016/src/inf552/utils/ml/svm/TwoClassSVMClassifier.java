@@ -42,10 +42,6 @@ public class TwoClassSVMClassifier extends Classifier {
 			throw new RuntimeException("TwoClassSVMClassifier classes error: must be two classes");
 	}
 
-	public TwoClassSVMClassifier(String path) {
-		load(path);
-	}
-
 	public TwoClassSVMClassifier() {
 
 	}
@@ -102,6 +98,11 @@ public class TwoClassSVMClassifier extends Classifier {
 			}
 		} else
 			throw new RuntimeException("SVM model does not exist");
+	}
+
+	@Override
+	public Classifier cloneBeforeTraining() {
+		return new TwoClassSVMClassifier(param.C, ifDefaultGamma ? null : param.gamma, ifScale, classes);
 	}
 
 	@Override

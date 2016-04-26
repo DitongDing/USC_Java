@@ -50,7 +50,8 @@ public class TwoClassSVMTest {
 
 		SVM.train(trainSet);
 		SVM.save("model");
-		SVM = new TwoClassSVMClassifier("model");
+		SVM = new TwoClassSVMClassifier();
+		SVM.load("model");
 
 		System.out.println(new ValidationResult(SVM.predict(trainSet), trainSet));
 

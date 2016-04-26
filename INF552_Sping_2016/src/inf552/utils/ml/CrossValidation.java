@@ -8,6 +8,7 @@ import java.util.Random;
 import inf552.utils.ml.bean.Data;
 import inf552.utils.ml.bean.ValidationResult;
 
+// All classifiers will be trained only once.
 public class CrossValidation {
 	private Integer n_fold;
 	private List<Classifier> classifiers;
@@ -35,8 +36,9 @@ public class CrossValidation {
 				bestClassifier = classifier;
 				bestValidationResult = validationResult;
 			}
-			
-			System.out.println(String.format("==========CrossValidation: ==========Current Best Classifier: %s, Best Validation Result: %s=========", bestClassifier.toString(), bestValidationResult.toString()));
+
+			System.out.println(String.format("==========CrossValidation: ==========Current Best Classifier: %s, Best Validation Result: %s=========",
+					bestClassifier.toString(), bestValidationResult.toString()));
 		}
 
 		return bestClassifier;

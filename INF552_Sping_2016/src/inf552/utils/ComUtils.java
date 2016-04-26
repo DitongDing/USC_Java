@@ -19,12 +19,12 @@ public class ComUtils {
 		return new Double[] { data[index * 2], data[index * 2 + 1] };
 	}
 
-	public static Double getDistance(Double[] data0, Double[] data1) {
+	public static Double getDistance(Double[] data0, Double[] data1, Integer lp) {
 		Double result = 0.0;
 		if (data0 != null && data1 != null && data0.length == data1.length) {
 			for (int i = 0; i < data0.length; i++)
-				result += (data0[i] - data1[i]) * (data0[i] - data1[i]);
-			result = Math.sqrt(result);
+				result += Math.pow((data0[i] - data1[i]), lp);
+			result = Math.pow(result, 1.0 / lp);
 		}
 		return result;
 	}
