@@ -51,6 +51,13 @@ public class TwoClassSVMClassifier extends Classifier {
 		return dataSet;
 	}
 
+	public Data predict(Data data) {
+		data = (Data) data.clone();
+		svm_node[] x = translateDataToSVMNodes(data);
+		data.setLabel(svm.svm_predict(svmModel, x));
+		return data;
+	}
+
 	@Override
 	public void train(List<Data> dataSet) {
 		svm_problem problem = translateDataSetToSVMProblem(dataSet);

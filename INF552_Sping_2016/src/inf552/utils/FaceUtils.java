@@ -1,4 +1,4 @@
-package utils;
+package inf552.utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -13,10 +13,9 @@ import Luxand.*;
 import Luxand.FSDK.*;
 import Luxand.FSDKCam.*;
 import bean.Face;
-import bean.Point;
 
 @SuppressWarnings("unused")
-public class ComUtils {
+public class FaceUtils {
 	static {
 		// Check key
 		int r = FSDK.ActivateLibrary(Constants.key);
@@ -69,10 +68,6 @@ public class ComUtils {
 			System.out.println(String.format("Load image %s fail", filePath));
 
 		return result;
-	}
-
-	public static double getDistance(Point a, Point b) {
-		return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 	}
 
 	public static void extractAndPaint(File input, File output, int radius) throws Exception {

@@ -2,7 +2,7 @@ package test;
 
 import java.io.File;
 
-import utils.ComUtils;
+import inf552.utils.FaceUtils;
 
 public class TestFaceSDK {
 	public static String input = "input/TestFaceSDK";
@@ -14,7 +14,7 @@ public class TestFaceSDK {
 			File[] files = dir.listFiles();
 			for (File file : files)
 				if (file.getName().endsWith(".jpg"))
-					ComUtils.extractAndPaint(file, new File(output + "/" + file.getName()), 1);
+					FaceUtils.extractAndPaint(file, new File(output + "/" + file.getName()), 1);
 		}
 	}
 }

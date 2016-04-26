@@ -7,7 +7,7 @@ import java.util.StringTokenizer;
 
 import Luxand.FSDK;
 import bean.Point;
-import utils.ComUtils;
+import inf552.utils.FaceUtils;
 
 @Deprecated
 // Filter HA & NE, save location to HA&NE_Location, save feature (mouth height, average eye height, eye center distance (for standardize)) to HA&NE_Feature
@@ -36,18 +36,19 @@ public class FacialDataFilter {
 				locationPW.println(label);
 
 				StringTokenizer st = new StringTokenizer(line, ",");
-				Point[] points = new Point[FSDK.FSDK_FACIAL_FEATURE_COUNT];
+				Double[] points = new Double[FSDK.FSDK_FACIAL_FEATURE_COUNT * 2];
 				int count = 0;
 				while (st.hasMoreTokens()) {
 					int X = Integer.valueOf(st.nextToken());
 					int Y = Integer.valueOf(st.nextToken());
-					points[count++] = new Point(X, Y);
+					points[count++] = (double) X;
+					points[count++] = (double) Y;
 				}
 
-				double mouthHeight = ComUtils.getDistance(points[FSDK.FSDKP_MOUTH_TOP_INNER], points[FSDK.FSDKP_MOUTH_BOTTOM_INNER]);
-				double leftEyeHeight = ComUtils.getDistance(points[FSDK.FSDKP_LEFT_EYE_UPPER_LINE2], points[FSDK.FSDKP_LEFT_EYE_LOWER_LINE2]);
-				double rightEyeHeight = ComUtils.getDistance(points[FSDK.FSDKP_RIGHT_EYE_UPPER_LINE2], points[FSDK.FSDKP_RIGHT_EYE_LOWER_LINE2]);
-				double eyeDistance = ComUtils.getDistance(points[FSDK.FSDKP_LEFT_EYE], points[FSDK.FSDKP_RIGHT_EYE]);
+				double mouthHeight = FaceUtils.getDistance(points[FSDK.FSDKP_MOUTH_TOP_INNER], points[FSDK.FSDKP_MOUTH_BOTTOM_INNER]);
+				double leftEyeHeight = FaceUtils.getDistance(points[FSDK.FSDKP_LEFT_EYE_UPPER_LINE2], points[FSDK.FSDKP_LEFT_EYE_LOWER_LINE2]);
+				double rightEyeHeight = FaceUtils.getDistance(points[FSDK.FSDKP_RIGHT_EYE_UPPER_LINE2], points[FSDK.FSDKP_RIGHT_EYE_LOWER_LINE2]);
+				double eyeDistance = FaceUtils.getDistance(points[FSDK.FSDKP_LEFT_EYE], points[FSDK.FSDKP_RIGHT_EYE]);
 				featurePW.println(String.format("%.2f,%.2f,%.2f,%.2f,%d", mouthHeight, leftEyeHeight, rightEyeHeight, eyeDistance, label));
 			}
 

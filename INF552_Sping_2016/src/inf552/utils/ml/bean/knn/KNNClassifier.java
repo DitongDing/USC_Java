@@ -54,8 +54,7 @@ public class KNNClassifier extends Classifier {
 				Integer count = labelToCount.get(KNNPair.label);
 				if (count == null)
 					count = 0;
-				count += 1;
-				labelToCount.put(KNNPair.label, count);
+				labelToCount.put(KNNPair.label, count + 1);
 			}
 
 			// Get most frequent one.

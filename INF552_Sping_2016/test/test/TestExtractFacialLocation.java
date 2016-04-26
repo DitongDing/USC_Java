@@ -6,7 +6,7 @@ import java.util.List;
 
 import Luxand.*;
 import bean.Face;
-import utils.ComUtils;
+import inf552.utils.FaceUtils;
 
 public class TestExtractFacialLocation {
 	public static String input = "input/jaffe";
@@ -14,7 +14,7 @@ public class TestExtractFacialLocation {
 
 	public static void main(String[] args) throws Exception {
 
-		List<Face> result = ComUtils.extractFacialLocation(new File(input));
+		List<Face> result = FaceUtils.extractFacialLocation(new File(input));
 
 		PrintWriter pw = new PrintWriter(output);
 
