@@ -10,11 +10,11 @@ import java.util.List;
 import inf552.bean.ml.Data;
 import inf552.bean.ml.ValidationResult;
 import inf552.utils.ml.Classifier;
-import inf552.utils.ml.bean.knn.KNNClassifier;
+import inf552.utils.ml.nn.NNClassifier;
 
-public class KNNTest {
+public class NNTest {
 	public static void main(String[] args) throws Exception {
-		String input = "output/jaffe_SpaceALocation";
+		String input = "output/jaffe_HA&NE&AN_SpaceAFeature";
 
 		List<Data> trainSet = new ArrayList<Data>();
 		// Top 10
@@ -23,7 +23,7 @@ public class KNNTest {
 		BufferedReader br = new BufferedReader(new FileReader(input));
 		String line = br.readLine();
 		while (line != null) {
-			if (testSet.size() < 50)
+			if (testSet.size() < 10)
 				testSet.add(Data.valueOf(line));
 			else
 				trainSet.add(Data.valueOf(line));
@@ -32,12 +32,13 @@ public class KNNTest {
 		}
 		br.close();
 
-		Classifier classifier = new KNNClassifier(1, 2, new HashSet<Double>(Arrays.asList(new Double[] { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0 })));
+		Classifier classifier = new NNClassifier(new ArrayList<Integer>(Arrays.asList(new Integer[] {})),
+				new HashSet<Double>(Arrays.asList(new Double[] { 0.0, 1.0, 2.0 })));
 
 		classifier.train(trainSet);
-		classifier.save("model");
-		classifier = new KNNClassifier();
-		classifier.load("model");
+		// classifier.save("model");
+		// classifier = new NNClassifier();
+		// classifier.load("model");
 
 		System.out.println(new ValidationResult(classifier.predict(trainSet), trainSet));
 

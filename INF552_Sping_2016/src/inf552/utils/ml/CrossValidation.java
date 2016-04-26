@@ -14,10 +14,13 @@ public class CrossValidation {
 	private List<Model> models;
 	private List<Data> dataSet;
 
+	public List<String> logs;
+
 	public CrossValidation(Integer n_fold, List<Model> models, List<Data> dataSet) {
 		this.n_fold = n_fold;
 		this.models = models;
 		this.dataSet = dataSet;
+		logs = new ArrayList<String>();
 	}
 
 	public Model getBestModel() {
@@ -26,6 +29,8 @@ public class CrossValidation {
 
 		for (Model model : models) {
 			ValidationResult validationResult = singleModelCrossValidation(model);
+			logs.add(String.format("Model: %s, Validation Result: %s", model.toString(), validationResult.toString()));
+
 			if (bestValidationResult == null || validationResult.compareTo(bestValidationResult) > 0) {
 				bestModel = model;
 				bestValidationResult = validationResult;
@@ -34,6 +39,8 @@ public class CrossValidation {
 			System.out.println(String.format("==========CrossValidation: ==========Current Best Model: %s, Best Validation Result: %s=========",
 					bestModel.toString(), bestValidationResult.toString()));
 		}
+
+		logs.add(String.format("==========Best Model: %s, Best Validation Result: %s=========", bestModel.toString(), bestValidationResult.toString()));
 
 		return bestModel;
 	}

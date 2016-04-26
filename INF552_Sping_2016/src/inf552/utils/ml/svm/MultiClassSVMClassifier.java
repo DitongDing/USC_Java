@@ -127,11 +127,21 @@ public class MultiClassSVMClassifier extends Classifier {
 		}
 	}
 
-	private String getClassifierName(Double class0, Double class1) {
+	@Override
+	public String toString() {
+		String result = "Multi-class SVM(OVO)";
+
+		for (Entry<String, TwoClassSVMClassifier> entry : classifiers.entrySet())
+			result += String.format("\t%s: %s", entry.getKey(), entry.getValue().toString());
+
+		return result;
+	}
+
+	public static String getClassifierName(Double class0, Double class1) {
 		return String.format("%.0f_%.0f", class0, class1);
 	}
 
-	private Set<Double> getClassifierClass(String classifierName) {
+	public static Set<Double> getClassifierClass(String classifierName) {
 		StringTokenizer st = new StringTokenizer(classifierName, "_");
 		Set<Double> result = new HashSet<Double>();
 

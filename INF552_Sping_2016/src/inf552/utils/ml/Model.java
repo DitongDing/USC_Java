@@ -98,6 +98,6 @@ public final class Model {
 
 	@Override
 	public String toString() {
-		return String.format("Model: preProcessor=%s, classifier=%s", preProcessor.getClass().getName(), classifier.toString());
+		return String.format("Model: preProcessor=%s, ifScale=%b, classifier=%s", preProcessor.getClass().getName(), ifScale, classifier.toString());
 	}
 }

@@ -122,6 +122,11 @@ public class KNNClassifier extends Classifier {
 			throw new RuntimeException("SVM model does not exist");
 	}
 
+	@Override
+	public String toString() {
+		return String.format("KNN: K=%d, lp=%d", K, lp);
+	}
+
 	protected class KNNPair implements Comparable<KNNPair> {
 		public Double distance;
 		public Double label;
