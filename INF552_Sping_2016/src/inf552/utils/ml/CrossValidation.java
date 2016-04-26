@@ -8,46 +8,40 @@ import java.util.Random;
 import inf552.utils.ml.bean.Data;
 import inf552.utils.ml.bean.ValidationResult;
 
-// All classifiers will be trained only once.
+// All models will be trained only once.
 public class CrossValidation {
 	private Integer n_fold;
-	private List<Classifier> classifiers;
+	private List<Model> models;
 	private List<Data> dataSet;
 
-	public CrossValidation(Integer n_fold, List<Classifier> classifiers, List<Data> dataSet) {
+	public CrossValidation(Integer n_fold, List<Model> models, List<Data> dataSet) {
 		this.n_fold = n_fold;
-		this.classifiers = classifiers;
+		this.models = models;
 		this.dataSet = dataSet;
 	}
 
-	public Classifier getBestClassifier() {
-		Classifier bestClassifier = null;
-		Classifier classifier = null;
+	public Model getBestModel() {
+		Model bestModel = null;
 		ValidationResult bestValidationResult = null;
-		ValidationResult validationResult = null;
 
-		ListIterator<Classifier> classifierLI = classifiers.listIterator();
-
-		while (classifierLI.hasNext()) {
-			classifier = classifierLI.next();
-			validationResult = singleClassifierCrossValidation(classifier);
-			// The greater the better.
+		for (Model model : models) {
+			ValidationResult validationResult = singleModelCrossValidation(model);
 			if (bestValidationResult == null || validationResult.compareTo(bestValidationResult) > 0) {
-				bestClassifier = classifier;
+				bestModel = model;
 				bestValidationResult = validationResult;
 			}
 
-			System.out.println(String.format("==========CrossValidation: ==========Current Best Classifier: %s, Best Validation Result: %s=========",
-					bestClassifier.toString(), bestValidationResult.toString()));
+			System.out.println(String.format("==========CrossValidation: ==========Current Best Model: %s, Best Validation Result: %s=========",
+					bestModel.toString(), bestValidationResult.toString()));
 		}
 
-		return bestClassifier;
+		return bestModel;
 	}
 
-	private ValidationResult singleClassifierCrossValidation(Classifier classifier) {
+	public ValidationResult singleModelCrossValidation(Model model) {
 		ValidationResult result = null;
 
-		if (classifier != null) {
+		if (model != null) {
 			Random random = new Random();
 			List<ValidationResult> validationResults = new ArrayList<ValidationResult>();
 
@@ -67,11 +61,10 @@ public class CrossValidation {
 				}
 
 				// Train on train set.
-				classifier.train(trainSet);
+				model.train(trainSet);
 
 				// Test on validation set
-				List<Data> prediction = classifier.predict(validationSet);
-				ValidationResult validationResult = new ValidationResult(prediction, validationSet);
+				ValidationResult validationResult = new ValidationResult(model.predict(validationSet), validationSet);
 
 				// Add to result set
 				validationResults.add(validationResult);

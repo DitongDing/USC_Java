@@ -10,7 +10,6 @@ public class KNNClassifier extends Classifier {
 	private Integer K;
 	private Integer lp;
 	private List<Data> knownDataSet;
-	private Set<Double> classes;
 
 	public KNNClassifier(Integer K, Integer lp, Set<Double> classes) {
 		this.K = K;
@@ -19,32 +18,24 @@ public class KNNClassifier extends Classifier {
 	}
 
 	@Override
-	public List<Data> predict(List<Data> dataSet) {		
+	public List<Data> predict(List<Data> dataSet) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public void train(List<Data> dataSet) {
-		knownDataSet = dataSet;
-		// TODO Auto-generated method stub
+		knownDataSet = Data.clone(dataSet);
 	}
 
 	@Override
 	public void save(String path) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void load(String path) {
 		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public Classifier cloneBeforeTraining() {
-		return new KNNClassifier(K, lp, classes);
 	}
 
 	protected class KNNPair implements Comparable<KNNPair> {

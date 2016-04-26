@@ -8,14 +8,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import inf552.utils.ml.Classifier;
+import inf552.utils.ml.Model;
 import inf552.utils.ml.bean.Data;
 import inf552.utils.ml.bean.ValidationResult;
 import inf552.utils.ml.svm.TwoClassSVMClassifier;
+import inf552.utils.preprocessor.SpaceAFeature;
+import inf552.utils.preprocessor.SpaceALocation;
+import inf552.utils.preprocessor.SpaceBFeature;
+import inf552.utils.preprocessor.SpaceBLocation;
 
-public class TwoClassSVMTest {
+public class ModelTest {
 	public static void main(String[] args) throws Exception {
-		String input = "output/jaffe_HA&NE_SpaceBLocation";
+		String input = "output/jaffe_HA&NE_SpaceALocation";
 		Integer featureCount = 0;
 
 		List<Data> trainSet = new ArrayList<Data>();
@@ -46,15 +50,16 @@ public class TwoClassSVMTest {
 
 		br.close();
 
-		Classifier SVM = new TwoClassSVMClassifier(1.0, 1.0 / featureCount, new HashSet<Double>(Arrays.asList(new Double[] { -1.0, 1.0 })));
+		Model model = new Model(new SpaceBFeature(), true,
+				new TwoClassSVMClassifier(1.0, 1.0 / 3, new HashSet<Double>(Arrays.asList(new Double[] { -1.0, 1.0 }))));
 
-		SVM.train(trainSet);
-		SVM.save("model");
-		SVM = new TwoClassSVMClassifier();
-		SVM.load("model");
+		model.train(trainSet);
+		model.save("model");
+		model = new Model();
+		model.load("model");
 
-		System.out.println(new ValidationResult(SVM.predict(trainSet), trainSet));
+		System.out.println(new ValidationResult(model.predict(trainSet), trainSet));
 
-		System.out.println(new ValidationResult(SVM.predict(testSet), testSet));
+		System.out.println(new ValidationResult(model.predict(testSet), testSet));
 	}
 }

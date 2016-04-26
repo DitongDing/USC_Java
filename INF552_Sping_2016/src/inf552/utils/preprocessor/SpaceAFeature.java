@@ -7,7 +7,7 @@ import Luxand.FSDK;
 import inf552.utils.ComUtils;
 import inf552.utils.ml.bean.Data;
 
-public class SpaceAFeature extends PreProcessor {
+public class SpaceAFeature implements PreProcessor {
 	@Override
 	public List<Data> preProcess(List<Data> original) {
 		List<Data> result = new ArrayList<Data>(original.size());

@@ -13,7 +13,6 @@ import java.util.Set;
 import inf552.utils.ComUtils;
 import inf552.utils.ml.Classifier;
 import inf552.utils.ml.bean.Data;
-import inf552.utils.ml.bean.ScaleModel;
 import libsvm.svm;
 import libsvm.svm_model;
 import libsvm.svm_node;
@@ -23,19 +22,13 @@ import libsvm.svm_problem;
 public class TwoClassSVMClassifier extends Classifier {
 	private svm_model svmModel;
 	private svm_parameter param;
-	private boolean ifScale;
 	private boolean ifDefaultGamma;
-	private Set<Double> classes;
 
-	private static Double upper = 1.0;
-	private static Double lower = -1.0;
 	private static String MODEL_FILE = "svm.model";
-	private static String SCALE_FILE = "svm.scale";
 	private static String PARAM_FILE = "svm.param";
 
-	public TwoClassSVMClassifier(Double C, Double gamma, boolean ifScale, Set<Double> classes) {
+	public TwoClassSVMClassifier(Double C, Double gamma, Set<Double> classes) {
 		param = initializeSVMParameter(C, gamma);
-		this.ifScale = ifScale;
 		this.ifDefaultGamma = gamma == null;
 		this.classes = classes;
 		if (classes.size() != 2)
@@ -48,25 +41,22 @@ public class TwoClassSVMClassifier extends Classifier {
 
 	@Override
 	public List<Data> predict(List<Data> dataSet) {
-		List<Data> result = scaleModel.scale(dataSet, ifScale);
+		dataSet = Data.clone(dataSet);
 
-		for (Data data : result) {
+		for (Data data : dataSet) {
 			svm_node[] x = translateDataToSVMNodes(data);
 			data.setLabel(svm.svm_predict(svmModel, x));
 		}
 
-		return result;
+		return dataSet;
 	}
 
 	@Override
 	public void train(List<Data> dataSet) {
-		scaleModel = new ScaleModel(dataSet, upper, lower);
-
-		List<Data> scaledData = scaleModel.scale(dataSet, ifScale);
-		svm_problem problem = translateDataSetToSVMProblem(scaledData);
+		svm_problem problem = translateDataSetToSVMProblem(dataSet);
 
 		if (ifDefaultGamma)
-			param.gamma = 1.0 / scaledData.get(0).getFeature().length;
+			param.gamma = 1.0 / dataSet.get(0).getFeature().length;
 
 		svmModel = svm.svm_train(problem, param);
 	}
@@ -77,7 +67,6 @@ public class TwoClassSVMClassifier extends Classifier {
 		dir.mkdir();
 		try {
 			svm.svm_save_model(ComUtils.getFilePath(dir.getPath(), MODEL_FILE), svmModel);
-			scaleModel.save(ComUtils.getFilePath(dir.getPath(), SCALE_FILE));
 			saveParam(ComUtils.getFilePath(dir.getPath(), PARAM_FILE));
 		} catch (IOException e) {
 			throw new RuntimeException("SVM model save error");
@@ -90,7 +79,6 @@ public class TwoClassSVMClassifier extends Classifier {
 		if (dir.exists()) {
 			try {
 				svmModel = svm.svm_load_model(ComUtils.getFilePath(dir.getPath(), MODEL_FILE));
-				scaleModel = ScaleModel.load(ComUtils.getFilePath(dir.getPath(), SCALE_FILE));
 				loadParam(ComUtils.getFilePath(dir.getPath(), PARAM_FILE));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -101,13 +89,8 @@ public class TwoClassSVMClassifier extends Classifier {
 	}
 
 	@Override
-	public Classifier cloneBeforeTraining() {
-		return new TwoClassSVMClassifier(param.C, ifDefaultGamma ? null : param.gamma, ifScale, classes);
-	}
-
-	@Override
 	public String toString() {
-		return String.format("SVM: C=%f, gamma=%f, ifScale=%b", param.C, param.gamma, ifScale);
+		return String.format("SVM(C=%f, gamma=%f)", param.C, param.gamma);
 	}
 
 	private svm_node[] translateDataToSVMNodes(Data data) {
@@ -168,7 +151,6 @@ public class TwoClassSVMClassifier extends Classifier {
 
 			pw.println(param.C);
 			pw.println(param.gamma);
-			pw.println(ifScale);
 			pw.println(ifDefaultGamma);
 			for (Double Class : classes)
 				pw.println(Class);
@@ -185,7 +167,6 @@ public class TwoClassSVMClassifier extends Classifier {
 		Double C = Double.valueOf(br.readLine());
 		Double gamma = Double.valueOf(br.readLine());
 		param = initializeSVMParameter(C, gamma);
-		ifScale = Boolean.valueOf(br.readLine());
 		ifDefaultGamma = Boolean.valueOf(br.readLine());
 		classes = new HashSet<Double>();
 		String line = br.readLine();

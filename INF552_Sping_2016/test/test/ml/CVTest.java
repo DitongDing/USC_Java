@@ -9,11 +9,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import inf552.utils.ml.Classifier;
 import inf552.utils.ml.CrossValidation;
+import inf552.utils.ml.Model;
 import inf552.utils.ml.bean.Data;
 import inf552.utils.ml.bean.ValidationResult;
 import inf552.utils.ml.svm.TwoClassSVMClassifier;
+import inf552.utils.preprocessor.SpaceALocation;
 
 public class CVTest {
 	public static void main(String[] args) throws Exception {
@@ -49,22 +50,20 @@ public class CVTest {
 		br.close();
 
 		Set<Double> classes = new HashSet<Double>(Arrays.asList(new Double[] { -1.0, 1.0 }));
-		List<Classifier> classifiers = new ArrayList<Classifier>();
-		classifiers.add(new TwoClassSVMClassifier(1.0, 1.0 / featureCount, false, classes));
-		classifiers.add(new TwoClassSVMClassifier(1.0, 1.0 / featureCount, true, classes));
-		classifiers.add(new TwoClassSVMClassifier(1.0, 0.0, false, classes));
-		classifiers.add(new TwoClassSVMClassifier(1.0, 1.0, false, classes));
+		List<Model> models = new ArrayList<Model>();
+		models.add(new Model(new SpaceALocation(), false, new TwoClassSVMClassifier(1.0, 1.0 / featureCount, classes)));
+		models.add(new Model(new SpaceALocation(), true, new TwoClassSVMClassifier(1.0, 1.0 / featureCount, classes)));
+		models.add(new Model(new SpaceALocation(), false, new TwoClassSVMClassifier(1.0, 0.0, classes)));
+		models.add(new Model(new SpaceALocation(), false, new TwoClassSVMClassifier(1.0, 1.0, classes)));
 
-		CrossValidation CV = new CrossValidation(10, classifiers, trainSet);
+		CrossValidation CV = new CrossValidation(10, models, trainSet);
 
-		Classifier SVM = CV.getBestClassifier();
+		Model model = CV.getBestModel();
 
-		SVM.train(trainSet);
+		model.train(trainSet);
 
-		List<Data> prediction = SVM.predict(trainSet);
-		System.out.println(new ValidationResult(prediction, trainSet).getOverallAccuracy());
+		System.out.println(new ValidationResult(model.predict(trainSet), trainSet));
 
-		prediction = SVM.predict(testSet);
-		System.out.println(new ValidationResult(prediction, testSet).getOverallAccuracy());
+		System.out.println(new ValidationResult(model.predict(testSet), testSet));
 	}
 }

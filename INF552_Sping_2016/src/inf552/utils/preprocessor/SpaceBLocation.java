@@ -7,7 +7,8 @@ import Luxand.FSDK;
 import inf552.utils.ComUtils;
 import inf552.utils.ml.bean.Data;
 
-public class SpaceBLocation extends PreProcessor {
+public class SpaceBLocation implements PreProcessor {
+
 	@Override
 	public List<Data> preProcess(List<Data> original) {
 		List<Data> result = new ArrayList<Data>(original.size());
@@ -18,7 +19,7 @@ public class SpaceBLocation extends PreProcessor {
 			Double label = data.getLabel();
 
 			// Move to originB
-			for (int i = 0, x = 0, y = 1; i < FSDK.FSDK_FACIAL_FEATURE_COUNT; i++, x += 2, y += 2){
+			for (int i = 0, x = 0, y = 1; i < FSDK.FSDK_FACIAL_FEATURE_COUNT; i++, x += 2, y += 2) {
 				feature[x] = orgFeature[x] - ComUtils.getXByIndex(orgFeature, FSDK.FSDKP_NOSE_BRIDGE);
 				feature[y] = orgFeature[y] - ComUtils.getYByIndex(orgFeature, FSDK.FSDKP_NOSE_BRIDGE);
 			}
