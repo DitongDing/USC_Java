@@ -4,12 +4,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.awt.Point;
+import javax.imageio.ImageIO;
+
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 
 import Luxand.*;
 import Luxand.FSDK.*;
 import Luxand.FSDKCam.*;
 import bean.Face;
+import bean.Point;
 
 @SuppressWarnings("unused")
 public class ComUtils {
@@ -69,5 +73,20 @@ public class ComUtils {
 
 	public static double getDistance(Point a, Point b) {
 		return Math.sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+	}
+
+	public static void extractAndPaint(File input, File output, int radius) throws Exception {
+		if (input.isFile() && radius >= 0) {
+			Face face = extractFacialLocation_ByFile(input);
+			if (face != null) {
+				BufferedImage original = ImageIO.read(input);
+				for (FSDK.TPoint point : face.features)
+					for (int x = point.x - radius; x <= point.x + radius; x++)
+						for (int y = point.y - radius; y <= point.y + radius; y++)
+							original.setRGB(x, y, new Color(255, 255, 255).getRGB());
+				ImageIO.write(original, "jpg", output);
+			}
+		} else
+			System.out.println("Input is not a file");
 	}
 }

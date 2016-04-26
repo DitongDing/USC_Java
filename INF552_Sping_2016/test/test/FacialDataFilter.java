@@ -1,14 +1,15 @@
 package test;
 
-import java.awt.Point;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.StringTokenizer;
 
 import Luxand.FSDK;
+import bean.Point;
 import utils.ComUtils;
 
+@Deprecated
 // Filter HA & NE, save location to HA&NE_Location, save feature (mouth height, average eye height, eye center distance (for standardize)) to HA&NE_Feature
 // Label 0 = NE, 1 = HA
 public class FacialDataFilter {
