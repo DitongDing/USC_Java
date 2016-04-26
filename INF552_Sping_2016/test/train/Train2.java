@@ -20,11 +20,11 @@ import inf552.utils.ml.bean.knn.KNNClassifier;
 import inf552.utils.ml.svm.MultiClassSVMClassifier;
 import inf552.utils.preprocessor.PreProcessor;
 import inf552.utils.preprocessor.SpaceAFeature;
+import inf552.utils.preprocessor.SpaceAFeature2;
 import inf552.utils.preprocessor.SpaceALocation;
-import inf552.utils.preprocessor.SpaceBFeature;
-import inf552.utils.preprocessor.SpaceBLocation;
+import inf552.utils.preprocessor.SpaceBFeature2;
 
-public class Train {
+public class Train2 {
 	public static void main(String[] args) throws Exception {
 		String input = "output/jaffe_SpaceALocation_generated";
 		int n_fold = 10;
@@ -48,15 +48,15 @@ public class Train {
 		Double[] classesArray = { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0 };
 		Set<Double> classes = new HashSet<Double>(Arrays.asList(classesArray));
 		List<Model> models = new ArrayList<Model>();
-		PreProcessor[] preProcessors = new PreProcessor[] { new SpaceALocation(), new SpaceAFeature(), new SpaceBLocation(), new SpaceBFeature() };
-		boolean[] ifScales = { false, true };
-		Integer[] Ks = { 1, 3, 5 };
-		Integer[] lps = { 1, 2, 3 };
+		PreProcessor[] preProcessors = new PreProcessor[] { new SpaceALocation(), new SpaceAFeature(), new SpaceAFeature2(), new SpaceBFeature2() };
+		boolean[] ifScales = { true };
+		Integer[] Ks = { 1, 3 };
+		Integer[] lps = { 2 };
 		Double[] CRange = { -2.0, 5.0 };
 		// Lower, Upper, Default
 		Double[] gammaRange = { -5.0, 5.0, null };
 		Double defaultPossibility = 0.8;
-		Integer SVMCount = 9;
+		Integer SVMCount = 3;
 
 		for (PreProcessor preProcessor : preProcessors)
 			for (boolean ifScale : ifScales) {
@@ -89,6 +89,6 @@ public class Train {
 		model.train(trainSet);
 		System.out.println(new ValidationResult(model.predict(trainSet), trainSet));
 		System.out.println(new ValidationResult(model.predict(testSet), testSet));
-		model.save("3rd_final_model");
+		model.save("4rd_final_model");
 	}
 }
