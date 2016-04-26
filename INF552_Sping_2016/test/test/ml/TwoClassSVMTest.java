@@ -7,9 +7,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import inf552.bean.ml.Data;
+import inf552.bean.ml.ValidationResult;
 import inf552.utils.ml.Classifier;
-import inf552.utils.ml.bean.Data;
-import inf552.utils.ml.bean.ValidationResult;
 import inf552.utils.ml.svm.TwoClassSVMClassifier;
 
 public class TwoClassSVMTest {

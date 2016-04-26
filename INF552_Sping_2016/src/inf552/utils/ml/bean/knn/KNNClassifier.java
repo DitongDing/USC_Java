@@ -13,9 +13,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import inf552.bean.ml.Data;
 import inf552.utils.ComUtils;
 import inf552.utils.ml.Classifier;
-import inf552.utils.ml.bean.Data;
 
 public class KNNClassifier extends Classifier {
 	private Integer K;

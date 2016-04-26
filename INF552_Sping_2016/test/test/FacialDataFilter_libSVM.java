@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import Luxand.FSDK;
-import inf552.utils.ml.bean.Data;
+import inf552.bean.ml.Data;
 import inf552.utils.preprocessor.SpaceAFeature;
 import inf552.utils.preprocessor.SpaceBFeature;
 import inf552.utils.preprocessor.SpaceBLocation;

@@ -1,4 +1,4 @@
-package inf552.utils.ml.bean;
+package inf552.bean.ml;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +29,7 @@ public class Data {
 	@Override
 	public Object clone() {
 		Double[] feature = Arrays.copyOf(this.feature, this.feature.length);
-		Double label = new Double(this.label);
+		Double label = this.label;
 		Object result = new Data(feature, label);
 		return result;
 	}

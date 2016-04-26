@@ -2,9 +2,10 @@ package inf552.utils.ml.nn;
 
 import java.util.List;
 
+import inf552.bean.ml.Data;
 import inf552.utils.ml.Classifier;
-import inf552.utils.ml.bean.Data;
 
+// TODO: Finish NNClassifier
 public class NNClassifier extends Classifier {
 
 	@Override

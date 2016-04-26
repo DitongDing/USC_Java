@@ -1,4 +1,4 @@
-package inf552.utils.ml.bean;
+package inf552.bean.ml;
 
 import java.util.List;
 import java.util.ListIterator;

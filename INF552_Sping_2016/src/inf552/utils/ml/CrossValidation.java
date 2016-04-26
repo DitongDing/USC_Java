@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Random;
 
-import inf552.utils.ml.bean.Data;
-import inf552.utils.ml.bean.ValidationResult;
+import inf552.bean.ml.Data;
+import inf552.bean.ml.ValidationResult;
 
 // All models will be trained only once.
 public class CrossValidation {

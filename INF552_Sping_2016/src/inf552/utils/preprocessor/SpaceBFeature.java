@@ -2,7 +2,7 @@ package inf552.utils.preprocessor;
 
 import java.util.List;
 
-import inf552.utils.ml.bean.Data;
+import inf552.bean.ml.Data;
 
 public class SpaceBFeature implements PreProcessor {
 	@Override

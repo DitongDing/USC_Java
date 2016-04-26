@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
 
+import inf552.bean.ml.Data;
+import inf552.bean.ml.ScaleModel;
 import inf552.utils.ComUtils;
-import inf552.utils.ml.bean.Data;
-import inf552.utils.ml.bean.ScaleModel;
 import inf552.utils.preprocessor.PreProcessor;
 
 public final class Model {

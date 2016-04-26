@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import inf552.bean.ml.Data;
+import inf552.bean.ml.ValidationResult;
 import inf552.utils.ml.CrossValidation;
 import inf552.utils.ml.Model;
-import inf552.utils.ml.bean.Data;
-import inf552.utils.ml.bean.ValidationResult;
 import inf552.utils.ml.bean.knn.KNNClassifier;
 import inf552.utils.ml.svm.TwoClassSVMClassifier;
 import inf552.utils.preprocessor.SpaceALocation;

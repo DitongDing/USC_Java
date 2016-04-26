@@ -12,7 +12,7 @@ import java.awt.image.BufferedImage;
 import Luxand.*;
 import Luxand.FSDK.*;
 import Luxand.FSDKCam.*;
-import bean.Face;
+import inf552.bean.Face;
 
 @SuppressWarnings("unused")
 public class FaceUtils {
@@ -51,7 +51,7 @@ public class FaceUtils {
 		return result;
 	}
 
-	private static Face extractFacialLocation_ByFile(File input) {
+	public static Face extractFacialLocation_ByFile(File input) {
 		Face result = null;
 		String filePath = input.getAbsolutePath();
 

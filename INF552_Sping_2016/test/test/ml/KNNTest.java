@@ -8,14 +8,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import inf552.bean.ml.Data;
+import inf552.bean.ml.ValidationResult;
 import inf552.utils.ml.Classifier;
-import inf552.utils.ml.bean.Data;
-import inf552.utils.ml.bean.ValidationResult;
 import inf552.utils.ml.bean.knn.KNNClassifier;
 
 public class KNNTest {
 	public static void main(String[] args) throws Exception {
-		String input = "output/jaffe_HA&NE_SpaceBLocation";
+		String input = "output/jaffe_HA&NE&AN_SpaceBLocation";
 		Integer featureCount = 0;
 
 		List<Data> trainSet = new ArrayList<Data>();
@@ -46,7 +46,7 @@ public class KNNTest {
 
 		br.close();
 
-		Classifier classifier = new KNNClassifier(1, 2, new HashSet<Double>(Arrays.asList(new Double[] { -1.0, 1.0 })));
+		Classifier classifier = new KNNClassifier(1, 2, new HashSet<Double>(Arrays.asList(new Double[] { 0.0, 1.0, 2.0 })));
 
 		classifier.train(trainSet);
 		classifier.save("model");

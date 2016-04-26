@@ -1,4 +1,4 @@
-package inf552.utils.ml.bean;
+package inf552.bean.ml;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

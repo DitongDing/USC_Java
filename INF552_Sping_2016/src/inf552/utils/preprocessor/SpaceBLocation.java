@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Luxand.FSDK;
+import inf552.bean.ml.Data;
 import inf552.utils.ComUtils;
-import inf552.utils.ml.bean.Data;
 
 public class SpaceBLocation implements PreProcessor {
 

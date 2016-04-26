@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.util.List;
 
 import Luxand.*;
-import bean.Face;
+import inf552.bean.Face;
 import inf552.utils.FaceUtils;
 
 public class TestExtractFacialLocation {

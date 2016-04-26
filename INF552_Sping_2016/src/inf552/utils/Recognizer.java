@@ -1,9 +1,11 @@
 package inf552.utils;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
+import inf552.bean.ml.Data;
 import inf552.utils.ml.Model;
-import inf552.utils.ml.bean.Data;
 
 // Image->Emotion
 public class Recognizer {
@@ -13,10 +15,18 @@ public class Recognizer {
 		this.model = model;
 	}
 
-	public List<Data> recognize(List<String> filePaths) {
-		List<Data> result = null;
+	public Recognizer(String path) {
+		this.model = new Model();
+		this.model.load(path);
+	}
 
-		// TODO: Finish recognizer
+	public List<Data> recognize(List<String> filePaths) {
+		List<Data> result = new ArrayList<Data>();
+
+		for (String filePath : filePaths)
+			result.add(FaceUtils.extractFacialLocation_ByFile(new File(filePath)).toData(null));
+
+		result = model.predict(result);
 
 		return result;
 	}

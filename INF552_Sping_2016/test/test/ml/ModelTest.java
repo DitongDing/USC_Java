@@ -8,9 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import inf552.bean.ml.Data;
+import inf552.bean.ml.ValidationResult;
 import inf552.utils.ml.Model;
-import inf552.utils.ml.bean.Data;
-import inf552.utils.ml.bean.ValidationResult;
+import inf552.utils.ml.bean.knn.KNNClassifier;
 import inf552.utils.ml.svm.TwoClassSVMClassifier;
 import inf552.utils.preprocessor.SpaceAFeature;
 import inf552.utils.preprocessor.SpaceALocation;
@@ -19,7 +20,7 @@ import inf552.utils.preprocessor.SpaceBLocation;
 
 public class ModelTest {
 	public static void main(String[] args) throws Exception {
-		String input = "output/jaffe_HA&NE_SpaceALocation";
+		String input = "output/jaffe_HA&NE&AN_SpaceALocation";
 		Integer featureCount = 0;
 
 		List<Data> trainSet = new ArrayList<Data>();
@@ -50,8 +51,7 @@ public class ModelTest {
 
 		br.close();
 
-		Model model = new Model(new SpaceBFeature(), false,
-				new TwoClassSVMClassifier(1.0, null, new HashSet<Double>(Arrays.asList(new Double[] { -1.0, 1.0 }))));
+		Model model = new Model(new SpaceBLocation(), false, new KNNClassifier(1, 2, new HashSet<Double>(Arrays.asList(new Double[] { 0.0, 1.0, 2.0 }))));
 
 		model.train(trainSet);
 		model.save("model");
