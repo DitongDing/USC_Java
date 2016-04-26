@@ -26,7 +26,7 @@ import inf552.utils.preprocessor.SpaceBLocation;
 
 public class Train {
 	public static void main(String[] args) throws Exception {
-		String input = "output/jaffe_SpaceALocation";
+		String input = "output/jaffe_SpaceALocation_generated";
 		int n_fold = 10;
 		Random r = new Random();
 
@@ -89,6 +89,6 @@ public class Train {
 		model.train(trainSet);
 		System.out.println(new ValidationResult(model.predict(trainSet), trainSet));
 		System.out.println(new ValidationResult(model.predict(testSet), testSet));
-		model.save("2nd_final_model");
+		model.save("3rd_final_model");
 	}
 }

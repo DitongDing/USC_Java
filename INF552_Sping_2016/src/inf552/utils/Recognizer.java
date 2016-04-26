@@ -20,13 +20,18 @@ public class Recognizer {
 		this.model.load(path);
 	}
 
-	public List<Data> recognize(List<String> filePaths) {
-		List<Data> result = new ArrayList<Data>();
+	public List<String> recognize(List<String> filePaths) {
+		List<String> result = new ArrayList<String>();
+
+		List<Data> dataSet = new ArrayList<Data>();
 
 		for (String filePath : filePaths)
-			result.add(FaceUtils.extractFacialLocation_ByFile(new File(filePath)).toData(null));
+			dataSet.add(FaceUtils.extractFacialLocation_ByFile(new File(filePath)).toData(null));
 
-		result = model.predict(result);
+		dataSet = model.predict(dataSet);
+
+		for (Data data : dataSet)
+			result.add(Constants.emotions[(int) Math.floor(data.getLabel())]);
 
 		return result;
 	}
